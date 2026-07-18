@@ -177,6 +177,21 @@ class HostAgentConfigTests(unittest.TestCase):
             self.assertEqual(storage["backup_count"], 1)
             self.assertEqual(storage["backup_bytes"], len(b"archive"))
 
+    def test_operation_logs_keep_progress_and_final_status(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            log_root = Path(directory) / "logs"
+            log_file = log_root / "operations.json"
+            with patch.object(AGENT, "OPERATION_LOG_ROOT", log_root), patch.object(AGENT, "OPERATION_LOG_FILE", log_file):
+                operation_id = AGENT.begin_operation_log("restore_backup")
+                AGENT.update_operation_log(operation_id, "正在安全停止 Palworld 服务…")
+                AGENT.update_operation_log(operation_id, "存档已恢复；恢复前版本已自动备份。", ok=True)
+                records = AGENT.list_operation_logs()["operations"]
+
+            self.assertEqual(len(records), 1)
+            self.assertEqual(records[0]["label"], "恢复世界存档")
+            self.assertEqual(records[0]["status"], "success")
+            self.assertEqual(records[0]["messages"], ["正在安全停止 Palworld 服务…", "存档已恢复；恢复前版本已自动备份。"])
+
 
 if __name__ == "__main__":
     unittest.main()

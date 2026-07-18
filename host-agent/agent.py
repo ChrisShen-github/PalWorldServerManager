@@ -12,6 +12,8 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import threading
+import uuid
 from datetime import datetime, timedelta, timezone
 from collections.abc import Callable
 import urllib.request
@@ -23,6 +25,9 @@ SERVICE = "palworld-server.service"
 # recovery points beside compose.yaml so they remain visible and portable.
 MANAGER_ROOT = Path(__file__).resolve().parent.parent
 BACKUP_ROOT = MANAGER_ROOT / "backups"
+OPERATION_LOG_ROOT = MANAGER_ROOT / "logs"
+OPERATION_LOG_FILE = OPERATION_LOG_ROOT / "operations.json"
+MAX_OPERATION_LOG_RECORDS = 120
 BACKUP_ID_RE = re.compile(r"^world-\d{8}T\d{6}(?:\d{6})?Z\.tar\.gz$")
 MAX_MANAGED_BACKUPS = 12
 # China has no daylight-saving time. A fixed offset avoids requiring the
@@ -33,6 +38,7 @@ BACKUP_TIMER = "palworld-backup.timer"
 BACKUP_SERVICE = "palworld-backup.service"
 STEAMCMD_URL = "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
 OPERATION_LOCK = asyncio.Lock()
+OPERATION_LOG_LOCK = threading.Lock()
 ANSI_ESCAPE = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
 OPTION_SETTINGS_RE = re.compile(r"^OptionSettings=\((.*)\)\s*$", re.MULTILINE)
 STRING_OPTION_KEYS = {
@@ -111,6 +117,76 @@ def checked_path(value: str) -> Path:
 def emit(output: Callable[[str], None] | None, message: str) -> None:
     if output:
         output(message)
+
+
+OPERATION_LABELS = {
+    "install": "安装 SteamCMD 与服务器",
+    "update": "更新服务器",
+    "start": "启动服务器",
+    "stop": "停止服务器",
+    "restart": "重启服务器",
+    "create_backup": "创建世界备份",
+    "restore_backup": "恢复世界存档",
+    "scheduled_backup": "自动创建世界备份",
+}
+
+
+def operation_now() -> str:
+    return datetime.now(CHINA_TZ).isoformat(timespec="seconds")
+
+
+def read_operation_logs() -> list[dict[str, object]]:
+    try:
+        loaded = json.loads(OPERATION_LOG_FILE.read_text(encoding="utf-8"))
+        return [item for item in loaded if isinstance(item, dict)] if isinstance(loaded, list) else []
+    except (OSError, json.JSONDecodeError):
+        return []
+
+
+def write_operation_logs(records: list[dict[str, object]]) -> None:
+    OPERATION_LOG_ROOT.mkdir(parents=True, exist_ok=True)
+    temporary = OPERATION_LOG_FILE.with_suffix(".json.partial")
+    temporary.write_text(json.dumps(records[-MAX_OPERATION_LOG_RECORDS:], ensure_ascii=False, indent=2), encoding="utf-8")
+    os.replace(temporary, OPERATION_LOG_FILE)
+
+
+def begin_operation_log(action: str) -> str:
+    operation_id = uuid.uuid4().hex
+    with OPERATION_LOG_LOCK:
+        records = read_operation_logs()
+        records.append({
+            "id": operation_id,
+            "action": action,
+            "label": OPERATION_LABELS.get(action, action),
+            "status": "running",
+            "started_at": operation_now(),
+            "finished_at": None,
+            "messages": [],
+        })
+        write_operation_logs(records)
+    return operation_id
+
+
+def update_operation_log(operation_id: str, message: str | None = None, ok: bool | None = None) -> None:
+    with OPERATION_LOG_LOCK:
+        records = read_operation_logs()
+        record = next((item for item in reversed(records) if item.get("id") == operation_id), None)
+        if not record:
+            return
+        if message:
+            messages = record.setdefault("messages", [])
+            if isinstance(messages, list) and len(messages) < 300:
+                messages.append(clean_terminal_output(message))
+        if ok is not None:
+            record["status"] = "success" if ok else "failed"
+            record["finished_at"] = operation_now()
+        write_operation_logs(records)
+
+
+def list_operation_logs() -> dict[str, object]:
+    with OPERATION_LOG_LOCK:
+        records = list(reversed(read_operation_logs()))
+    return {"message": "已读取最近的服务器任务日志。", "operations": records}
 
 
 def clean_terminal_output(value: str) -> str:
@@ -428,12 +504,16 @@ def apply_backup_schedule(payload: dict[str, object]) -> dict[str, object]:
 
 
 def scheduled_backup(server: Path) -> int:
+    operation_id = begin_operation_log("scheduled_backup")
     try:
-        result = create_backup(server)
+        result = create_backup(server, output=lambda message: update_operation_log(operation_id, message))
+        update_operation_log(operation_id, str(result["message"]), ok=True)
         print(str(result["message"]))
         return 0
     except Exception as error:
-        print(f"自动备份失败：{error.__class__.__name__}: {error}", file=sys.stderr)
+        message = f"自动备份失败：{error.__class__.__name__}: {error}"
+        update_operation_log(operation_id, message, ok=False)
+        print(message, file=sys.stderr)
         return 1
 
 
@@ -707,6 +787,7 @@ def operate(action: str, payload: dict[str, object], output: Callable[[str], Non
     if action == "get_config": return read_server_config(payload)
     if action == "set_config": return write_server_config(payload)
     if action == "list_backups": return list_backups(checked_path(str(payload["server_path"])))
+    if action == "list_operation_logs": return list_operation_logs()
     if action == "set_backup_schedule": return apply_backup_schedule(payload)
     if action == "create_backup": return create_backup(checked_path(str(payload["server_path"])), payload.get("name"), output)
     if action == "restore_backup": return restore_backup(checked_path(str(payload["server_path"])), str(payload.get("backup_id", "")), payload.get("confirmed") is True, output)
@@ -733,6 +814,7 @@ async def write_event(writer: asyncio.StreamWriter, event: dict[str, object]) ->
 
 
 async def stream_operation(action: str, payload: dict[str, str], writer: asyncio.StreamWriter) -> None:
+    operation_id = begin_operation_log(action)
     queue: asyncio.Queue[str] = asyncio.Queue()
     loop = asyncio.get_running_loop()
     task = asyncio.create_task(asyncio.to_thread(operate, action, payload, lambda message: loop.call_soon_threadsafe(queue.put_nowait, message)))
@@ -741,6 +823,7 @@ async def stream_operation(action: str, payload: dict[str, str], writer: asyncio
             message = await asyncio.wait_for(queue.get(), timeout=0.25)
         except asyncio.TimeoutError:
             continue
+        update_operation_log(operation_id, message)
         await write_event(writer, {"event": "progress", "message": message})
     try:
         result = await task
@@ -753,10 +836,14 @@ async def stream_operation(action: str, payload: dict[str, str], writer: asyncio
                 "message": str(result.get("message") or "操作完成。"),
                 "result": result,
             })
+            update_operation_log(operation_id, str(result.get("message") or "操作完成。"), ok=True)
         else:
             await write_event(writer, {"event": "complete", "ok": True, "message": result or "操作完成。"})
+            update_operation_log(operation_id, result or "操作完成。", ok=True)
     except Exception as error:
-        await write_event(writer, {"event": "complete", "ok": False, "message": f"{error.__class__.__name__}: {error}"})
+        message = f"{error.__class__.__name__}: {error}"
+        update_operation_log(operation_id, message, ok=False)
+        await write_event(writer, {"event": "complete", "ok": False, "message": message})
 
 
 async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
@@ -764,7 +851,7 @@ async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> 
     try:
         payload = json.loads((await reader.readline()).decode())
         action = payload.get("action")
-        if action not in {"status", "install", "update", "start", "stop", "restart", "get_config", "set_config", "list_backups", "set_backup_schedule", "create_backup", "restore_backup", "delete_backup", "rename_backup"}:
+        if action not in {"status", "install", "update", "start", "stop", "restart", "get_config", "set_config", "list_backups", "list_operation_logs", "set_backup_schedule", "create_backup", "restore_backup", "delete_backup", "rename_backup"}:
             raise ValueError("不允许的操作")
         streaming = bool(payload.get("stream"))
         async with OPERATION_LOCK:

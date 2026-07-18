@@ -8,7 +8,7 @@ type Storage = { backup_bytes: number; backup_count: number; disk_total_bytes: n
 type Schedule = { enabled: boolean; hour: number; minute: number; timezone: string; timer_active?: boolean };
 type Reply = { ok: boolean; agent_connected: boolean; message: string; backups?: Backup[]; retention?: number; storage?: Storage; schedule?: Schedule };
 type StreamEvent = { event: "progress" | "complete"; ok?: boolean; message: string };
-type Pending = { kind: "create" } | { kind: "restore" | "delete" | "rename"; backup: Backup };
+type Pending = { kind: "create" } | { kind: "restore-review" | "restore-confirm" | "delete" | "rename"; backup: Backup };
 
 class BackupErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
@@ -83,6 +83,7 @@ function BackupPanelContent() {
   const [running, setRunning] = useState<"create" | "restore" | null>(null);
   const [pending, setPending] = useState<Pending | null>(null);
   const [draftName, setDraftName] = useState(() => defaultBackupName());
+  const [restoreConfirmation, setRestoreConfirmation] = useState("");
   const [log, setLog] = useState("");
   const [storage, setStorage] = useState<Storage | null>(null);
   const [schedule, setSchedule] = useState<Schedule>({ enabled: false, hour: 4, minute: 0, timezone: "Asia/Shanghai" });
@@ -176,7 +177,7 @@ function BackupPanelContent() {
       } finally { await refresh(); }
       return;
     }
-    setRunning(current.kind);
+    setRunning(current.kind === "create" ? "create" : "restore");
     setMessage(current.kind === "create" ? "正在创建安全备份；服务会短暂停服并自动恢复。" : "正在恢复存档；会先保护当前版本并自动恢复服务。");
     try {
       await stream(current.kind === "create" ? "/api/backups/create/stream" : `/api/backups/${encodeURIComponent(current.backup.id)}/restore/stream`, current.kind === "create" ? { name: draftName } : { confirmed: true });
@@ -188,11 +189,13 @@ function BackupPanelContent() {
     }
   };
 
-  const title = pending?.kind === "create" ? "立即备份？" : pending?.kind === "restore" ? "恢复这份存档？" : pending?.kind === "rename" ? "修改备份名称" : "删除这份备份？";
+  const title = pending?.kind === "create" ? "立即备份？" : pending?.kind === "restore-review" ? "恢复这份存档？" : pending?.kind === "restore-confirm" ? "最后确认恢复" : pending?.kind === "rename" ? "修改备份名称" : "删除这份备份？";
   const detail = pending?.kind === "create"
     ? "为了保证备份一致性，面板会短暂停止帕鲁服务，打包全部世界存档后自动重新启动。"
-      : pending?.kind === "restore"
+      : pending?.kind === "restore-review"
       ? "服务会停止；恢复前会自动备份当前世界。恢复完成后服务将自动重新启动，在线训练家会断开连接。"
+      : pending?.kind === "restore-confirm"
+      ? "这是不可逆操作。请输入“恢复”完成第二次确认；恢复前的当前世界会作为新的安全备份保留。"
       : pending?.kind === "rename"
         ? "名称只用于面板显示和下载文件名，不会修改归档内容。"
       : "删除后无法从面板恢复。请确认这不是你需要保留的存档版本。";
@@ -213,9 +216,9 @@ function BackupPanelContent() {
 
     <section className="backup-panel" aria-labelledby="backup-list-title">
       <header className="backup-panel-heading"><div><p className="eyebrow">RECOVERY POINTS</p><h2 id="backup-list-title">世界恢复点</h2><p>保留最近 {retention} 份面板创建的备份；创建新备份时会自动清理更早版本。</p></div><button className="button button-primary backup-create" disabled={loading || running !== null} onClick={() => { setDraftName(defaultBackupName()); setPending({ kind: "create" }); }} type="button"><PalIcon name="backup" />{running === "create" ? "正在备份…" : "立即备份"}</button></header>
-      {backups.length ? <div className="backup-table" role="list">{backups.map((backup) => <article className="backup-row" key={backup.id} role="listitem"><div className="backup-file"><b><PalIcon name="backup" /></b><span><strong>{backup.name}</strong><small><time dateTime={backup.created_at}>{date(backup.created_at)}</time> · {bytes(backup.size_bytes)} · {backup.id}</small></span></div><div className="backup-actions"><a className="button button-secondary" download href={`/api/backups/${encodeURIComponent(backup.id)}/download`}>下载</a><button className="button button-secondary" disabled={running !== null} onClick={() => { setDraftName(backup.name); setPending({ kind: "rename", backup }); }} type="button">改名</button><button className="button button-secondary" disabled={running !== null} onClick={() => setPending({ kind: "restore", backup })} type="button">恢复</button><button aria-label={`删除备份 ${backup.name}`} className="button button-danger backup-delete" disabled={running !== null} onClick={() => setPending({ kind: "delete", backup })} type="button">删除</button></div></article>)}</div> : <div className="backup-empty"><PalIcon name="backup" /><strong>还没有可用备份</strong><span>先创建一次安全备份，今后更新或调整高风险规则前也建议手动保留一个恢复点。</span></div>}
+      {backups.length ? <div className="backup-table" role="list">{backups.map((backup) => <article className="backup-row" key={backup.id} role="listitem"><div className="backup-file"><b><PalIcon name="backup" /></b><span><strong>{backup.name}</strong><small><time dateTime={backup.created_at}>{date(backup.created_at)}</time> · {bytes(backup.size_bytes)} · {backup.id}</small></span></div><div className="backup-actions"><a className="button button-secondary" download href={`/api/backups/${encodeURIComponent(backup.id)}/download`}>下载</a><button className="button button-secondary" disabled={running !== null} onClick={() => { setDraftName(backup.name); setPending({ kind: "rename", backup }); }} type="button">改名</button><button className="button button-secondary" disabled={running !== null} onClick={() => { setRestoreConfirmation(""); setPending({ kind: "restore-review", backup }); }} type="button">恢复</button><button aria-label={`删除备份 ${backup.name}`} className="button button-danger backup-delete" disabled={running !== null} onClick={() => setPending({ kind: "delete", backup })} type="button">删除</button></div></article>)}</div> : <div className="backup-empty"><PalIcon name="backup" /><strong>还没有可用备份</strong><span>先创建一次安全备份，今后更新或调整高风险规则前也建议手动保留一个恢复点。</span></div>}
     </section>
     {log && <details className="backup-log"><summary>查看本次操作日志</summary><pre>{log}</pre></details>}
-    {pending && <div aria-labelledby="backup-confirmation-title" aria-modal="true" className="confirmation-scrim" role="dialog"><section className="confirmation-dialog backup-confirmation"><p className="eyebrow">CONFIRM SAVE OPERATION</p><h2 id="backup-confirmation-title">{title}</h2><p>{detail}</p>{(pending.kind === "create" || pending.kind === "rename") && <label className="backup-name-field">备份名称<input autoFocus maxLength={80} onChange={(event) => setDraftName(event.target.value)} value={draftName} /></label>}{pending.kind !== "create" && <dl><div><dt>目标备份</dt><dd>{pending.backup.name}</dd></div><div><dt>创建时间</dt><dd>{date(pending.backup.created_at)}</dd></div></dl>}<div className="dialog-actions"><button autoFocus={pending.kind !== "create" && pending.kind !== "rename"} className="button button-secondary" onClick={() => setPending(null)} type="button">取消</button><button className={pending.kind === "delete" ? "button button-danger" : "button button-primary"} disabled={(pending.kind === "create" || pending.kind === "rename") && !draftName.trim()} onClick={() => void execute()} type="button">{pending.kind === "create" ? "确认备份" : pending.kind === "restore" ? "确认恢复并重启服务" : pending.kind === "rename" ? "保存名称" : "确认删除"}</button></div></section></div>}
+    {pending && <div aria-labelledby="backup-confirmation-title" aria-modal="true" className="confirmation-scrim" role="dialog"><section className="confirmation-dialog backup-confirmation"><p className="eyebrow">CONFIRM SAVE OPERATION</p><h2 id="backup-confirmation-title">{title}</h2><p>{detail}</p>{(pending.kind === "create" || pending.kind === "rename") && <label className="backup-name-field">备份名称<input autoFocus maxLength={80} onChange={(event) => setDraftName(event.target.value)} value={draftName} /></label>}{pending.kind === "restore-confirm" && <label className="backup-name-field">请输入“恢复”确认<input autoFocus autoComplete="off" onChange={(event) => setRestoreConfirmation(event.target.value)} value={restoreConfirmation} /></label>}{pending.kind !== "create" && <dl><div><dt>目标备份</dt><dd>{pending.backup.name}</dd></div><div><dt>创建时间</dt><dd>{date(pending.backup.created_at)}</dd></div></dl>}<div className="dialog-actions"><button autoFocus={pending.kind === "restore-review" || pending.kind === "delete"} className="button button-secondary" onClick={() => setPending(null)} type="button">{pending.kind === "restore-confirm" ? "取消恢复" : "取消"}</button>{pending.kind === "restore-review" ? <button className="button button-primary" onClick={() => { setRestoreConfirmation(""); setPending({ kind: "restore-confirm", backup: pending.backup }); }} type="button">继续确认</button> : <button className={pending.kind === "delete" ? "button button-danger" : "button button-primary"} disabled={(pending.kind === "create" || pending.kind === "rename") && !draftName.trim() || pending.kind === "restore-confirm" && restoreConfirmation.trim() !== "恢复"} onClick={() => void execute()} type="button">{pending.kind === "create" ? "确认备份" : pending.kind === "restore-confirm" ? "确认恢复并重启服务" : pending.kind === "rename" ? "保存名称" : "确认删除"}</button>}</div></section></div>}
   </main>;
 }

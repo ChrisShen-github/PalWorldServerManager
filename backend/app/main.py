@@ -363,6 +363,11 @@ async def backups() -> dict[str, object]:
     return await _agent("list_backups")
 
 
+@app.get("/api/operations")
+async def operations() -> dict[str, object]:
+    return await _agent("list_operation_logs")
+
+
 @app.put("/api/backups/schedule")
 async def put_backup_schedule(value: BackupScheduleInput) -> dict[str, object]:
     return await _agent("set_backup_schedule", value.model_dump())

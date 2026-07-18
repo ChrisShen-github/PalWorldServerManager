@@ -28,6 +28,7 @@ pnpm-debug.log*
 runtime/
 data/
 backups/
+logs/
 Saved/
 
 # Coverage and operating-system files
