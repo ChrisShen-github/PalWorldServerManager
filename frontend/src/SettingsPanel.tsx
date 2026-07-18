@@ -11,7 +11,8 @@ type Settings = {
 };
 
 type Operation = "install" | "update" | "start" | "stop" | "restart";
-type HostReply = { ok: boolean; message: string };
+type HostReply = { ok: boolean; agent_connected: boolean; message: string };
+type StreamEvent = { event: "progress" | "complete"; ok?: boolean; message: string };
 
 const initial: Settings = {
   demo_mode: true,
@@ -68,7 +69,7 @@ export default function SettingsPanel() {
       const response = await fetch("/api/host/status");
       setHost(await response.json() as HostReply);
     } catch {
-      setHost({ ok: false, message: "无法连接管理面板 API，请检查容器状态。" });
+      setHost({ ok: false, agent_connected: false, message: "无法连接管理面板 API，请检查容器状态。" });
     } finally {
       setCheckingHost(false);
     }
@@ -134,9 +135,42 @@ export default function SettingsPanel() {
       return;
     }
     try {
-      const response = await fetch(`/api/host/${nextOperation}`, { method: "POST" });
-      const result = await response.json() as HostReply;
-      setFeedback(result.ok ? `${operationLabel[nextOperation]}完成。\n${result.message}` : `操作未完成：${result.message}`);
+      const response = await fetch(`/api/host/${nextOperation}/stream`, { method: "POST" });
+      if (!response.ok || !response.body) throw new Error("stream");
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let receivedProgress = false;
+      let completed = false;
+      let lines: string[] = [];
+      const appendLog = (message: string) => {
+        lines = [...lines, message];
+        setFeedback(lines.join("\n"));
+      };
+      const handleEvent = (event: StreamEvent) => {
+        if (event.event === "progress") {
+          receivedProgress = true;
+          appendLog(event.message);
+          return;
+        }
+        completed = true;
+        appendLog(event.ok ? `${operationLabel[nextOperation]}完成。` : `操作未完成：${event.message}`);
+        if (!event.ok || !receivedProgress) appendLog(event.message);
+      };
+      while (true) {
+        const { done, value } = await reader.read();
+        buffer += decoder.decode(value ?? new Uint8Array(), { stream: !done });
+        let boundary = buffer.indexOf("\n\n");
+        while (boundary >= 0) {
+          const packet = buffer.slice(0, boundary);
+          buffer = buffer.slice(boundary + 2);
+          const data = packet.split("\n").find((line) => line.startsWith("data: "))?.slice(6);
+          if (data) handleEvent(JSON.parse(data) as StreamEvent);
+          boundary = buffer.indexOf("\n\n");
+        }
+        if (done) break;
+      }
+      if (!completed) throw new Error("incomplete stream");
     } catch {
       setFeedback("操作请求失败，请检查管理面板与宿主机代理是否正在运行。");
     } finally {
@@ -153,7 +187,7 @@ export default function SettingsPanel() {
     setConfirming(nextOperation);
   };
 
-  const agentReady = host?.ok === true;
+  const agentReady = host?.agent_connected === true;
   const busy = saving || operation !== null;
 
   return (

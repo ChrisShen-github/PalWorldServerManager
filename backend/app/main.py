@@ -8,6 +8,7 @@ from typing import Literal
 
 import httpx
 from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from .config import Settings, SettingsStore
@@ -183,7 +184,7 @@ async def put_settings(value: SettingsInput) -> Settings:
 
 async def _agent(action: str) -> dict[str, object]:
     if not Path(AGENT_SOCKET).exists():
-        return {"ok": False, "message": "宿主机代理未安装。请先在 Ubuntu 执行 host-agent/install.sh。"}
+        return {"ok": False, "agent_connected": False, "message": "宿主机代理未安装。请先在 Ubuntu 执行 host-agent/install.sh。"}
     settings = store.get()
     payload = {"action": action, "steamcmd_path": settings.steamcmd_path, "server_path": settings.server_path}
     try:
@@ -193,14 +194,46 @@ async def _agent(action: str) -> dict[str, object]:
         response = json.loads((await asyncio.wait_for(reader.readline(), timeout=900)).decode())
         writer.close()
         await writer.wait_closed()
+        response["agent_connected"] = True
         return response
     except (OSError, asyncio.TimeoutError, json.JSONDecodeError) as error:
-        return {"ok": False, "message": f"宿主机代理调用失败：{error.__class__.__name__}"}
+        return {"ok": False, "agent_connected": False, "message": f"宿主机代理调用失败：{error.__class__.__name__}"}
+
+
+async def _agent_stream(action: str):
+    if not Path(AGENT_SOCKET).exists():
+        yield f"data: {json.dumps({'event': 'complete', 'ok': False, 'message': '宿主机代理未安装。请先在 Ubuntu 执行 host-agent/install.sh。'}, ensure_ascii=False)}\n\n"
+        return
+    settings = store.get()
+    payload = {"action": action, "stream": True, "steamcmd_path": settings.steamcmd_path, "server_path": settings.server_path}
+    writer: asyncio.StreamWriter | None = None
+    try:
+        reader, writer = await asyncio.wait_for(asyncio.open_unix_connection(AGENT_SOCKET), timeout=2)
+        writer.write((json.dumps(payload) + "\n").encode())
+        await writer.drain()
+        while line := await reader.readline():
+            event = json.loads(line.decode())
+            # Older installed agents respond once without the stream envelope.
+            if "event" not in event:
+                event = {"event": "complete", **event}
+            yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+            if event.get("event") == "complete":
+                break
+    except (OSError, asyncio.TimeoutError, json.JSONDecodeError) as error:
+        event = {"event": "complete", "ok": False, "message": f"宿主机代理流式调用失败：{error.__class__.__name__}"}
+        yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+    finally:
+        if writer:
+            writer.close()
+            await writer.wait_closed()
 
 
 @app.get("/api/host/status")
 async def host_status() -> dict[str, object]:
-    return await _agent("status")
+    response = await _agent("status")
+    if response.get("agent_connected") and not response.get("ok") and "CalledProcessError" in str(response.get("message", "")):
+        response["message"] = "代理已连接；Palworld systemd 服务尚未安装。可以直接开始安装。"
+    return response
 
 
 @app.post("/api/host/install")
@@ -211,6 +244,11 @@ async def host_install() -> dict[str, object]:
 @app.post("/api/host/update")
 async def host_update() -> dict[str, object]:
     return await _agent("update")
+
+
+@app.post("/api/host/{operation}/stream")
+async def host_service_stream(operation: Literal["install", "update", "start", "stop", "restart"]) -> StreamingResponse:
+    return StreamingResponse(_agent_stream(operation), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
 
 @app.post("/api/host/{operation}")
