@@ -32,6 +32,8 @@ const operationLabel: Record<Operation, string> = {
   restart: "重启服务器",
 };
 
+const cleanTerminalOutput = (message: string) => message.replace(/\u001b\[[0-?]*[ -/]*[@-~]/g, "").replace(/\r/g, "");
+
 const confirmationCopy: Record<Exclude<Operation, "start">, { title: string; detail: string; confirm: string }> = {
   install: {
     title: "开始安装原生专服？",
@@ -145,7 +147,9 @@ export default function SettingsPanel() {
       let completed = false;
       let lines: string[] = [];
       const appendLog = (message: string) => {
-        lines = [...lines, message];
+        const cleanMessage = cleanTerminalOutput(message);
+        if (!cleanMessage) return;
+        lines = [...lines, cleanMessage];
         setFeedback(lines.join("\n"));
       };
       const handleEvent = (event: StreamEvent) => {

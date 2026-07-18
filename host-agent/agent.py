@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -18,6 +19,7 @@ SOCKET = Path("/run/palworld-server-manager/agent.sock")
 SERVICE = "palworld-server.service"
 STEAMCMD_URL = "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
 OPERATION_LOCK = asyncio.Lock()
+ANSI_ESCAPE = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
 
 
 def checked_path(value: str) -> Path:
@@ -32,13 +34,17 @@ def emit(output: Callable[[str], None] | None, message: str) -> None:
         output(message)
 
 
+def clean_terminal_output(value: str) -> str:
+    return ANSI_ESCAPE.sub("", value).replace("\r", "")
+
+
 def run(*args: str, output: Callable[[str], None] | None = None) -> str:
     if output:
         process = subprocess.Popen(args, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1)
         lines: list[str] = []
         assert process.stdout is not None
         for line in process.stdout:
-            text = line.rstrip()
+            text = clean_terminal_output(line).rstrip()
             if text:
                 lines.append(text)
                 output(text)
@@ -46,7 +52,7 @@ def run(*args: str, output: Callable[[str], None] | None = None) -> str:
             raise subprocess.CalledProcessError(process.returncode, args, output="\n".join(lines))
         return "\n".join(lines[-4000:])
     result = subprocess.run(args, check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    return result.stdout[-4000:]
+    return clean_terminal_output(result.stdout)[-4000:]
 
 
 def ensure_user(output: Callable[[str], None] | None = None) -> None:
