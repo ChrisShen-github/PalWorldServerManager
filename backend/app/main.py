@@ -86,6 +86,10 @@ class ServerConfigInput(BaseModel):
         return value
 
 
+class BackupRestoreInput(BaseModel):
+    confirmed: bool = False
+
+
 def _demo_overview() -> ServerOverview:
     return ServerOverview(
         status="demo",
@@ -231,12 +235,14 @@ async def _agent(action: str, extra: dict[str, object] | None = None) -> dict[st
         return {"ok": False, "agent_connected": False, "message": f"宿主机代理调用失败：{error.__class__.__name__}"}
 
 
-async def _agent_stream(action: str):
+async def _agent_stream(action: str, extra: dict[str, object] | None = None):
     if not Path(AGENT_SOCKET).exists():
         yield f"data: {json.dumps({'event': 'complete', 'ok': False, 'message': '宿主机代理未安装。请先在 Ubuntu 执行 host-agent/install.sh。'}, ensure_ascii=False)}\n\n"
         return
     settings = store.get()
-    payload = {"action": action, "stream": True, "steamcmd_path": settings.steamcmd_path, "server_path": settings.server_path}
+    payload: dict[str, object] = {"action": action, "stream": True, "steamcmd_path": settings.steamcmd_path, "server_path": settings.server_path}
+    if extra:
+        payload.update(extra)
     writer: asyncio.StreamWriter | None = None
     try:
         reader, writer = await asyncio.wait_for(asyncio.open_unix_connection(AGENT_SOCKET), timeout=2)
@@ -330,6 +336,28 @@ async def host_install() -> dict[str, object]:
 @app.post("/api/host/update")
 async def host_update() -> dict[str, object]:
     return await _agent("update")
+
+
+@app.get("/api/backups")
+async def backups() -> dict[str, object]:
+    return await _agent("list_backups")
+
+
+@app.post("/api/backups/create/stream")
+async def create_backup_stream() -> StreamingResponse:
+    return StreamingResponse(_agent_stream("create_backup"), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+@app.post("/api/backups/{backup_id}/restore/stream")
+async def restore_backup_stream(backup_id: str, value: BackupRestoreInput) -> StreamingResponse:
+    if not value.confirmed:
+        raise HTTPException(status_code=422, detail="恢复存档必须明确确认。")
+    return StreamingResponse(_agent_stream("restore_backup", {"backup_id": backup_id, "confirmed": True}), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+@app.delete("/api/backups/{backup_id}")
+async def delete_backup(backup_id: str) -> dict[str, object]:
+    return await _agent("delete_backup", {"backup_id": backup_id, "confirmed": True})
 
 
 @app.post("/api/host/{operation}/stream")

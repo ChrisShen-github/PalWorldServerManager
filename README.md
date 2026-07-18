@@ -39,6 +39,8 @@ npm run dev
 
 如果目标 `PalWorldSettings.ini` 尚未创建、为空或不包含 `OptionSettings`，面板会从服务器自带的 `DefaultPalWorldSettings.ini` 载入当前版本默认模板；首次保存前仍会备份原目标文件。游戏升级新增的未知配置项会在读写时原样保留。若存档包含 `WorldOption.sav`，面板会提示其可能优先于 INI 配置。
 
+在“存档与备份”页面创建的世界恢复点会放在 Compose YAML 同级的 `backups/`。创建或恢复时会短暂停止 `palworld-server.service` 以确保一致性，完成后自动重新启动；恢复前还会自动备份当前存档。面板保留最近 12 份自己创建的归档，`backups/` 默认不提交到 Git。
+
 ## 连接面板到原生服务器
 
 在“服务器配置”中保存设置时，面板会自动写入 `RESTAPIEnabled=True`，使用管理员密码连接 `http://host.docker.internal:<端口>/v1/api`，并关闭演示模式。配置需要重启 Palworld 服务后生效。
@@ -66,7 +68,7 @@ sudo ./host-agent/install.sh
 ```text
 backend/       FastAPI：状态聚合与后续运维工作流
 frontend/      React + Vite：管理仪表盘
-runtime/       面板运行时数据、备份与日志（不提交）
+runtime/       面板运行时数据、备份与日志（不提交；世界存档备份在 runtime/backups/）
 ```
 
 参考：[官方服务器文档](https://docs.palworldgame.com/)、[Bluefissure/pal-conf](https://github.com/Bluefissure/pal-conf)、[官方 Docker 示例](https://github.com/pocketpairjp/palworld-dedicated-server-docker)。

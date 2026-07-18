@@ -87,6 +87,32 @@ class HostAgentConfigTests(unittest.TestCase):
 
         asyncio.run(scenario())
 
+    def test_world_backup_and_restore_keep_a_recovery_copy(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            server = Path(directory) / "palserver"
+            saves = server / "Pal" / "Saved" / "SaveGames" / "0" / "WORLD"
+            saves.mkdir(parents=True)
+            world = saves / "Level.sav"
+            world.write_text("before", encoding="utf-8")
+            backup_root = Path(directory) / "runtime" / "backups"
+
+            with patch.object(AGENT, "BACKUP_ROOT", backup_root), patch.object(AGENT, "status", return_value="inactive"), patch.object(AGENT, "run", return_value=""):
+                created = AGENT.create_backup(server)
+                backup_id = created["backup"]["id"]
+                self.assertTrue((backup_root / backup_id).is_file())
+                world.write_text("after", encoding="utf-8")
+
+                restored = AGENT.restore_backup(server, backup_id, confirmed=True)
+
+            self.assertEqual(world.read_text(encoding="utf-8"), "before")
+            self.assertEqual(restored["backup"], backup_id)
+            self.assertIsNotNone(restored["safety_backup"])
+            self.assertEqual(len(list(backup_root.glob("world-*.tar.gz"))), 2)
+
+    def test_backup_identifiers_do_not_allow_path_traversal(self) -> None:
+        with self.assertRaisesRegex(ValueError, "备份标识"):
+            AGENT.backup_path("../../PalWorldSettings.ini")
+
 
 if __name__ == "__main__":
     unittest.main()

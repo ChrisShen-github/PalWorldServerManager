@@ -19,6 +19,12 @@ from pathlib import Path
 
 SOCKET = Path("/run/palworld-server-manager/agent.sock")
 SERVICE = "palworld-server.service"
+# install.sh runs this source directly from <compose-dir>/host-agent. Keep
+# recovery points beside compose.yaml so they remain visible and portable.
+MANAGER_ROOT = Path(__file__).resolve().parent.parent
+BACKUP_ROOT = MANAGER_ROOT / "backups"
+BACKUP_ID_RE = re.compile(r"^world-\d{8}T\d{6}(?:\d{6})?Z\.tar\.gz$")
+MAX_MANAGED_BACKUPS = 12
 STEAMCMD_URL = "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
 OPERATION_LOCK = asyncio.Lock()
 ANSI_ESCAPE = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
@@ -162,6 +168,132 @@ def encode_string(value: str) -> str:
 
 def config_file(server: Path) -> Path:
     return server / "Pal" / "Saved" / "Config" / "LinuxServer" / "PalWorldSettings.ini"
+
+
+def save_games_path(server: Path) -> Path:
+    return server / "Pal" / "Saved" / "SaveGames"
+
+
+def backup_path(backup_id: str) -> Path:
+    if not BACKUP_ID_RE.fullmatch(backup_id):
+        raise ValueError("备份标识无效")
+    return BACKUP_ROOT / backup_id
+
+
+def backup_records() -> list[dict[str, object]]:
+    if not BACKUP_ROOT.exists():
+        return []
+    records: list[dict[str, object]] = []
+    for archive in BACKUP_ROOT.glob("world-*.tar.gz"):
+        if not BACKUP_ID_RE.fullmatch(archive.name) or not archive.is_file():
+            continue
+        stat = archive.stat()
+        records.append({
+            "id": archive.name,
+            "created_at": datetime.fromtimestamp(stat.st_mtime, timezone.utc).isoformat(),
+            "size_bytes": stat.st_size,
+        })
+    return sorted(records, key=lambda item: str(item["id"]), reverse=True)
+
+
+def prune_backups(output: Callable[[str], None] | None = None) -> None:
+    stale = backup_records()[MAX_MANAGED_BACKUPS:]
+    for record in stale:
+        backup_path(str(record["id"])).unlink(missing_ok=True)
+    if stale:
+        emit(output, f"已按保留策略清理 {len(stale)} 份较早的备份。")
+
+
+def create_backup(server: Path, output: Callable[[str], None] | None = None) -> dict[str, object]:
+    saves = save_games_path(server)
+    if not saves.is_dir():
+        raise FileNotFoundError("未找到世界存档目录，请确认服务器已启动过并生成存档")
+    BACKUP_ROOT.mkdir(parents=True, exist_ok=True)
+    was_running = status({}) == "active"
+    if was_running:
+        emit(output, "正在安全停止 Palworld 服务以冻结存档…")
+        run("systemctl", "stop", SERVICE, output=output)
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    archive = backup_path(f"world-{stamp}.tar.gz")
+    temporary = archive.with_suffix(".tar.gz.partial")
+    try:
+        emit(output, "正在打包世界存档…")
+        with tarfile.open(temporary, "w:gz") as bundle:
+            bundle.add(saves, arcname="SaveGames", recursive=True)
+        os.replace(temporary, archive)
+        prune_backups(output)
+        emit(output, f"备份完成：{archive.name}")
+        record = next(item for item in backup_records() if item["id"] == archive.name)
+        return {"message": "存档备份已创建。", "backup": record, "server_restarted": was_running, "retention": MAX_MANAGED_BACKUPS}
+    finally:
+        temporary.unlink(missing_ok=True)
+        if was_running:
+            emit(output, "正在重新启动 Palworld 服务…")
+            run("systemctl", "start", SERVICE, output=output)
+
+
+def safe_extract(bundle: tarfile.TarFile, destination: Path) -> None:
+    destination_root = destination.resolve()
+    for member in bundle.getmembers():
+        target = (destination / member.name).resolve()
+        if not target.is_relative_to(destination_root) or member.issym() or member.islnk() or not (member.isfile() or member.isdir()):
+            raise ValueError("备份归档包含不安全路径")
+    bundle.extractall(destination)
+
+
+def restore_backup(server: Path, backup_id: str, confirmed: bool, output: Callable[[str], None] | None = None) -> dict[str, object]:
+    if not confirmed:
+        raise ValueError("恢复存档必须明确确认")
+    archive = backup_path(backup_id)
+    if not archive.is_file():
+        raise FileNotFoundError("备份不存在或已被清理")
+    saves = save_games_path(server)
+    if not saves.is_dir():
+        raise FileNotFoundError("当前世界存档目录不存在，拒绝覆盖恢复")
+    was_running = status({}) == "active"
+    if was_running:
+        emit(output, "正在安全停止 Palworld 服务…")
+        run("systemctl", "stop", SERVICE, output=output)
+    restore_safety_backup: dict[str, object] | None = None
+    staging = Path(tempfile.mkdtemp(prefix=".palworld-restore-", dir=saves.parent))
+    try:
+        emit(output, "正在为当前存档创建恢复前保护备份…")
+        restore_safety_backup = create_backup(server, output)
+        emit(output, "正在校验并解压选择的备份…")
+        with tarfile.open(archive, "r:gz") as bundle:
+            safe_extract(bundle, staging)
+        restored = staging / "SaveGames"
+        if not restored.is_dir():
+            raise ValueError("备份中不包含 SaveGames 根目录")
+        emit(output, "正在替换世界存档…")
+        shutil.rmtree(saves)
+        os.replace(restored, saves)
+        run("chown", "-R", "palworld:palworld", str(saves))
+        emit(output, "存档恢复完成。")
+        return {"message": "存档已恢复；恢复前版本已自动备份。", "backup": backup_id, "safety_backup": restore_safety_backup.get("backup") if restore_safety_backup else None, "server_restarted": was_running}
+    finally:
+        shutil.rmtree(staging, ignore_errors=True)
+        if was_running:
+            emit(output, "正在重新启动 Palworld 服务…")
+            run("systemctl", "start", SERVICE, output=output)
+
+
+def list_backups(server: Path) -> dict[str, object]:
+    return {
+        "message": "已读取本机存档备份。" if save_games_path(server).exists() else "尚未检测到世界存档目录。",
+        "backups": backup_records(),
+        "retention": MAX_MANAGED_BACKUPS,
+    }
+
+
+def delete_backup(backup_id: str, confirmed: bool) -> dict[str, object]:
+    if not confirmed:
+        raise ValueError("删除备份必须明确确认")
+    archive = backup_path(backup_id)
+    if not archive.is_file():
+        raise FileNotFoundError("备份不存在或已被清理")
+    archive.unlink()
+    return {"message": "备份已删除。", "deleted": backup_id}
 
 
 def default_config_file(server: Path) -> Path:
@@ -410,6 +542,10 @@ def status(_: dict[str, str]) -> str:
 def operate(action: str, payload: dict[str, object], output: Callable[[str], None] | None = None) -> str | dict[str, object]:
     if action == "get_config": return read_server_config(payload)
     if action == "set_config": return write_server_config(payload)
+    if action == "list_backups": return list_backups(checked_path(str(payload["server_path"])))
+    if action == "create_backup": return create_backup(checked_path(str(payload["server_path"])), output)
+    if action == "restore_backup": return restore_backup(checked_path(str(payload["server_path"])), str(payload.get("backup_id", "")), payload.get("confirmed") is True, output)
+    if action == "delete_backup": return delete_backup(str(payload.get("backup_id", "")), payload.get("confirmed") is True)
     if action == "install": return install(payload, output)
     if action == "update":
         steamcmd, server = checked_path(payload["steamcmd_path"]), checked_path(payload["server_path"])
@@ -452,7 +588,7 @@ async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> 
     try:
         payload = json.loads((await reader.readline()).decode())
         action = payload.get("action")
-        if action not in {"status", "install", "update", "start", "stop", "restart", "get_config", "set_config"}:
+        if action not in {"status", "install", "update", "start", "stop", "restart", "get_config", "set_config", "list_backups", "create_backup", "restore_backup", "delete_backup"}:
             raise ValueError("不允许的操作")
         streaming = bool(payload.get("stream"))
         async with OPERATION_LOCK:

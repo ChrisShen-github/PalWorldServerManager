@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import SettingsPanel from "./SettingsPanel";
+import BackupPanel from "./BackupPanel";
 import { PalIcon, type PalIconName } from "./PalIcons";
 import ThemeToggle from "./ThemeToggle";
 import "./dashboard-overrides.css";
@@ -48,6 +49,7 @@ function nativeService(host: HostStatus) {
 
 export default function App() {
   if (new URLSearchParams(location.search).get("view") === "settings") return <SettingsPanel />;
+  if (new URLSearchParams(location.search).get("view") === "backups") return <BackupPanel />;
 
   const [overview, setOverview] = useState(empty);
   const [host, setHost] = useState(disconnectedHost);
@@ -88,7 +90,7 @@ export default function App() {
         <button aria-current="page" className="active"><PalIcon className="nav-icon" name="dashboard" /><span>指挥台</span></button>
         <button><PalIcon className="nav-icon" name="server" /><span>服务器</span></button>
         <button><PalIcon className="nav-icon" name="trainers" /><span>训练家</span></button>
-        <button><PalIcon className="nav-icon" name="backup" /><span>存档与备份</span></button>
+        <button onClick={() => { location.href = "?view=backups"; }}><PalIcon className="nav-icon" name="backup" /><span>存档与备份</span></button>
         <button onClick={() => { location.href = "?view=settings"; }}><PalIcon className="nav-icon" name="settings" /><span>世界规则与安装</span></button>
       </nav>
       <footer>原生 SteamCMD · Docker 面板</footer>
