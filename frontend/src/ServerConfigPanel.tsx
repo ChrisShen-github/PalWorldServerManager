@@ -1,31 +1,34 @@
-import { useCallback, useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { PalIcon } from "./PalIcons";
+import {
+  DEFAULT_SERVER_OPTIONS,
+  SERVER_CONFIG_FIELDS,
+  SERVER_CONFIG_GROUPS,
+  type ConfigField,
+  type ConfigGroup,
+  type ConfigValue,
+} from "./serverConfigFields";
 
-type ServerConfig = {
-  server_name: string; server_description: string; server_password: string; admin_password: string;
-  server_player_max_num: number; rest_api_port: number; backup_save_data: boolean;
-  exp_rate: number; pal_capture_rate: number; pal_spawn_num_rate: number;
-  day_time_speed_rate: number; night_time_speed_rate: number;
-  death_penalty: "None" | "Item" | "ItemAndEquipment" | "All";
+type LoadedConfig = {
+  options: Record<string, ConfigValue>;
+  passwords: { server: boolean; admin: boolean };
+  file_exists: boolean;
+  source: "target" | "default-missing" | "default-invalid";
+  world_option_exists: boolean;
 };
 
-type LoadedConfig = Omit<ServerConfig, "server_password" | "admin_password"> & {
-  server_password_set: boolean; admin_password_set: boolean; file_exists: boolean;
-};
-
-const defaults: ServerConfig = {
-  server_name: "Default Palworld Server", server_description: "", server_password: "", admin_password: "",
-  server_player_max_num: 32, rest_api_port: 8212, backup_save_data: true,
-  exp_rate: 1, pal_capture_rate: 1, pal_spawn_num_rate: 1, day_time_speed_rate: 1, night_time_speed_rate: 1,
-  death_penalty: "All",
-};
+const passwordKey = (key: string) => key === "AdminPassword" ? "admin" : "server";
 
 export default function ServerConfigPanel({ disabled, restPasswordReady, onSaved }: { disabled: boolean; restPasswordReady: boolean; onSaved: () => Promise<void> }) {
-  const [values, setValues] = useState(defaults);
+  const [values, setValues] = useState<Record<string, ConfigValue>>({ ...DEFAULT_SERVER_OPTIONS });
   const [passwords, setPasswords] = useState({ server: false, admin: false });
+  const [activeGroup, setActiveGroup] = useState(SERVER_CONFIG_GROUPS[0].id);
+  const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState("连接宿主机代理后，可读取并编辑 PalWorldSettings.ini。");
+  const [dirty, setDirty] = useState(false);
+  const [worldOptionPresent, setWorldOptionPresent] = useState(false);
+  const [message, setMessage] = useState("连接宿主机 Agent 后，可读取并编辑 PalWorldSettings.ini。");
   const [error, setError] = useState(false);
 
   const load = useCallback(async () => {
@@ -35,36 +38,54 @@ export default function ServerConfigPanel({ disabled, restPasswordReady, onSaved
       const response = await fetch("/api/server/config");
       const data = await response.json() as { ok: boolean; message: string; config?: LoadedConfig };
       if (!response.ok || !data.ok || !data.config) throw new Error(data.message || "无法读取服务器配置");
-      const { server_password_set, admin_password_set, file_exists: _fileExists, ...config } = data.config;
-      setValues({ ...config, server_password: "", admin_password: "" });
-      setPasswords({ server: server_password_set, admin: admin_password_set });
+      const knownOptions = Object.fromEntries(Object.entries(data.config.options).filter(([key]) => SERVER_CONFIG_FIELDS.some((field) => field.key === key)));
+      setValues({ ...DEFAULT_SERVER_OPTIONS, ...knownOptions, ServerPassword: "", AdminPassword: "" });
+      setPasswords(data.config.passwords);
+      setWorldOptionPresent(data.config.world_option_exists);
+      setDirty(false);
       setMessage(data.message);
     } catch (reason) {
       setError(true);
-      setMessage(reason instanceof Error ? reason.message : "无法读取服务器配置，请检查宿主机代理版本。");
+      setMessage(reason instanceof Error ? reason.message : "无法读取服务器配置，请检查宿主机 Agent 版本。");
     } finally { setLoading(false); }
   }, [disabled]);
 
   useEffect(() => { void load(); }, [load]);
 
-  const text = (key: "server_name" | "server_description" | "server_password" | "admin_password") => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setValues((current) => ({ ...current, [key]: event.target.value }));
+  const setValue = (key: string, value: ConfigValue) => {
+    setValues((current) => ({ ...current, [key]: value }));
+    setDirty(true);
   };
-  const number = (key: "server_player_max_num" | "rest_api_port" | "exp_rate" | "pal_capture_rate" | "pal_spawn_num_rate" | "day_time_speed_rate" | "night_time_speed_rate") => (event: ChangeEvent<HTMLInputElement>) => {
-    setValues((current) => ({ ...current, [key]: Number(event.target.value) }));
-  };
+
+  const visibleGroups = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) return SERVER_CONFIG_GROUPS.filter((group) => group.id === activeGroup);
+    return SERVER_CONFIG_GROUPS.map((group) => ({
+      ...group,
+      fields: group.fields.filter((field) => `${field.label} ${field.key} ${field.help ?? ""}`.toLowerCase().includes(normalized)),
+    })).filter((group) => group.fields.length);
+  }, [activeGroup, query]);
 
   const save = async (event: FormEvent) => {
     event.preventDefault(); setSaving(true); setError(false);
     try {
+      if (!restPasswordReady && !String(values.AdminPassword ?? "")) {
+        throw new Error("首次连接 REST API 时必须输入管理员密码。");
+      }
+      const options = { ...values };
+      if (!String(options.ServerPassword ?? "")) delete options.ServerPassword;
+      if (!String(options.AdminPassword ?? "")) delete options.AdminPassword;
       const response = await fetch("/api/server/config", {
-        method: "PUT", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values, server_password: values.server_password || null, admin_password: values.admin_password || null }),
+        method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ options }),
       });
       const data = await response.json() as { ok?: boolean; message?: string; detail?: string; restart_required?: boolean };
       if (!response.ok || !data.ok) throw new Error(data.detail || data.message || "保存失败");
-      setPasswords((current) => ({ server: current.server || Boolean(values.server_password), admin: current.admin || Boolean(values.admin_password) }));
-      setValues((current) => ({ ...current, server_password: "", admin_password: "" }));
+      setPasswords((current) => ({
+        server: current.server || Boolean(values.ServerPassword),
+        admin: current.admin || Boolean(values.AdminPassword),
+      }));
+      setValues((current) => ({ ...current, ServerPassword: "", AdminPassword: "" }));
+      setDirty(false);
       setMessage(`${data.message ?? "服务器配置已保存。"}${data.restart_required ? " 请使用上方“重启”使配置生效。" : ""}`);
       await onSaved().catch(() => undefined);
     } catch (reason) {
@@ -73,45 +94,74 @@ export default function ServerConfigPanel({ disabled, restPasswordReady, onSaved
   };
 
   const unavailable = disabled || loading || saving;
+  const renderField = (field: ConfigField) => {
+    const value = values[field.key] ?? field.defaultValue;
+    const help = field.help ? <small className="config-field-help">{field.help}</small> : null;
+    const heading = <span className="config-field-heading"><strong>{field.label}</strong><code>{field.key}</code></span>;
+
+    if (field.type === "boolean") {
+      return <label className={`config-switch ${field.danger ? "config-danger" : ""}`} key={field.key}>
+        <input checked={Boolean(value)} onChange={(event) => setValue(field.key, event.target.checked)} type="checkbox" />
+        <span>{heading}{help}</span>
+      </label>;
+    }
+    if (field.type === "multi" && field.options?.length) {
+      const selected = Array.isArray(value) ? value : [];
+      return <fieldset className="config-multi config-wide" key={field.key}>
+        <legend>{heading}</legend>{help}
+        <div className="config-choice-grid">{field.options.map((option) => <label key={option.value}>
+          <input checked={selected.includes(option.value)} onChange={(event) => setValue(field.key, event.target.checked ? [...selected, option.value] : selected.filter((item) => item !== option.value))} type="checkbox" />
+          <span>{option.label}</span>
+        </label>)}</div>
+      </fieldset>;
+    }
+    if (field.type === "multi") {
+      return <label className="config-wide" key={field.key}>{heading}
+        <input onChange={(event) => setValue(field.key, event.target.value.split(",").map((item) => item.trim()).filter(Boolean))} placeholder="多个 ID 用英文逗号分隔" value={Array.isArray(value) ? value.join(", ") : ""} />{help}
+      </label>;
+    }
+    if (field.type === "textarea") {
+      return <label className="config-wide" key={field.key}>{heading}<textarea maxLength={512} onChange={(event) => setValue(field.key, event.target.value)} rows={3} value={String(value)} />{help}</label>;
+    }
+    if (field.type === "select") {
+      return <label key={field.key}>{heading}<select onChange={(event) => setValue(field.key, event.target.value)} value={String(value)}>
+        {field.options?.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+      </select>{help}</label>;
+    }
+    if (field.type === "password") {
+      const kind = passwordKey(field.key);
+      const hasPassword = passwords[kind];
+      const adminRequired = field.key === "AdminPassword" && !restPasswordReady;
+      return <label key={field.key}>{heading}<input autoComplete="new-password" onChange={(event) => setValue(field.key, event.target.value)} placeholder={adminRequired ? "首次连接时必须输入" : hasPassword ? "已设置；留空保持不变" : "未设置"} required={adminRequired} type="password" value={String(value)} />{help}</label>;
+    }
+    if (field.type === "number") {
+      return <label key={field.key}>{heading}<input max={field.max} min={field.min} onChange={(event) => setValue(field.key, event.target.valueAsNumber)} required step={field.step} type="number" value={Number(value)} />{help}</label>;
+    }
+    return <label className={field.wide ? "config-wide" : ""} key={field.key}>{heading}<input maxLength={256} onChange={(event) => setValue(field.key, event.target.value)} required={field.key === "ServerName"} value={String(value)} />{help}</label>;
+  };
+
   return <section className="settings-card server-config-card" aria-labelledby="server-config-title">
     <div className="settings-card-heading">
-      <div><p className="eyebrow">WORLD & REST API</p><h2 id="server-config-title">服务器配置</h2></div>
+      <div><p className="eyebrow">WORLD CONFIGURATION</p><h2 id="server-config-title">服务器配置</h2></div>
       <button className="button button-secondary" disabled={unavailable} onClick={() => void load()} type="button"><PalIcon name="refresh" />{loading ? "读取中…" : "重新读取"}</button>
     </div>
-    <p className={`config-feedback ${error ? "error" : ""}`} role="status">{message}</p>
+    <p className={`config-feedback ${error ? "error" : ""}`} aria-live="polite">{message}</p>
+    {worldOptionPresent && <p className="config-priority-warning"><strong>检测到 WorldOption.sav</strong><span>它可能优先于 PalWorldSettings.ini；若保存后规则未变化，需要同步处理该存档级配置。</span></p>}
+    <div className="config-explorer">
+      <label className="config-search"><span>搜索配置项</span><div><PalIcon name="search" /><input onChange={(event) => setQuery(event.target.value)} placeholder="输入中文名称或 INI 键，例如 ExpRate" type="search" value={query} /></div></label>
+      <nav aria-label="配置分类" className="config-tabs" role="tablist">
+        {SERVER_CONFIG_GROUPS.map((group) => <button aria-selected={!query && activeGroup === group.id} className={!query && activeGroup === group.id ? "active" : ""} key={group.id} onClick={() => { setActiveGroup(group.id); setQuery(""); }} role="tab" type="button">
+          <span>{group.title}</span><small>{group.fields.length} 项</small>
+        </button>)}
+      </nav>
+    </div>
     <form onSubmit={save}>
-      <fieldset disabled={unavailable}>
-        <legend>服务器信息</legend>
-        <div className="config-fields config-fields-main">
-          <label>服务器名称<input maxLength={128} onChange={text("server_name")} required value={values.server_name} /></label>
-          <label>最大训练家人数<input max={32} min={1} onChange={number("server_player_max_num")} required type="number" value={values.server_player_max_num} /></label>
-          <label className="config-wide">服务器简介<textarea maxLength={512} onChange={text("server_description")} rows={3} value={values.server_description} /></label>
-          <label>加入密码<input autoComplete="new-password" onChange={text("server_password")} placeholder={passwords.server ? "已设置；留空保持不变" : "可选"} type="password" value={values.server_password} /></label>
-          <label>管理员密码<input autoComplete="new-password" onChange={text("admin_password")} placeholder={restPasswordReady ? "面板已保存；留空保持不变" : passwords.admin ? "服务端已有密码，请重新输入供面板连接" : "首次启用 REST API 时必填"} required={!restPasswordReady} type="password" value={values.admin_password} /></label>
-        </div>
-      </fieldset>
-      <fieldset disabled={unavailable}>
-        <legend>接口与存档</legend>
-        <p className="field-help">保存时自动启用 REST API、关闭演示模式，并连接官方 <code>/v1/api</code> 接口。请勿将 REST API 端口直接暴露到公网。</p>
-        <div className="config-fields">
-          <label>REST API 端口<input max={65535} min={1024} onChange={number("rest_api_port")} required type="number" value={values.rest_api_port} /></label>
-          <label className="config-switch"><input checked={values.backup_save_data} onChange={(event) => setValues((current) => ({ ...current, backup_save_data: event.target.checked }))} type="checkbox" /><span><strong>启用游戏内世界备份</strong><small>由 Palworld 按官方保留策略生成备份。</small></span></label>
-        </div>
-      </fieldset>
-      <details className="advanced-config">
-        <summary>游戏倍率与死亡惩罚</summary>
-        <fieldset disabled={unavailable}>
-          <div className="config-fields config-rates">
-            <label>经验倍率<input max={20} min={0.1} onChange={number("exp_rate")} required step={0.1} type="number" value={values.exp_rate} /></label>
-            <label>捕获倍率<input max={20} min={0.1} onChange={number("pal_capture_rate")} required step={0.1} type="number" value={values.pal_capture_rate} /></label>
-            <label>帕鲁出现倍率<input max={20} min={0.1} onChange={number("pal_spawn_num_rate")} required step={0.1} type="number" value={values.pal_spawn_num_rate} /></label>
-            <label>白天速度<input max={20} min={0.1} onChange={number("day_time_speed_rate")} required step={0.1} type="number" value={values.day_time_speed_rate} /></label>
-            <label>夜晚速度<input max={20} min={0.1} onChange={number("night_time_speed_rate")} required step={0.1} type="number" value={values.night_time_speed_rate} /></label>
-            <label>死亡惩罚<select onChange={(event) => setValues((current) => ({ ...current, death_penalty: event.target.value as ServerConfig["death_penalty"] }))} value={values.death_penalty}><option value="None">不掉落</option><option value="Item">仅掉落物品</option><option value="ItemAndEquipment">掉落物品与装备</option><option value="All">全部掉落</option></select></label>
-          </div>
-        </fieldset>
-      </details>
-      <div className="config-save-row"><span>写入前会自动保留一份带时间戳的配置备份。</span><button className="button button-primary" disabled={unavailable} type="submit">{saving ? "保存中…" : "保存配置并启用 REST API"}</button></div>
+      {visibleGroups.length ? visibleGroups.map((group: ConfigGroup) => <section className="config-group" key={group.id}>
+        <header><div><p className="eyebrow">{group.eyebrow}</p><h3>{group.title}</h3></div><span>{group.fields.length} 项</span></header>
+        <p>{group.description}</p>
+        <fieldset className="config-fields config-dynamic-fields" disabled={unavailable}>{group.fields.map(renderField)}</fieldset>
+      </section>) : <div className="config-empty"><strong>没有找到匹配的配置项</strong><span>可尝试“倍率”“密码”“PvP”或直接输入 INI 键。</span><button className="button button-secondary" onClick={() => setQuery("")} type="button">清除搜索</button></div>}
+      <div className="config-save-row"><span>{dirty ? "有尚未保存的修改。" : `已加载 ${SERVER_CONFIG_FIELDS.length} 个可管理字段。`} 写入前会自动备份原配置；未知字段会原样保留。</span><button className="button button-primary" disabled={unavailable || !visibleGroups.length} type="submit">{saving ? "保存中…" : "保存全部配置并启用 REST API"}</button></div>
     </form>
   </section>;
 }

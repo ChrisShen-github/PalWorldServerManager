@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import math
 import os
 import re
 import shutil
@@ -22,34 +23,70 @@ STEAMCMD_URL = "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.
 OPERATION_LOCK = asyncio.Lock()
 ANSI_ESCAPE = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
 OPTION_SETTINGS_RE = re.compile(r"^OptionSettings=\((.*)\)\s*$", re.MULTILINE)
-CONFIG_DEFAULTS: dict[str, object] = {
-    "server_name": "Default Palworld Server",
-    "server_description": "",
-    "server_player_max_num": 32,
-    "rest_api_port": 8212,
-    "backup_save_data": True,
-    "exp_rate": 1.0,
-    "pal_capture_rate": 1.0,
-    "pal_spawn_num_rate": 1.0,
-    "day_time_speed_rate": 1.0,
-    "night_time_speed_rate": 1.0,
-    "death_penalty": "All",
+STRING_OPTION_KEYS = {
+    "ServerName", "ServerDescription", "AdminPassword", "ServerPassword", "PublicIP", "Region",
+    "BanListURL", "RandomizerSeed", "AdditionalDropItemWhenPlayerKillingInPvPMode",
 }
-CONFIG_KEYS = {
-    "server_name": "ServerName",
-    "server_description": "ServerDescription",
-    "server_password": "ServerPassword",
-    "admin_password": "AdminPassword",
-    "server_player_max_num": "ServerPlayerMaxNum",
-    "rest_api_port": "RESTAPIPort",
-    "backup_save_data": "bIsUseBackupSaveData",
-    "exp_rate": "ExpRate",
-    "pal_capture_rate": "PalCaptureRate",
-    "pal_spawn_num_rate": "PalSpawnNumRate",
-    "day_time_speed_rate": "DayTimeSpeedRate",
-    "night_time_speed_rate": "NightTimeSpeedRate",
-    "death_penalty": "DeathPenalty",
+PASSWORD_OPTION_KEYS = {"AdminPassword", "ServerPassword"}
+ARRAY_OPTION_KEYS = {"CrossplayPlatforms", "DenyTechnologyList"}
+SELECT_OPTION_VALUES = {
+    "Difficulty": {"None"},
+    "DeathPenalty": {"None", "Item", "ItemAndEquipment", "All"},
+    "LogFormatType": {"Text", "Json"},
+    "RandomizerType": {"None", "Region", "All"},
 }
+BOOLEAN_OPTION_KEYS = {
+    "bIsRandomizerPalLevelRandom", "bEnableVoiceChat", "bIsUseBackupSaveData",
+    "bEnableInvaderEnemy", "EnablePredatorBossPal", "bEnablePlayerToPlayerDamage",
+    "bEnableFriendlyFire", "bActiveUNKO", "bEnableAimAssistPad", "bEnableAimAssistKeyboard",
+    "bAutoResetGuildNoOnlinePlayers", "bIsMultiplay", "bIsPvP", "bHardcore", "bPalLost",
+    "bCharacterRecreateInHardcore", "bCanPickupOtherGuildDeathPenaltyDrop",
+    "bEnableNonLoginPenalty", "bEnableFastTravel", "bEnableFastTravelOnlyBaseCamp",
+    "bIsStartLocationSelectByMap", "bExistPlayerAfterLogout", "bEnableDefenseOtherGuildPlayer",
+    "bInvisibleOtherGuildBaseCampAreaFX", "bBuildAreaLimit", "bShowPlayerList",
+    "bAllowGlobalPalboxExport", "bAllowGlobalPalboxImport", "RCONEnabled", "RESTAPIEnabled",
+    "bUseAuth", "bAllowClientMod", "bIsShowJoinLeftMessage",
+    "bDisplayPvPItemNumOnWorldMap_BaseCamp", "bDisplayPvPItemNumOnWorldMap_Player",
+    "bAdditionalDropItemWhenPlayerKillingInPvPMode", "bAllowEnhanceStat_Health",
+    "bAllowEnhanceStat_Attack", "bAllowEnhanceStat_Stamina", "bAllowEnhanceStat_Weight",
+    "bAllowEnhanceStat_WorkSpeed", "bEnableBuildingPlayerUIdDisplay",
+}
+INTEGER_OPTION_RANGES = {
+    "PublicPort": (1, 65535), "ServerPlayerMaxNum": (1, 512), "RCONPort": (1, 65535),
+    "RESTAPIPort": (1, 65535), "DropItemMaxNum": (0, 10000), "DropItemMaxNum_UNKO": (0, 5000),
+    "BaseCampMaxNum": (0, 10240), "BaseCampMaxNumInGuild": (1, 10), "BaseCampWorkerMaxNum": (1, 50),
+    "GuildPlayerMaxNum": (1, 100), "CoopPlayerMaxNum": (1, 4), "SupplyDropSpan": (0, 10080),
+    "ChatPostLimitPerMinute": (0, 100), "MaxBuildingLimitNum": (0, 1000000),
+    "GuildRejoinCooldownMinutes": (0, 10080), "AdditionalDropItemNumWhenPlayerKillingInPvPMode": (0, 100),
+    "PhysicsActiveDropItemMaxNum": (-1, 10000), "AutoTransferMasterThresholdDays": (1, 365),
+    "MaxGuildsPerFrame": (1, 100), "BuildingNameDisplayCacheTTLSeconds": (1, 3600),
+}
+FLOAT_OPTION_RANGES = {
+    "DayTimeSpeedRate": (0.1, 5), "NightTimeSpeedRate": (0.1, 5), "ExpRate": (0, 20),
+    "PalCaptureRate": (0.1, 5), "PalSpawnNumRate": (0.1, 5), "PalDamageRateAttack": (0.1, 5),
+    "PalDamageRateDefense": (0.1, 5), "PlayerDamageRateAttack": (0.1, 5),
+    "PlayerDamageRateDefense": (0.1, 5), "PlayerStomachDecreaceRate": (0.1, 5),
+    "PlayerStaminaDecreaceRate": (0.1, 5), "PlayerAutoHPRegeneRate": (0.1, 5),
+    "PlayerAutoHpRegeneRateInSleep": (0.1, 5), "PalStomachDecreaceRate": (0.1, 5),
+    "PalStaminaDecreaceRate": (0.1, 5), "PalAutoHPRegeneRate": (0.1, 5),
+    "PalAutoHpRegeneRateInSleep": (0.1, 5), "BuildObjectHpRate": (0.1, 5),
+    "BuildObjectDamageRate": (0.1, 5), "BuildObjectDeteriorationDamageRate": (0, 10),
+    "CollectionDropRate": (0.1, 5), "CollectionObjectHpRate": (0.1, 5),
+    "CollectionObjectRespawnSpeedRate": (0.1, 5), "EnemyDropItemRate": (0.1, 5),
+    "DropItemAliveMaxHours": (0, 240), "AutoResetGuildTimeNoOnlinePlayers": (0, 240),
+    "PalEggDefaultHatchingTime": (0, 240), "WorkSpeedRate": (0.1, 5), "AutoSaveSpan": (30, 3600),
+    "ItemWeightRate": (0.1, 5), "ServerReplicatePawnCullDistance": (5000, 15000),
+    "EquipmentDurabilityDamageRate": (0.1, 5), "ItemContainerForceMarkDirtyInterval": (0.1, 10),
+    "ItemCorruptionMultiplier": (0.1, 10), "BlockRespawnTime": (0, 60),
+    "RespawnPenaltyDurationThreshold": (0, 3600), "RespawnPenaltyTimeScale": (0, 10),
+    "PlayerDataPalStorageUpdateCheckTickInterval": (0.1, 60), "MonsterFarmActionSpeedRate": (0.1, 5),
+    "AutoTransferMasterCheckIntervalSeconds": (60, 86400), "VoiceChatMaxVolumeDistance": (100, 50000),
+    "VoiceChatZeroVolumeDistance": (100, 50000),
+}
+EDITABLE_OPTION_KEYS = (
+    STRING_OPTION_KEYS | PASSWORD_OPTION_KEYS | ARRAY_OPTION_KEYS | set(SELECT_OPTION_VALUES) |
+    BOOLEAN_OPTION_KEYS | set(INTEGER_OPTION_RANGES) | set(FLOAT_OPTION_RANGES)
+)
 
 
 def checked_path(value: str) -> Path:
@@ -131,97 +168,133 @@ def default_config_file(server: Path) -> Path:
     return server / "DefaultPalWorldSettings.ini"
 
 
-def config_source(server: Path) -> tuple[Path, bool]:
+def config_source(server: Path) -> tuple[Path, str]:
     target = config_file(server)
     if target.exists():
-        return target, True
+        content = target.read_text(encoding="utf-8-sig")
+        if OPTION_SETTINGS_RE.search(content):
+            return target, "target"
     default = default_config_file(server)
-    if default.exists():
-        return default, False
+    if default.exists() and OPTION_SETTINGS_RE.search(default.read_text(encoding="utf-8-sig")):
+        return default, "default-invalid" if target.exists() else "default-missing"
     raise FileNotFoundError("未找到 PalWorldSettings.ini 或 DefaultPalWorldSettings.ini，请先安装服务器")
+
+
+def decode_array(value: str) -> list[str]:
+    if value.startswith("(") and value.endswith(")"):
+        value = value[1:-1]
+    return [decode_string(item.strip()) for item in split_option_settings(value) if item.strip()]
+
+
+def decode_option_value(key: str, value: str) -> object:
+    if key in STRING_OPTION_KEYS:
+        return decode_string(value)
+    if key in ARRAY_OPTION_KEYS:
+        return decode_array(value)
+    if key in BOOLEAN_OPTION_KEYS:
+        return value.lower() == "true"
+    if key in INTEGER_OPTION_RANGES:
+        try:
+            return int(float(value))
+        except ValueError:
+            return INTEGER_OPTION_RANGES[key][0]
+    if key in FLOAT_OPTION_RANGES:
+        try:
+            return float(value)
+        except ValueError:
+            return 1.0
+    return value
 
 
 def read_server_config(payload: dict[str, object]) -> dict[str, object]:
     server = checked_path(str(payload["server_path"]))
-    source, exists = config_source(server)
+    source, source_state = config_source(server)
     _, entries = option_map(source.read_text(encoding="utf-8-sig"))
     values = dict(entries)
-
-    def number(key: str, default: float) -> float:
-        try:
-            return float(values.get(key, default))
-        except ValueError:
-            return default
-
-    config = dict(CONFIG_DEFAULTS)
-    config.update({
-        "server_name": decode_string(values.get("ServerName", encode_string(str(CONFIG_DEFAULTS["server_name"])))),
-        "server_description": decode_string(values.get("ServerDescription", '""')),
-        "server_player_max_num": int(number("ServerPlayerMaxNum", 32)),
-        "rest_api_port": int(number("RESTAPIPort", 8212)),
-        "backup_save_data": values.get("bIsUseBackupSaveData", "True").lower() == "true",
-        "exp_rate": number("ExpRate", 1.0),
-        "pal_capture_rate": number("PalCaptureRate", 1.0),
-        "pal_spawn_num_rate": number("PalSpawnNumRate", 1.0),
-        "day_time_speed_rate": number("DayTimeSpeedRate", 1.0),
-        "night_time_speed_rate": number("NightTimeSpeedRate", 1.0),
-        "death_penalty": values.get("DeathPenalty", "All"),
-        "server_password_set": bool(decode_string(values.get("ServerPassword", '""'))),
-        "admin_password_set": bool(decode_string(values.get("AdminPassword", '""'))),
-        "file_exists": exists,
-    })
-    return {"message": "已读取 PalWorldSettings.ini。" if exists else "已读取默认配置，保存后将创建 PalWorldSettings.ini。", "config": config}
+    options = {
+        key: decode_option_value(key, value)
+        for key, value in entries
+        if key in EDITABLE_OPTION_KEYS and key not in PASSWORD_OPTION_KEYS
+    }
+    config = {
+        "options": options,
+        "passwords": {
+            "server": bool(decode_string(values.get("ServerPassword", '""'))),
+            "admin": bool(decode_string(values.get("AdminPassword", '""'))),
+        },
+        "file_exists": source_state == "target",
+        "source": source_state,
+        "world_option_exists": any((server / "Pal" / "Saved" / "SaveGames").glob("*/*/WorldOption.sav")),
+    }
+    messages = {
+        "target": "已读取 PalWorldSettings.ini。",
+        "default-missing": "目标配置尚未创建，已载入服务器默认模板；保存后将自动创建。",
+        "default-invalid": "目标配置为空或不完整，已载入服务器默认模板；保存时会先备份旧文件再初始化。",
+    }
+    return {"message": messages[source_state], "config": config}
 
 
 def validated_config(raw: object) -> dict[str, object]:
     if not isinstance(raw, dict):
         raise ValueError("服务器配置格式无效")
-    unknown = set(raw) - set(CONFIG_KEYS)
+    options = raw.get("options")
+    if set(raw) != {"options"} or not isinstance(options, dict):
+        raise ValueError("服务器配置格式无效")
+    unknown = set(options) - EDITABLE_OPTION_KEYS
     if unknown:
-        raise ValueError("包含不允许的配置项")
-    result = dict(raw)
-    for key, maximum in (("server_name", 128), ("server_description", 512), ("server_password", 128), ("admin_password", 128)):
-        if key in result:
-            if not isinstance(result[key], str) or len(result[key]) > maximum:
+        raise ValueError(f"包含不允许的配置项：{', '.join(sorted(unknown))}")
+    result = dict(options)
+    for key, value in result.items():
+        if key in STRING_OPTION_KEYS:
+            maximum = 512 if key == "ServerDescription" else 256
+            if not isinstance(value, str) or len(value) > maximum or "\n" in value or "\r" in value:
                 raise ValueError(f"{key} 格式无效")
-            if key == "server_name" and not result[key].strip():
+            if key == "ServerName" and not value.strip():
                 raise ValueError("服务器名称不能为空")
-    integer_ranges = {"server_player_max_num": (1, 32), "rest_api_port": (1024, 65535)}
-    for key, (minimum, maximum) in integer_ranges.items():
-        value = result.get(key)
-        if not isinstance(value, int) or isinstance(value, bool) or not minimum <= value <= maximum:
-            raise ValueError(f"{key} 必须在 {minimum} 到 {maximum} 之间")
-    for key in ("exp_rate", "pal_capture_rate", "pal_spawn_num_rate", "day_time_speed_rate", "night_time_speed_rate"):
-        value = result.get(key)
-        if not isinstance(value, (int, float)) or isinstance(value, bool) or not 0.1 <= float(value) <= 20:
-            raise ValueError(f"{key} 必须在 0.1 到 20 之间")
-    if not isinstance(result.get("backup_save_data"), bool):
-        raise ValueError("备份开关格式无效")
-    if result.get("death_penalty") not in {"None", "Item", "ItemAndEquipment", "All"}:
-        raise ValueError("死亡惩罚选项无效")
+        elif key in ARRAY_OPTION_KEYS:
+            if not isinstance(value, list) or len(value) > 256 or any(not isinstance(item, str) or len(item) > 128 for item in value):
+                raise ValueError(f"{key} 格式无效")
+        elif key in SELECT_OPTION_VALUES:
+            if value not in SELECT_OPTION_VALUES[key]:
+                raise ValueError(f"{key} 选项无效")
+        elif key in BOOLEAN_OPTION_KEYS:
+            if not isinstance(value, bool):
+                raise ValueError(f"{key} 必须为布尔值")
+        elif key in INTEGER_OPTION_RANGES:
+            minimum, maximum = INTEGER_OPTION_RANGES[key]
+            if not isinstance(value, int) or isinstance(value, bool) or not minimum <= value <= maximum:
+                raise ValueError(f"{key} 必须在 {minimum} 到 {maximum} 之间")
+        elif key in FLOAT_OPTION_RANGES:
+            minimum, maximum = FLOAT_OPTION_RANGES[key]
+            if not isinstance(value, (int, float)) or isinstance(value, bool) or not math.isfinite(float(value)) or not minimum <= float(value) <= maximum:
+                raise ValueError(f"{key} 必须在 {minimum} 到 {maximum} 之间")
     return result
 
 
 def encode_config_value(key: str, value: object) -> str:
-    if key in {"server_name", "server_description", "server_password", "admin_password"}:
+    if key in STRING_OPTION_KEYS:
         return encode_string(str(value))
+    if key in ARRAY_OPTION_KEYS:
+        items = value if isinstance(value, list) else []
+        if key == "DenyTechnologyList":
+            return "(" + ",".join(encode_string(str(item)) for item in items) + ")"
+        return "(" + ",".join(str(item) for item in items) + ")"
     if isinstance(value, bool):
         return "True" if value else "False"
-    if isinstance(value, float):
-        return f"{value:g}"
+    if key in FLOAT_OPTION_RANGES:
+        return f"{float(value):.6f}"
     return str(value)
 
 
 def write_server_config(payload: dict[str, object]) -> dict[str, object]:
     server = checked_path(str(payload["server_path"]))
-    source, _ = config_source(server)
+    source, source_state = config_source(server)
     target = config_file(server)
     content = source.read_text(encoding="utf-8-sig")
     match, entries = option_map(content)
     config = validated_config(payload.get("config"))
-    config["rest_api_enabled"] = True
-    config_key_map = {**CONFIG_KEYS, "rest_api_enabled": "RESTAPIEnabled"}
-    updates = {config_key_map[key]: encode_config_value(key, value) for key, value in config.items()}
+    config["RESTAPIEnabled"] = True
+    updates = {key: encode_config_value(key, value) for key, value in config.items()}
     updated_entries: list[tuple[str, str]] = []
     seen: set[str] = set()
     for key, value in entries:
@@ -244,7 +317,7 @@ def write_server_config(payload: dict[str, object]) -> dict[str, object]:
     os.replace(temporary_path, target)
     run("chown", "palworld:palworld", str(target))
     return {
-        "message": "服务器配置已保存；重启 Palworld 服务后生效。",
+        "message": ("服务器配置已初始化并保存；重启 Palworld 服务后生效。" if source_state != "target" else "服务器配置已保存；重启 Palworld 服务后生效。"),
         "restart_required": True,
         "backup_created": str(backup_path) if backup_path else None,
     }

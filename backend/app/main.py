@@ -70,25 +70,19 @@ class SettingsInput(BaseModel):
 
 
 class ServerConfigInput(BaseModel):
-    server_name: str = Field(min_length=1, max_length=128)
-    server_description: str = Field(default="", max_length=512)
-    server_password: str | None = Field(default=None, max_length=128)
-    admin_password: str | None = Field(default=None, max_length=128)
-    server_player_max_num: int = Field(ge=1, le=32)
-    rest_api_port: int = Field(ge=1024, le=65535)
-    backup_save_data: bool = True
-    exp_rate: float = Field(ge=0.1, le=20)
-    pal_capture_rate: float = Field(ge=0.1, le=20)
-    pal_spawn_num_rate: float = Field(ge=0.1, le=20)
-    day_time_speed_rate: float = Field(ge=0.1, le=20)
-    night_time_speed_rate: float = Field(ge=0.1, le=20)
-    death_penalty: Literal["None", "Item", "ItemAndEquipment", "All"] = "All"
+    options: dict[str, bool | int | float | str | list[str]]
 
-    @field_validator("server_name", "server_description", "server_password", "admin_password")
+    @field_validator("options")
     @classmethod
-    def single_line(cls, value: str | None) -> str | None:
-        if value is not None and ("\n" in value or "\r" in value):
-            raise ValueError("配置文本不能包含换行")
+    def valid_options(cls, value: dict[str, object]) -> dict[str, object]:
+        if not value or len(value) > 128:
+            raise ValueError("配置项数量无效")
+        for key, option in value.items():
+            if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", key):
+                raise ValueError("配置项名称无效")
+            strings = option if isinstance(option, list) else [option] if isinstance(option, str) else []
+            if any("\n" in item or "\r" in item for item in strings):
+                raise ValueError("配置文本不能包含换行")
         return value
 
 
@@ -282,12 +276,16 @@ async def get_server_config() -> dict[str, object]:
 @app.put("/api/server/config")
 async def put_server_config(value: ServerConfigInput) -> dict[str, object]:
     current = store.get()
-    admin_password = value.admin_password or current.rest_password
+    submitted_admin_password = value.options.get("AdminPassword")
+    admin_password = submitted_admin_password if isinstance(submitted_admin_password, str) and submitted_admin_password else current.rest_password
     if not admin_password:
         raise HTTPException(status_code=422, detail="首次启用 REST API 时必须设置管理员密码。")
-    response = await _agent("set_config", {"config": value.model_dump(exclude_none=True)})
+    response = await _agent("set_config", {"config": value.model_dump()})
     if response.get("ok"):
-        rest_url = f"http://host.docker.internal:{value.rest_api_port}/v1/api"
+        rest_api_port = value.options.get("RESTAPIPort", 8212)
+        if not isinstance(rest_api_port, int) or isinstance(rest_api_port, bool):
+            raise HTTPException(status_code=422, detail="REST API 端口格式无效。")
+        rest_url = f"http://host.docker.internal:{rest_api_port}/v1/api"
         store.save(Settings(
             demo_mode=False,
             rest_url=rest_url,

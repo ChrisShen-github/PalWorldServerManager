@@ -32,10 +32,12 @@ npm run dev
 
 1. 保存 `/opt/steamcmd` 与 `/opt/palserver` 等安装目录。
 2. 点击“安装 SteamCMD 与服务器”，面板会在 Ubuntu 宿主机原生安装依赖、SteamCMD、PalServer 和 systemd 服务。
-3. 在“服务器配置”中设置服务器名称、管理员密码、REST API 端口与世界倍率。
+3. 在“服务器配置”中按分类或搜索编辑服务器连接、世界倍率、公会、PvP、性能等完整规则。
 4. 保存配置后点击“启动”；以后可在面板中执行更新、启动、停止和重启。
 
 游戏配置位于 `/opt/palserver/Pal/Saved/Config/LinuxServer/PalWorldSettings.ini`，存档位于 `/opt/palserver/Pal/Saved/`。配置写入前会自动生成带时间戳的 `.bak` 文件。
+
+如果目标 `PalWorldSettings.ini` 尚未创建、为空或不包含 `OptionSettings`，面板会从服务器自带的 `DefaultPalWorldSettings.ini` 载入当前版本默认模板；首次保存前仍会备份原目标文件。游戏升级新增的未知配置项会在读写时原样保留。若存档包含 `WorldOption.sav`，面板会提示其可能优先于 INI 配置。
 
 ## 连接面板到原生服务器
 
@@ -67,7 +69,7 @@ frontend/      React + Vite：管理仪表盘
 runtime/       面板运行时数据、备份与日志（不提交）
 ```
 
-参考：[官方服务器文档](https://docs.palworldgame.com/)、[官方 Docker 示例](https://github.com/pocketpairjp/palworld-dedicated-server-docker)。
+参考：[官方服务器文档](https://docs.palworldgame.com/)、[Bluefissure/pal-conf](https://github.com/Bluefissure/pal-conf)、[官方 Docker 示例](https://github.com/pocketpairjp/palworld-dedicated-server-docker)。
 
 ## GitHub Actions 镜像发布
 
