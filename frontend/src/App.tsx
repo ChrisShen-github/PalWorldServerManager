@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import SettingsPanel from "./SettingsPanel";
+import { PalIcon, type PalIconName } from "./PalIcons";
+import ThemeToggle from "./ThemeToggle";
 import "./dashboard-overrides.css";
 
 type Overview = {
@@ -33,8 +35,6 @@ const disconnectedHost: HostStatus = {
   service_state: "unknown",
   message: "尚未连接宿主机代理。",
 };
-
-const Icon = ({ children }: { children: string }) => <span className="glyph" aria-hidden="true">{children}</span>;
 
 function nativeService(host: HostStatus) {
   if (!host.agent_connected) return { label: "代理未连接", detail: "无法读取 Ubuntu 原生服务状态。", tone: "offline" };
@@ -83,22 +83,23 @@ export default function App() {
 
   return <div className="shell">
     <aside>
-      <div className="brand"><b>◇</b><span><strong>PALWORLD</strong><small>SERVER MANAGER</small></span></div>
+      <div className="brand"><b className="brand-mark"><PalIcon name="sphere" /></b><span><strong>PALWORLD</strong><small>SERVER MANAGER</small></span></div>
       <nav>
-        <button className="active"><Icon>▦</Icon><span>指挥台</span></button>
-        <button><Icon>▣</Icon><span>服务器</span></button>
-        <button><Icon>◉</Icon><span>训练家</span></button>
-        <button><Icon>▤</Icon><span>存档与备份</span></button>
-        <button onClick={() => { location.href = "?view=settings"; }}><Icon>⌘</Icon><span>世界规则与安装</span></button>
+        <button aria-current="page" className="active"><PalIcon className="nav-icon" name="dashboard" /><span>指挥台</span></button>
+        <button><PalIcon className="nav-icon" name="server" /><span>服务器</span></button>
+        <button><PalIcon className="nav-icon" name="trainers" /><span>训练家</span></button>
+        <button><PalIcon className="nav-icon" name="backup" /><span>存档与备份</span></button>
+        <button onClick={() => { location.href = "?view=settings"; }}><PalIcon className="nav-icon" name="settings" /><span>世界规则与安装</span></button>
       </nav>
       <footer>原生 SteamCMD · Docker 面板</footer>
     </aside>
     <main id="main">
       <header>
         <div className="crumb">服务器管理　/　<strong>指挥台</strong></div>
-        <div>
+        <div className="pal-header-actions">
           <span className={`status ${native.tone}`}><i />{native.label}</span>
-          <button className="refresh" onClick={() => void refresh()} disabled={busy}>{busy ? "同步中…" : "刷新数据"}</button>
+          <button aria-label={busy ? "正在同步数据" : "刷新服务器数据"} className="refresh" onClick={() => void refresh()} disabled={busy}><PalIcon name="refresh" /><span>{busy ? "同步中…" : "刷新数据"}</span></button>
+          <ThemeToggle />
         </div>
       </header>
 
@@ -109,7 +110,7 @@ export default function App() {
           <p>{overview.server.description || "先在面板设置中完成原生服务器安装与连接。"}</p>
           <small>{overview.server.version}　·　世界 ID {overview.server.world_guid.slice(0, 8)}</small>
         </div>
-        <div className="orb"><b><strong>{overview.metrics.server_fps.toFixed(0)}</strong><small>SERVER FPS</small></b></div>
+        <div className="orb"><PalIcon className="orb-icon" name="sphere" /><b><strong>{overview.metrics.server_fps.toFixed(0)}</strong><small>SERVER FPS</small></b></div>
       </section>
 
       <section className="service-overview" aria-label="原生服务状态">
@@ -119,10 +120,10 @@ export default function App() {
       </section>
 
       <section className="metrics">
-        <Metric l="在线训练家" v={`${overview.metrics.current_players}/${overview.metrics.max_players || "—"}`} d="当前在线玩家" />
-        <Metric l="服务器帧率" v={`${overview.metrics.server_fps.toFixed(0)} FPS`} d={`${overview.metrics.frame_time_ms.toFixed(1)} ms 每帧`} />
-        <Metric l="世界进程" v={`第 ${overview.metrics.world_days} 天`} d={`${overview.metrics.base_camps} 座基地`} />
-        <Metric l="原生服务" v={native.label} d={host.agent_connected ? "宿主机代理已连接" : "等待宿主机代理"} />
+        <Metric icon="trainers" l="在线训练家" v={`${overview.metrics.current_players}/${overview.metrics.max_players || "—"}`} d="当前在线玩家" />
+        <Metric icon="pulse" l="服务器帧率" v={`${overview.metrics.server_fps.toFixed(0)} FPS`} d={`${overview.metrics.frame_time_ms.toFixed(1)} ms 每帧`} />
+        <Metric icon="sphere" l="世界进程" v={`第 ${overview.metrics.world_days} 天`} d={`${overview.metrics.base_camps} 座基地`} />
+        <Metric icon="server" l="原生服务" v={native.label} d={host.agent_connected ? "宿主机代理已连接" : "等待宿主机代理"} />
       </section>
 
       <section className="content">
@@ -144,6 +145,6 @@ export default function App() {
   </div>;
 }
 
-function Metric({ l, v, d }: { l: string; v: string; d: string }) {
-  return <article className="card"><p>{l}</p><strong>{v}</strong><small>{d}</small></article>;
+function Metric({ icon, l, v, d }: { icon: PalIconName; l: string; v: string; d: string }) {
+  return <article className="card"><PalIcon className="metric-icon" name={icon} /><p>{l}</p><strong>{v}</strong><small>{d}</small></article>;
 }

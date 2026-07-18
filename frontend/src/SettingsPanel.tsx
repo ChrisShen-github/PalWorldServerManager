@@ -1,4 +1,5 @@
 import { FormEvent, useCallback, useEffect, useState, type ChangeEvent } from "react";
+import ThemeToggle from "./ThemeToggle";
 import "./settings.css";
 import "./settings-overrides.css";
 
@@ -211,7 +212,7 @@ export default function SettingsPanel() {
 
   return (
     <main className="settings-page" id="main">
-      <a className="settings-back" href="/">← 返回指挥台</a>
+      <div className="settings-toolbar"><a className="settings-back" href="/">← 返回指挥台</a><ThemeToggle /></div>
       <section className="settings-hero" aria-labelledby="settings-title">
         <p className="eyebrow">HOST · NATIVE INSTALLATION</p>
         <h1 id="settings-title">主机与服务器设置</h1>

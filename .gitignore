@@ -16,6 +16,7 @@ venv/
 frontend/node_modules/
 frontend/dist/
 frontend/.vite/
+.playwright-cli/
 *.tsbuildinfo
 frontend/vite.config.js
 frontend/vite.config.d.ts
