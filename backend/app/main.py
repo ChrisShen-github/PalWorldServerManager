@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import asyncio
 import json
+import re
 from pathlib import Path
 from typing import Literal
 
@@ -55,6 +56,8 @@ class ServerOverview(BaseModel):
 app = FastAPI(title="Palworld Server Manager API", version="0.1.0")
 store = SettingsStore()
 AGENT_SOCKET = "/run/palworld-server-manager/agent.sock"
+SERVICE_STATES = {"active", "inactive", "failed", "activating", "deactivating"}
+SYSTEMD_ACTIVE_RE = re.compile(r"(?:^|\n)\s*Active:\s+(active|inactive|failed|activating|deactivating)\b")
 
 
 class SettingsInput(BaseModel):
@@ -75,7 +78,7 @@ def _demo_overview() -> ServerOverview:
         server=ServerInfo(
             version="v1.0.1.100619",
             name="Palpagos · Expedition 01",
-            description="为冒险者保留一盏篝火。",
+            description="为训练家保留一盏篝火。",
             world_guid="A7E97BAA767DB9029EF013BB71E993A0",
         ),
         metrics=Metrics(
@@ -228,14 +231,33 @@ async def _agent_stream(action: str):
             await writer.wait_closed()
 
 
+def _service_state(message: str) -> str:
+    """Normalize both current and older host-agent systemd responses."""
+    normalized = message.strip().lower()
+    if normalized in SERVICE_STATES:
+        return normalized
+    match = SYSTEMD_ACTIVE_RE.search(message)
+    return match.group(1) if match else "unknown"
+
+
 @app.get("/api/host/status")
 async def host_status() -> dict[str, object]:
     response = await _agent("status")
     message = str(response.get("message", ""))
-    service_missing = message in {"not-installed", "unknown"}
-    response["service_installed"] = False if service_missing else True if response.get("ok") else None
+    state = _service_state(message)
+    service_missing = message.strip().lower() == "not-installed"
+    response["service_state"] = "not-installed" if service_missing else state
+    response["service_installed"] = False if service_missing else True if state != "unknown" or response.get("ok") else None
     if response.get("agent_connected") and service_missing:
         response["message"] = "代理已连接；Palworld systemd 服务尚未安装。请先执行安装。"
+    elif response.get("agent_connected") and state == "active":
+        response["message"] = "Palworld 原生服务正在运行。"
+    elif response.get("agent_connected") and state == "inactive":
+        response["message"] = "Palworld 原生服务已安装，当前未运行。"
+    elif response.get("agent_connected") and state == "failed":
+        response["message"] = "Palworld 原生服务启动失败，请在主机日志中排查。"
+    elif response.get("agent_connected") and state in {"activating", "deactivating"}:
+        response["message"] = "Palworld 原生服务正在切换状态，请稍候刷新。"
     elif response.get("agent_connected") and response["service_installed"] is None:
         response["message"] = "代理已连接，但当前代理无法确认服务状态。可尝试启动服务，或更新代理后重新检查。"
     return response

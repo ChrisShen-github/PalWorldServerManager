@@ -12,7 +12,7 @@ type Settings = {
 };
 
 type Operation = "install" | "update" | "start" | "stop" | "restart";
-type HostReply = { ok: boolean; agent_connected: boolean; service_installed: boolean | null; message: string };
+type HostReply = { ok: boolean; agent_connected: boolean; service_installed: boolean | null; service_state?: string; message: string };
 type StreamEvent = { event: "progress" | "complete"; ok?: boolean; message: string };
 
 const initial: Settings = {
@@ -65,6 +65,7 @@ export default function SettingsPanel() {
   const [checkingHost, setCheckingHost] = useState(true);
   const [operation, setOperation] = useState<Operation | null>(null);
   const [confirming, setConfirming] = useState<Exclude<Operation, "start"> | null>(null);
+  const [operationLog, setOperationLog] = useState("");
 
   const refreshHost = useCallback(async () => {
     setCheckingHost(true);
@@ -131,6 +132,7 @@ export default function SettingsPanel() {
   const execute = async (nextOperation: Operation) => {
     setConfirming(null);
     setOperation(nextOperation);
+    setOperationLog("");
     setFeedback(nextOperation === "install" ? "正在安装 SteamCMD 与 PalServer；下载可能持续数分钟，请保持页面打开。" : `正在${operationLabel[nextOperation]}…`);
     const saved = await persistSettings(false);
     if (!saved) {
@@ -150,7 +152,7 @@ export default function SettingsPanel() {
         const cleanMessage = cleanTerminalOutput(message);
         if (!cleanMessage) return;
         lines = [...lines, cleanMessage];
-        setFeedback(lines.join("\n"));
+        setOperationLog(lines.join("\n"));
       };
       const handleEvent = (event: StreamEvent) => {
         if (event.event === "progress") {
@@ -159,7 +161,7 @@ export default function SettingsPanel() {
           return;
         }
         completed = true;
-        appendLog(event.ok ? `${operationLabel[nextOperation]}完成。` : `操作未完成：${event.message}`);
+        setFeedback(event.ok ? `${operationLabel[nextOperation]}完成。` : `操作未完成：${event.message}`);
         if (!event.ok || !receivedProgress) appendLog(event.message);
       };
       while (true) {
@@ -195,6 +197,16 @@ export default function SettingsPanel() {
   const agentReady = host?.agent_connected === true;
   const serviceMissing = host?.service_installed === false;
   const serviceStatusUnknown = agentReady && host?.service_installed === null;
+  const serviceState = host?.service_state;
+  const agentSummary = !agentReady
+    ? host?.message ?? "正在读取状态…"
+    : serviceMissing
+      ? "服务安装、更新与运行状态会显示在指挥台。"
+      : serviceState === "active"
+        ? "服务正在运行；实时状态和训练家数据请前往指挥台查看。"
+        : serviceState === "inactive"
+          ? "服务已安装但当前停止；可在下方启动，运行状态会同步到指挥台。"
+          : host?.message ?? "正在读取状态…";
   const busy = saving || operation !== null;
 
   return (
@@ -255,7 +267,7 @@ export default function SettingsPanel() {
               <button aria-label="重新检查宿主机代理" className="button button-secondary" disabled={checkingHost || busy} onClick={() => void refreshHost()} type="button">{checkingHost ? "检查中…" : "重新检查"}</button>
             </div>
             <p className={`agent-state ${agentReady ? "ready" : "missing"}`} role="status"><i />{checkingHost ? "正在检查代理状态…" : agentReady ? serviceMissing ? "代理已连接 · 服务未安装" : serviceStatusUnknown ? "代理已连接 · 状态待确认" : "代理与服务器已就绪" : "代理未连接"}</p>
-            <p className="agent-message">{host?.message ?? "正在读取状态…"}</p>
+            <p className="agent-message">{agentSummary}</p>
             {!agentReady && !checkingHost && <p className="agent-hint">先在 Ubuntu 的 Compose 目录执行 <code>sudo ./host-agent/install.sh</code>，然后点击“重新检查”。</p>}
           </section>
 
@@ -279,6 +291,7 @@ export default function SettingsPanel() {
       <section aria-live="polite" className={`operation-feedback ${feedback.includes("失败") || feedback.includes("未完成") || feedback.includes("无法") ? "error" : ""}`}>
         <p className="eyebrow">OPERATION FEEDBACK</p>
         <pre>{feedback || "保存设置后，检查宿主机代理并开始安装。"}</pre>
+        {operationLog && <details className="operation-log"><summary>查看本次操作过程日志</summary><pre>{operationLog}</pre></details>}
       </section>
 
       {confirming && <div aria-labelledby="confirmation-title" aria-modal="true" className="confirmation-scrim" role="dialog">
