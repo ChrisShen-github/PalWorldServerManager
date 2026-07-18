@@ -13,6 +13,7 @@ import sys
 import tarfile
 import tempfile
 import threading
+import time
 import uuid
 from datetime import datetime, timedelta, timezone
 from collections.abc import Callable
@@ -39,6 +40,8 @@ BACKUP_SERVICE = "palworld-backup.service"
 STEAMCMD_URL = "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
 OPERATION_LOCK = asyncio.Lock()
 OPERATION_LOG_LOCK = threading.Lock()
+HOST_CPU_SAMPLE: tuple[int, int] | None = None
+PROCESS_CPU_SAMPLES: dict[int, tuple[float, int]] = {}
 ANSI_ESCAPE = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
 OPTION_SETTINGS_RE = re.compile(r"^OptionSettings=\((.*)\)\s*$", re.MULTILINE)
 STRING_OPTION_KEYS = {
@@ -191,6 +194,84 @@ def list_operation_logs() -> dict[str, object]:
 
 def clean_terminal_output(value: str) -> str:
     return ANSI_ESCAPE.sub("", value).replace("\r", "")
+
+
+def read_host_cpu_percent() -> float:
+    global HOST_CPU_SAMPLE
+    try:
+        fields = (Path("/proc/stat").read_text(encoding="utf-8").splitlines()[0]).split()[1:]
+        counters = [int(value) for value in fields]
+        total, idle = sum(counters), counters[3] + (counters[4] if len(counters) > 4 else 0)
+    except (OSError, ValueError, IndexError):
+        return 0.0
+    previous = HOST_CPU_SAMPLE
+    HOST_CPU_SAMPLE = (total, idle)
+    if not previous or total <= previous[0]:
+        return 0.0
+    return round(max(0.0, min(100.0, (1 - (idle - previous[1]) / (total - previous[0])) * 100)), 1)
+
+
+def read_memory() -> tuple[int, int]:
+    values: dict[str, int] = {}
+    try:
+        for line in Path("/proc/meminfo").read_text(encoding="utf-8").splitlines():
+            key, raw = line.split(":", 1)
+            values[key] = int(raw.strip().split()[0]) * 1024
+    except (OSError, ValueError, IndexError):
+        return 0, 0
+    return values.get("MemTotal", 0), values.get("MemAvailable", 0)
+
+
+def palworld_process_metrics() -> dict[str, float | int | None]:
+    try:
+        entries = list(Path("/proc").iterdir())
+    except OSError:
+        return {"pid": None, "cpu_percent": 0.0, "memory_bytes": 0}
+    for entry in entries:
+        if not entry.name.isdigit():
+            continue
+        try:
+            command = (entry / "cmdline").read_bytes().decode("utf-8", "replace")
+            if "PalServer-Linux-Shipping" not in command:
+                continue
+            pid = int(entry.name)
+            stat = (entry / "stat").read_text(encoding="utf-8")
+            after_name = stat.rsplit(")", 1)[1].split()
+            ticks = int(after_name[11]) + int(after_name[12])
+            rss_pages = int((entry / "statm").read_text(encoding="utf-8").split()[1])
+            now = time.monotonic()
+            previous = PROCESS_CPU_SAMPLES.get(pid)
+            PROCESS_CPU_SAMPLES.clear()
+            PROCESS_CPU_SAMPLES[pid] = (now, ticks)
+            cpu_percent = 0.0 if not previous or now <= previous[0] else max(0.0, (ticks - previous[1]) / os.sysconf("SC_CLK_TCK") / (now - previous[0]) * 100)
+            return {"pid": pid, "cpu_percent": round(cpu_percent, 1), "memory_bytes": rss_pages * os.sysconf("SC_PAGE_SIZE")}
+        except (OSError, ValueError, IndexError):
+            continue
+    PROCESS_CPU_SAMPLES.clear()
+    return {"pid": None, "cpu_percent": 0.0, "memory_bytes": 0}
+
+
+def monitor_host(payload: dict[str, object]) -> dict[str, object]:
+    total_memory, available_memory = read_memory()
+    requested_server = Path(str(payload.get("server_path", "/opt/palserver")))
+    disk_target = requested_server if requested_server.exists() else Path("/")
+    disk = shutil.disk_usage(disk_target)
+    process = palworld_process_metrics()
+    load = os.getloadavg() if hasattr(os, "getloadavg") else (0.0, 0.0, 0.0)
+    return {
+        "message": "已读取 Ubuntu 宿主机运行指标。",
+        "sampled_at": operation_now(),
+        "service_state": status({}),
+        "cpu_percent": read_host_cpu_percent(),
+        "cpu_cores": os.cpu_count() or 1,
+        "load_1m": round(load[0], 2),
+        "memory_total_bytes": total_memory,
+        "memory_available_bytes": available_memory,
+        "disk_total_bytes": disk.total,
+        "disk_free_bytes": disk.free,
+        "disk_used_bytes": disk.used,
+        "palworld": process,
+    }
 
 
 def split_option_settings(value: str) -> list[str]:
@@ -784,6 +865,7 @@ def status(_: dict[str, str]) -> str:
 
 
 def operate(action: str, payload: dict[str, object], output: Callable[[str], None] | None = None) -> str | dict[str, object]:
+    if action == "monitor": return monitor_host(payload)
     if action == "get_config": return read_server_config(payload)
     if action == "set_config": return write_server_config(payload)
     if action == "list_backups": return list_backups(checked_path(str(payload["server_path"])))
@@ -851,7 +933,7 @@ async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> 
     try:
         payload = json.loads((await reader.readline()).decode())
         action = payload.get("action")
-        if action not in {"status", "install", "update", "start", "stop", "restart", "get_config", "set_config", "list_backups", "list_operation_logs", "set_backup_schedule", "create_backup", "restore_backup", "delete_backup", "rename_backup"}:
+        if action not in {"status", "monitor", "install", "update", "start", "stop", "restart", "get_config", "set_config", "list_backups", "list_operation_logs", "set_backup_schedule", "create_backup", "restore_backup", "delete_backup", "rename_backup"}:
             raise ValueError("不允许的操作")
         streaming = bool(payload.get("stream"))
         async with OPERATION_LOCK:

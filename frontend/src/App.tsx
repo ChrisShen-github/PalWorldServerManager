@@ -5,6 +5,7 @@ import OperationLogPanel from "./OperationLogPanel";
 import { PalIcon, type PalIconName } from "./PalIcons";
 import ThemeToggle from "./ThemeToggle";
 import "./dashboard-overrides.css";
+import "./monitoring.css";
 
 type Overview = {
   status: "online" | "offline" | "demo";
@@ -20,6 +21,28 @@ type HostStatus = {
   service_installed: boolean | null;
   service_state?: "active" | "inactive" | "failed" | "activating" | "deactivating" | "not-installed" | "unknown";
   message: string;
+};
+
+type MonitorHost = {
+  sampled_at: string;
+  service_state: string;
+  cpu_percent: number;
+  cpu_cores: number;
+  load_1m: number;
+  memory_total_bytes: number;
+  memory_available_bytes: number;
+  disk_total_bytes: number;
+  disk_free_bytes: number;
+  disk_used_bytes: number;
+  palworld: { pid: number | null; cpu_percent: number; memory_bytes: number };
+};
+
+type Monitoring = {
+  ok: boolean;
+  message: string;
+  host?: MonitorHost;
+  game?: { source: string; server_fps: number; current_players: number; max_players: number };
+  history?: Array<{ sampled_at: string; host_cpu_percent: number; host_memory_percent: number; disk_used_percent: number; palworld_cpu_percent: number; palworld_memory_bytes: number; server_fps: number | null; current_players: number | null }>;
 };
 
 const empty: Overview = {
@@ -38,6 +61,21 @@ const disconnectedHost: HostStatus = {
   message: "尚未连接宿主机代理。",
 };
 
+const emptyMonitoring: Monitoring = { ok: false, message: "正在等待宿主机监控数据。", history: [] };
+
+function bytes(value: number) {
+  if (value < 1024) return `${value} B`;
+  const units = ["KB", "MB", "GB", "TB"];
+  let size = value / 1024;
+  let unit = 0;
+  while (size >= 1024 && unit < units.length - 1) { size /= 1024; unit += 1; }
+  return `${size.toFixed(size >= 10 ? 0 : 1)} ${units[unit]}`;
+}
+
+function ratio(part: number, total: number) {
+  return total > 0 ? Math.min(100, Math.max(0, (part / total) * 100)) : 0;
+}
+
 function nativeService(host: HostStatus) {
   if (!host.agent_connected) return { label: "代理未连接", detail: "无法读取 Ubuntu 原生服务状态。", tone: "offline" };
   if (host.service_installed === false) return { label: "尚未安装", detail: "SteamCMD 与 PalServer 尚未安装。", tone: "demo" };
@@ -55,13 +93,15 @@ export default function App() {
 
   const [overview, setOverview] = useState(empty);
   const [host, setHost] = useState(disconnectedHost);
+  const [monitoring, setMonitoring] = useState(emptyMonitoring);
   const [busy, setBusy] = useState(true);
 
   const refresh = useCallback(async () => {
     setBusy(true);
-    const [overviewResult, hostResult] = await Promise.allSettled([
+    const [overviewResult, hostResult, monitoringResult] = await Promise.allSettled([
       fetch("/api/server/overview"),
       fetch("/api/host/status"),
+      fetch("/api/monitoring"),
     ]);
     if (overviewResult.status === "fulfilled" && overviewResult.value.ok) {
       setOverview(await overviewResult.value.json() as Overview);
@@ -72,6 +112,11 @@ export default function App() {
       setHost(await hostResult.value.json() as HostStatus);
     } else {
       setHost(disconnectedHost);
+    }
+    if (monitoringResult.status === "fulfilled" && monitoringResult.value.ok) {
+      setMonitoring(await monitoringResult.value.json() as Monitoring);
+    } else {
+      setMonitoring(emptyMonitoring);
     }
     setBusy(false);
   }, []);
@@ -131,6 +176,8 @@ export default function App() {
         <Metric icon="server" l="原生服务" v={native.label} d={host.agent_connected ? "宿主机代理已连接" : "等待宿主机代理"} />
       </section>
 
+      <HostMonitor monitoring={monitoring} />
+
       <section className="content">
         <article className="panel">
           <div className="head"><div><p className="eyebrow">LIVE TRAINERS</p><h2>在线训练家</h2></div></div>
@@ -152,4 +199,41 @@ export default function App() {
 
 function Metric({ icon, l, v, d }: { icon: PalIconName; l: string; v: string; d: string }) {
   return <article className="card"><PalIcon className="metric-icon" name={icon} /><p>{l}</p><strong>{v}</strong><small>{d}</small></article>;
+}
+
+function HostMonitor({ monitoring }: { monitoring: Monitoring }) {
+  const host = monitoring.host;
+  const memory = host ? ratio(host.memory_total_bytes - host.memory_available_bytes, host.memory_total_bytes) : 0;
+  const disk = host ? ratio(host.disk_used_bytes, host.disk_total_bytes) : 0;
+  const health = !host ? "offline" : host.service_state !== "active" || disk >= 90 || memory >= 90 ? "warning" : "online";
+  const summary = !host ? monitoring.message : health === "warning" ? "有需要留意的资源或服务状态。" : `负载 ${host.load_1m.toFixed(2)} · ${host.cpu_cores} 核 CPU`;
+  const history = monitoring.history ?? [];
+  return <section className="host-monitor panel" aria-labelledby="host-monitor-title">
+    <header className="host-monitor-heading"><div><p className="eyebrow">HOST TELEMETRY · 24H</p><h2 id="host-monitor-title">宿主机运行监控</h2><p>{summary}</p></div><span className={`host-monitor-state ${health}`}><i />{health === "online" ? "状态正常" : health === "warning" ? "需要留意" : "暂不可用"}</span></header>
+    <div className="host-stat-grid">
+      <HostStat label="主机 CPU" value={host ? `${host.cpu_percent.toFixed(1)}%` : "—"} detail={host ? `1 分钟负载 ${host.load_1m.toFixed(2)}` : "等待宿主机代理"} tone={host && host.cpu_percent >= 90 ? "warning" : ""} />
+      <HostStat label="主机内存" value={host ? `${memory.toFixed(0)}%` : "—"} detail={host ? `${bytes(host.memory_available_bytes)} 可用` : "等待宿主机代理"} tone={memory >= 90 ? "warning" : ""} />
+      <HostStat label="Palworld 进程" value={host?.palworld.pid ? bytes(host.palworld.memory_bytes) : "未运行"} detail={host?.palworld.pid ? `PID ${host.palworld.pid} · CPU ${host.palworld.cpu_percent.toFixed(1)}%` : "未检测到游戏进程"} tone={!host?.palworld.pid && host?.service_state === "active" ? "warning" : ""} />
+      <HostStat label="服务器磁盘" value={host ? `${disk.toFixed(0)}%` : "—"} detail={host ? `${bytes(host.disk_free_bytes)} 可用` : "等待宿主机代理"} tone={disk >= 90 ? "warning" : ""} />
+    </div>
+    <div className="host-trends">
+      <Trend label="主机 CPU" unit="%" values={history.map((item) => item.host_cpu_percent)} color="teal" />
+      <Trend label="内存占用" unit="%" values={history.map((item) => item.host_memory_percent)} color="mint" />
+      <Trend label="服务器 FPS" unit=" FPS" values={history.map((item) => item.server_fps ?? 0)} color="gold" unavailable={!history.some((item) => item.server_fps !== null)} />
+      <Trend label="在线训练家" unit=" 人" values={history.map((item) => item.current_players ?? 0)} color="blue" unavailable={!history.some((item) => item.current_players !== null)} />
+    </div>
+    <p className="host-monitor-foot">趋势按面板每 20 秒刷新时采样；最多保留 720 个样本。游戏 FPS 和在线人数需要已连接 Palworld REST API。</p>
+  </section>;
+}
+
+function HostStat({ label, value, detail, tone }: { label: string; value: string; detail: string; tone: string }) {
+  return <article className={tone ? `host-stat ${tone}` : "host-stat"}><p>{label}</p><strong>{value}</strong><small>{detail}</small></article>;
+}
+
+function Trend({ label, unit, values, color, unavailable = false }: { label: string; unit: string; values: number[]; color: string; unavailable?: boolean }) {
+  const usable = values.slice(-120);
+  const max = Math.max(1, ...usable);
+  const points = usable.length > 1 ? usable.map((value, index) => `${(index / (usable.length - 1)) * 100},${36 - (value / max) * 30}`).join(" ") : "0,36 100,36";
+  const latest = usable.at(-1) ?? 0;
+  return <article className={`host-trend ${color}`}><header><span>{label}</span><strong>{unavailable ? "—" : `${latest.toFixed(label === "服务器 FPS" ? 0 : 1)}${unit}`}</strong></header><svg aria-label={unavailable ? `${label}暂无可用数据` : `${label}最近趋势`} role="img" viewBox="0 0 100 40"><path d="M0 36H100" /><polyline points={points} /></svg><small>{unavailable ? "等待 REST 数据" : `${usable.length} 个样本`}</small></article>;
 }

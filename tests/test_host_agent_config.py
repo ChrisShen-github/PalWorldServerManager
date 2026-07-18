@@ -192,6 +192,16 @@ class HostAgentConfigTests(unittest.TestCase):
             self.assertEqual(records[0]["status"], "success")
             self.assertEqual(records[0]["messages"], ["正在安全停止 Palworld 服务…", "存档已恢复；恢复前版本已自动备份。"])
 
+    def test_host_monitor_returns_safe_numeric_shape(self) -> None:
+        with tempfile.TemporaryDirectory() as directory, patch.object(AGENT, "status", return_value="active"):
+            metrics = AGENT.monitor_host({"server_path": directory})
+
+        self.assertEqual(metrics["service_state"], "active")
+        self.assertGreaterEqual(metrics["cpu_percent"], 0)
+        self.assertGreaterEqual(metrics["memory_total_bytes"], 0)
+        self.assertGreater(metrics["disk_total_bytes"], 0)
+        self.assertIn("pid", metrics["palworld"])
+
 
 if __name__ == "__main__":
     unittest.main()

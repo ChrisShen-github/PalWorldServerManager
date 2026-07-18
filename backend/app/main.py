@@ -348,6 +348,39 @@ async def host_status() -> dict[str, object]:
     return response
 
 
+@app.get("/api/monitoring")
+async def monitoring() -> dict[str, object]:
+    settings = store.get()
+    overview_task = asyncio.create_task(_fetch_overview(settings) if not settings.demo_mode else asyncio.sleep(0, result=_demo_overview()))
+    host = await _agent("monitor")
+    overview = await overview_task
+    if not host.get("ok"):
+        return {**host, "history": store.monitoring_history()}
+
+    total_memory = int(host.get("memory_total_bytes") or 0)
+    available_memory = int(host.get("memory_available_bytes") or 0)
+    disk_total = int(host.get("disk_total_bytes") or 0)
+    disk_used = int(host.get("disk_used_bytes") or 0)
+    process = host.get("palworld") if isinstance(host.get("palworld"), dict) else {}
+    store.record_monitoring_sample({
+        "host_cpu_percent": float(host.get("cpu_percent") or 0),
+        "host_memory_percent": round((total_memory - available_memory) / total_memory * 100, 1) if total_memory else 0.0,
+        "disk_used_percent": round(disk_used / disk_total * 100, 1) if disk_total else 0.0,
+        "palworld_cpu_percent": float(process.get("cpu_percent") or 0),
+        "palworld_memory_bytes": int(process.get("memory_bytes") or 0),
+        "server_fps": overview.metrics.server_fps if overview.source == "palworld-rest" else None,
+        "current_players": overview.metrics.current_players if overview.source == "palworld-rest" else None,
+    })
+    return {
+        "ok": True,
+        "agent_connected": True,
+        "message": "已同步宿主机与游戏运行指标。",
+        "host": host,
+        "game": {"source": overview.source, "server_fps": overview.metrics.server_fps, "current_players": overview.metrics.current_players, "max_players": overview.metrics.max_players},
+        "history": store.monitoring_history(),
+    }
+
+
 @app.post("/api/host/install")
 async def host_install() -> dict[str, object]:
     return await _agent("install")
