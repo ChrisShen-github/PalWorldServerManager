@@ -6,6 +6,7 @@ import os
 import re
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import patch
 
@@ -115,6 +116,14 @@ class HostAgentConfigTests(unittest.TestCase):
     def test_backup_identifiers_do_not_allow_path_traversal(self) -> None:
         with self.assertRaisesRegex(ValueError, "备份标识"):
             AGENT.backup_path("../../PalWorldSettings.ini")
+
+    def test_backup_stamps_and_legacy_names_use_china_time(self) -> None:
+        utc_time = datetime(2026, 7, 18, 8, 59, 51, 612412, tzinfo=timezone.utc)
+        self.assertEqual(AGENT.china_backup_stamp(utc_time), "20260718T165951612412Z")
+        self.assertEqual(
+            AGENT.default_backup_name("world-20260718T085951612412Z.tar.gz"),
+            "世界备份 20260718T165951612412Z",
+        )
 
 
 if __name__ == "__main__":

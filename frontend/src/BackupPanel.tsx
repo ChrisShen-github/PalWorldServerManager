@@ -29,7 +29,38 @@ function bytes(value: number) {
 
 function date(value: string) {
   const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? "未知时间" : new Intl.DateTimeFormat("zh-CN", { dateStyle: "medium", timeStyle: "short" }).format(parsed);
+  if (Number.isNaN(parsed.getTime())) return "未知时间";
+  try {
+    return new Intl.DateTimeFormat("zh-CN", {
+      timeZone: "Asia/Shanghai",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(parsed);
+  } catch {
+    return parsed.toISOString().replace("T", " ").slice(0, 16);
+  }
+}
+
+function defaultBackupName(value = new Date()) {
+  try {
+    const values = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Shanghai",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hourCycle: "h23",
+    }).formatToParts(value).reduce<Record<string, string>>((parts, part) => ({ ...parts, [part.type]: part.value }), {});
+    return `世界备份 ${values.year}${values.month}${values.day}T${values.hour}${values.minute}${values.second}${String(value.getMilliseconds()).padStart(3, "0")}000Z`;
+  } catch {
+    return `世界备份 ${value.toISOString().replace(/[-:.]/g, "").replace("T", "T")}`;
+  }
 }
 
 const clean = (value: string) => value.replace(/\u001b\[[0-?]*[ -/]*[@-~]/g, "").replace(/\r/g, "");
@@ -45,7 +76,7 @@ function BackupPanelContent() {
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState<"create" | "restore" | null>(null);
   const [pending, setPending] = useState<Pending | null>(null);
-  const [draftName, setDraftName] = useState("世界备份");
+  const [draftName, setDraftName] = useState(() => defaultBackupName());
   const [log, setLog] = useState("");
 
   const refresh = useCallback(async () => {
@@ -150,7 +181,7 @@ function BackupPanelContent() {
     <section className="backup-status" aria-live="polite"><div><PalIcon name="server" /><span><strong>{loading ? "正在同步备份目录" : "主机备份库"}</strong><small>{message}</small></span></div><button className="button button-secondary" disabled={loading || running !== null} onClick={() => void refresh()} type="button"><PalIcon name="refresh" />刷新列表</button></section>
 
     <section className="backup-panel" aria-labelledby="backup-list-title">
-      <header className="backup-panel-heading"><div><p className="eyebrow">RECOVERY POINTS</p><h2 id="backup-list-title">世界恢复点</h2><p>保留最近 {retention} 份面板创建的备份；创建新备份时会自动清理更早版本。</p></div><button className="button button-primary backup-create" disabled={loading || running !== null} onClick={() => { setDraftName("世界备份"); setPending({ kind: "create" }); }} type="button"><PalIcon name="backup" />{running === "create" ? "正在备份…" : "立即备份"}</button></header>
+      <header className="backup-panel-heading"><div><p className="eyebrow">RECOVERY POINTS</p><h2 id="backup-list-title">世界恢复点</h2><p>保留最近 {retention} 份面板创建的备份；创建新备份时会自动清理更早版本。</p></div><button className="button button-primary backup-create" disabled={loading || running !== null} onClick={() => { setDraftName(defaultBackupName()); setPending({ kind: "create" }); }} type="button"><PalIcon name="backup" />{running === "create" ? "正在备份…" : "立即备份"}</button></header>
       {backups.length ? <div className="backup-table" role="list">{backups.map((backup) => <article className="backup-row" key={backup.id} role="listitem"><div className="backup-file"><b><PalIcon name="backup" /></b><span><strong>{backup.name}</strong><small><time dateTime={backup.created_at}>{date(backup.created_at)}</time> · {bytes(backup.size_bytes)} · {backup.id}</small></span></div><div className="backup-actions"><a className="button button-secondary" download href={`/api/backups/${encodeURIComponent(backup.id)}/download`}>下载</a><button className="button button-secondary" disabled={running !== null} onClick={() => { setDraftName(backup.name); setPending({ kind: "rename", backup }); }} type="button">改名</button><button className="button button-secondary" disabled={running !== null} onClick={() => setPending({ kind: "restore", backup })} type="button">恢复</button><button aria-label={`删除备份 ${backup.name}`} className="button button-danger backup-delete" disabled={running !== null} onClick={() => setPending({ kind: "delete", backup })} type="button">删除</button></div></article>)}</div> : <div className="backup-empty"><PalIcon name="backup" /><strong>还没有可用备份</strong><span>先创建一次安全备份，今后更新或调整高风险规则前也建议手动保留一个恢复点。</span></div>}
     </section>
     {log && <details className="backup-log"><summary>查看本次操作日志</summary><pre>{log}</pre></details>}

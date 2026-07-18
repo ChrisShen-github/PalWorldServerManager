@@ -12,7 +12,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from collections.abc import Callable
 import urllib.request
 from pathlib import Path
@@ -25,6 +25,9 @@ MANAGER_ROOT = Path(__file__).resolve().parent.parent
 BACKUP_ROOT = MANAGER_ROOT / "backups"
 BACKUP_ID_RE = re.compile(r"^world-\d{8}T\d{6}(?:\d{6})?Z\.tar\.gz$")
 MAX_MANAGED_BACKUPS = 12
+# China has no daylight-saving time. A fixed offset avoids requiring the
+# optional tzdata package when the agent is smoke-tested on Windows.
+CHINA_TZ = timezone(timedelta(hours=8), name="Asia/Shanghai")
 STEAMCMD_URL = "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
 OPERATION_LOCK = asyncio.Lock()
 ANSI_ESCAPE = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
@@ -193,6 +196,27 @@ def clean_backup_name(value: object) -> str:
     return name
 
 
+def china_backup_stamp(value: datetime) -> str:
+    """Return the user-visible backup stamp in China Standard Time.
+
+    The trailing Z is retained for backwards-compatible archive identifiers,
+    while the clock value intentionally follows the manager's Chinese UI.
+    """
+    return value.astimezone(CHINA_TZ).strftime("%Y%m%dT%H%M%S%fZ")
+
+
+def default_backup_name(backup_id: str) -> str:
+    """Build a China-time display name for archives without metadata."""
+    stamp = backup_id.removesuffix(".tar.gz").removeprefix("world-")
+    for pattern in ("%Y%m%dT%H%M%S%fZ", "%Y%m%dT%H%M%SZ"):
+        try:
+            archived_at = datetime.strptime(stamp, pattern).replace(tzinfo=timezone.utc)
+            return f"世界备份 {china_backup_stamp(archived_at)}"
+        except ValueError:
+            continue
+    return f"世界备份 {stamp}"
+
+
 def read_backup_metadata() -> dict[str, str]:
     try:
         raw = json.loads(backup_metadata_path().read_text(encoding="utf-8"))
@@ -220,7 +244,7 @@ def backup_records() -> list[dict[str, object]]:
         stat = archive.stat()
         records.append({
             "id": archive.name,
-            "name": metadata.get(archive.name, f"世界备份 {archive.name.removesuffix('.tar.gz').removeprefix('world-')}"),
+            "name": metadata.get(archive.name, default_backup_name(archive.name)),
             "created_at": datetime.fromtimestamp(stat.st_mtime, timezone.utc).isoformat(),
             "size_bytes": stat.st_size,
         })
@@ -249,7 +273,7 @@ def create_backup(server: Path, name: object = None, output: Callable[[str], Non
     if was_running:
         emit(output, "正在安全停止 Palworld 服务以冻结存档…")
         run("systemctl", "stop", SERVICE, output=output)
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    stamp = china_backup_stamp(datetime.now(CHINA_TZ))
     archive = backup_path(f"world-{stamp}.tar.gz")
     temporary = archive.with_suffix(".tar.gz.partial")
     try:
