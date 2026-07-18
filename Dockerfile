@@ -20,5 +20,9 @@ COPY backend/app ./app
 COPY infra/container/nginx.conf /etc/nginx/conf.d/default.conf
 COPY infra/container/supervisord.conf /etc/supervisor/conf.d/manager.conf
 COPY --from=web-build /web/dist /usr/share/nginx/html
+COPY host-agent/ /usr/share/palworld-server-manager/host-agent/
+COPY infra/container/manager-entrypoint.sh /usr/local/bin/manager-entrypoint
+RUN chmod 0755 /usr/share/palworld-server-manager/host-agent/install.sh /usr/local/bin/manager-entrypoint
 EXPOSE 80
+ENTRYPOINT ["/usr/local/bin/manager-entrypoint"]
 CMD ["/usr/bin/supervisord", "-n"]
