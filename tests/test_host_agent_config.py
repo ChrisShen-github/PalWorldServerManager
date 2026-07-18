@@ -160,6 +160,23 @@ class HostAgentConfigTests(unittest.TestCase):
 
         asyncio.run(scenario())
 
+    def test_schedule_timer_converts_china_time_to_utc(self) -> None:
+        timer = AGENT.schedule_timer_content(4, 30)
+        self.assertIn("20:30:00 UTC", timer)
+        self.assertIn("Persistent=true", timer)
+        self.assertIn(AGENT.BACKUP_SERVICE, timer)
+
+    def test_storage_counts_only_managed_backup_archives(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            backup_root = Path(directory) / "backups"
+            backup_root.mkdir()
+            (backup_root / "world-20260718T165951612412Z.tar.gz").write_bytes(b"archive")
+            (backup_root / "metadata.json").write_text("{}", encoding="utf-8")
+            with patch.object(AGENT, "BACKUP_ROOT", backup_root):
+                storage = AGENT.backup_storage()
+            self.assertEqual(storage["backup_count"], 1)
+            self.assertEqual(storage["backup_bytes"], len(b"archive"))
+
 
 if __name__ == "__main__":
     unittest.main()

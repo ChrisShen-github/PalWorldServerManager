@@ -28,6 +28,9 @@ MAX_MANAGED_BACKUPS = 12
 # China has no daylight-saving time. A fixed offset avoids requiring the
 # optional tzdata package when the agent is smoke-tested on Windows.
 CHINA_TZ = timezone(timedelta(hours=8), name="Asia/Shanghai")
+BACKUP_SCHEDULE_FILE = BACKUP_ROOT / "schedule.json"
+BACKUP_TIMER = "palworld-backup.timer"
+BACKUP_SERVICE = "palworld-backup.service"
 STEAMCMD_URL = "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
 OPERATION_LOCK = asyncio.Lock()
 ANSI_ESCAPE = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
@@ -187,6 +190,45 @@ def backup_metadata_path() -> Path:
     return BACKUP_ROOT / "metadata.json"
 
 
+def default_backup_schedule() -> dict[str, object]:
+    return {"enabled": False, "hour": 4, "minute": 0, "timezone": "Asia/Shanghai"}
+
+
+def read_backup_schedule() -> dict[str, object]:
+    schedule = default_backup_schedule()
+    try:
+        stored = json.loads(BACKUP_SCHEDULE_FILE.read_text(encoding="utf-8"))
+        if isinstance(stored, dict):
+            enabled = stored.get("enabled")
+            hour, minute = stored.get("hour"), stored.get("minute")
+            if isinstance(enabled, bool) and isinstance(hour, int) and not isinstance(hour, bool) and isinstance(minute, int) and not isinstance(minute, bool) and 0 <= hour <= 23 and 0 <= minute <= 59:
+                schedule.update({"enabled": enabled, "hour": hour, "minute": minute})
+    except (FileNotFoundError, OSError, json.JSONDecodeError):
+        pass
+    return schedule
+
+
+def write_backup_schedule(schedule: dict[str, object]) -> None:
+    BACKUP_ROOT.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=BACKUP_ROOT, prefix=".schedule-", delete=False) as temporary:
+        json.dump(schedule, temporary, ensure_ascii=False, sort_keys=True)
+        temporary_path = Path(temporary.name)
+    os.replace(temporary_path, BACKUP_SCHEDULE_FILE)
+
+
+def backup_storage() -> dict[str, int]:
+    BACKUP_ROOT.mkdir(parents=True, exist_ok=True)
+    usage = shutil.disk_usage(BACKUP_ROOT)
+    archives = [path for path in BACKUP_ROOT.glob("world-*.tar.gz") if BACKUP_ID_RE.fullmatch(path.name) and path.is_file()]
+    return {
+        "backup_bytes": sum(path.stat().st_size for path in archives),
+        "backup_count": len(archives),
+        "disk_total_bytes": usage.total,
+        "disk_free_bytes": usage.free,
+        "disk_used_bytes": usage.used,
+    }
+
+
 def clean_backup_name(value: object) -> str:
     if not isinstance(value, str):
         raise ValueError("备份名称格式无效")
@@ -343,11 +385,56 @@ def restore_backup(server: Path, backup_id: str, confirmed: bool, output: Callab
 
 
 def list_backups(server: Path) -> dict[str, object]:
+    schedule = read_backup_schedule()
+    timer_state = subprocess.run(("systemctl", "is-enabled", BACKUP_TIMER), check=False, text=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout.strip()
+    schedule["timer_active"] = timer_state == "enabled"
     return {
         "message": "已读取本机存档备份。" if save_games_path(server).exists() else "尚未检测到世界存档目录。",
         "backups": backup_records(),
         "retention": MAX_MANAGED_BACKUPS,
+        "storage": backup_storage(),
+        "schedule": schedule,
     }
+
+
+def schedule_timer_content(hour: int, minute: int) -> str:
+    # systemd runs on many hosts in UTC. Convert the China-time control to an
+    # explicit UTC calendar expression, independent of host timezone settings.
+    utc_hour = (hour - 8) % 24
+    return f"""[Unit]\nDescription=Palworld daily backup timer\n\n[Timer]\nOnCalendar=*-*-* {utc_hour:02d}:{minute:02d}:00 UTC\nPersistent=true\nUnit={BACKUP_SERVICE}\n\n[Install]\nWantedBy=timers.target\n"""
+
+
+def schedule_service_content(server: Path) -> str:
+    return f"""[Unit]\nDescription=Palworld scheduled world backup\nAfter=network.target\n\n[Service]\nType=oneshot\nExecStart=/usr/bin/python3 /opt/palworld-server-manager/agent.py --scheduled-backup {server}\n"""
+
+
+def apply_backup_schedule(payload: dict[str, object]) -> dict[str, object]:
+    enabled, hour, minute = payload.get("enabled"), payload.get("hour"), payload.get("minute")
+    if not isinstance(enabled, bool) or not isinstance(hour, int) or isinstance(hour, bool) or not isinstance(minute, int) or isinstance(minute, bool) or not 0 <= hour <= 23 or not 0 <= minute <= 59:
+        raise ValueError("自动备份时间无效")
+    server = checked_path(str(payload["server_path"]))
+    schedule = {"enabled": enabled, "hour": hour, "minute": minute, "timezone": "Asia/Shanghai"}
+    write_backup_schedule(schedule)
+    Path(f"/etc/systemd/system/{BACKUP_SERVICE}").write_text(schedule_service_content(server), encoding="utf-8")
+    Path(f"/etc/systemd/system/{BACKUP_TIMER}").write_text(schedule_timer_content(hour, minute), encoding="utf-8")
+    run("systemctl", "daemon-reload")
+    if enabled:
+        run("systemctl", "enable", "--now", BACKUP_TIMER)
+        message = f"已开启每日自动备份：每天中国时间 {hour:02d}:{minute:02d}。"
+    else:
+        subprocess.run(("systemctl", "disable", "--now", BACKUP_TIMER), check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        message = "已关闭自动备份计划。"
+    return {"message": message, "schedule": {**schedule, "timer_active": enabled}}
+
+
+def scheduled_backup(server: Path) -> int:
+    try:
+        result = create_backup(server)
+        print(str(result["message"]))
+        return 0
+    except Exception as error:
+        print(f"自动备份失败：{error.__class__.__name__}: {error}", file=sys.stderr)
+        return 1
 
 
 def delete_backup(backup_id: str, confirmed: bool) -> dict[str, object]:
@@ -620,6 +707,7 @@ def operate(action: str, payload: dict[str, object], output: Callable[[str], Non
     if action == "get_config": return read_server_config(payload)
     if action == "set_config": return write_server_config(payload)
     if action == "list_backups": return list_backups(checked_path(str(payload["server_path"])))
+    if action == "set_backup_schedule": return apply_backup_schedule(payload)
     if action == "create_backup": return create_backup(checked_path(str(payload["server_path"])), payload.get("name"), output)
     if action == "restore_backup": return restore_backup(checked_path(str(payload["server_path"])), str(payload.get("backup_id", "")), payload.get("confirmed") is True, output)
     if action == "delete_backup": return delete_backup(str(payload.get("backup_id", "")), payload.get("confirmed") is True)
@@ -676,7 +764,7 @@ async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> 
     try:
         payload = json.loads((await reader.readline()).decode())
         action = payload.get("action")
-        if action not in {"status", "install", "update", "start", "stop", "restart", "get_config", "set_config", "list_backups", "create_backup", "restore_backup", "delete_backup", "rename_backup"}:
+        if action not in {"status", "install", "update", "start", "stop", "restart", "get_config", "set_config", "list_backups", "set_backup_schedule", "create_backup", "restore_backup", "delete_backup", "rename_backup"}:
             raise ValueError("不允许的操作")
         streaming = bool(payload.get("stream"))
         async with OPERATION_LOCK:
@@ -727,5 +815,7 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
+    if len(sys.argv) == 3 and sys.argv[1] == "--scheduled-backup":
+        sys.exit(scheduled_backup(checked_path(sys.argv[2])))
     try: asyncio.run(main())
     except KeyboardInterrupt: sys.exit(0)

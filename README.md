@@ -41,6 +41,8 @@ npm run dev
 
 在“存档与备份”页面创建的世界恢复点会放在 Compose YAML 同级的 `backups/`。可在创建后修改显示名称并直接下载 `.tar.gz` 归档。创建或恢复时会短暂停止 `palworld-server.service` 以确保一致性，完成后自动重新启动；恢复前还会自动备份当前存档。面板保留最近 12 份自己创建的归档，`backups/` 默认不提交到 Git。
 
+同一页面也可查看备份库占用、所在磁盘可用空间，并设置每日自动备份。自动任务默认关闭；启用后由宿主机的 `palworld-backup.timer` 执行，面板输入的时间始终按中国标准时间（`Asia/Shanghai`）换算，不受 Ubuntu 宿主机时区影响。每次自动备份与手动备份一样会短暂停止并恢复游戏服务。
+
 ## 连接面板到原生服务器
 
 在“服务器配置”中保存设置时，面板会自动写入 `RESTAPIEnabled=True`，使用管理员密码连接 `http://host.docker.internal:<端口>/v1/api`，并关闭演示模式。配置需要重启 Palworld 服务后生效。

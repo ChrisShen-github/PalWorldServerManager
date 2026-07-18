@@ -104,6 +104,12 @@ class BackupNameInput(BaseModel):
         return name
 
 
+class BackupScheduleInput(BaseModel):
+    enabled: bool = False
+    hour: int = Field(default=4, ge=0, le=23)
+    minute: int = Field(default=0, ge=0, le=59)
+
+
 def _demo_overview() -> ServerOverview:
     return ServerOverview(
         status="demo",
@@ -355,6 +361,11 @@ async def host_update() -> dict[str, object]:
 @app.get("/api/backups")
 async def backups() -> dict[str, object]:
     return await _agent("list_backups")
+
+
+@app.put("/api/backups/schedule")
+async def put_backup_schedule(value: BackupScheduleInput) -> dict[str, object]:
+    return await _agent("set_backup_schedule", value.model_dump())
 
 
 @app.post("/api/backups/create/stream")

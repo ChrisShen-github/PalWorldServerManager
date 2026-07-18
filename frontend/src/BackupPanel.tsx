@@ -4,7 +4,9 @@ import ThemeToggle from "./ThemeToggle";
 import "./backup.css";
 
 type Backup = { id: string; name: string; created_at: string; size_bytes: number };
-type Reply = { ok: boolean; agent_connected: boolean; message: string; backups?: Backup[]; retention?: number };
+type Storage = { backup_bytes: number; backup_count: number; disk_total_bytes: number; disk_free_bytes: number; disk_used_bytes: number };
+type Schedule = { enabled: boolean; hour: number; minute: number; timezone: string; timer_active?: boolean };
+type Reply = { ok: boolean; agent_connected: boolean; message: string; backups?: Backup[]; retention?: number; storage?: Storage; schedule?: Schedule };
 type StreamEvent = { event: "progress" | "complete"; ok?: boolean; message: string };
 type Pending = { kind: "create" } | { kind: "restore" | "delete" | "rename"; backup: Backup };
 
@@ -25,6 +27,10 @@ function bytes(value: number) {
   let unit = 0;
   while (size >= 1024 && unit < units.length - 1) { size /= 1024; unit += 1; }
   return `${size.toFixed(size >= 10 ? 0 : 1)} ${units[unit]}`;
+}
+
+function percent(value: number, total: number) {
+  return total > 0 ? Math.min(100, Math.max(0, Math.round((value / total) * 100))) : 0;
 }
 
 function date(value: string) {
@@ -78,6 +84,9 @@ function BackupPanelContent() {
   const [pending, setPending] = useState<Pending | null>(null);
   const [draftName, setDraftName] = useState(() => defaultBackupName());
   const [log, setLog] = useState("");
+  const [storage, setStorage] = useState<Storage | null>(null);
+  const [schedule, setSchedule] = useState<Schedule>({ enabled: false, hour: 4, minute: 0, timezone: "Asia/Shanghai" });
+  const [savingSchedule, setSavingSchedule] = useState(false);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -87,6 +96,8 @@ function BackupPanelContent() {
       if (!response.ok || !data.ok) throw new Error(data.message);
       setBackups(data.backups ?? []);
       setRetention(data.retention ?? 12);
+      setStorage(data.storage ?? null);
+      setSchedule(data.schedule ?? { enabled: false, hour: 4, minute: 0, timezone: "Asia/Shanghai" });
       setMessage(data.message);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "无法读取备份列表，请检查宿主机代理。");
@@ -101,6 +112,21 @@ function BackupPanelContent() {
     window.addEventListener("keydown", close);
     return () => window.removeEventListener("keydown", close);
   }, [running]);
+
+  const saveSchedule = async () => {
+    setSavingSchedule(true);
+    try {
+      const response = await fetch("/api/backups/schedule", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ enabled: schedule.enabled, hour: schedule.hour, minute: schedule.minute }) });
+      const data = await response.json() as Reply;
+      if (!response.ok || !data.ok) throw new Error(data.message);
+      setMessage(data.message);
+      if (data.schedule) setSchedule(data.schedule);
+    } catch (error) {
+      setMessage(`自动备份设置失败：${error instanceof Error ? error.message : "未知错误"}`);
+    } finally {
+      setSavingSchedule(false);
+    }
+  };
 
   const stream = async (path: string, body?: object) => {
     const response = await fetch(path, { method: "POST", headers: body ? { "Content-Type": "application/json" } : undefined, body: body ? JSON.stringify(body) : undefined });
@@ -179,6 +205,11 @@ function BackupPanelContent() {
     </section>
 
     <section className="backup-status" aria-live="polite"><div><PalIcon name="server" /><span><strong>{loading ? "正在同步备份目录" : "主机备份库"}</strong><small>{message}</small></span></div><button className="button button-secondary" disabled={loading || running !== null} onClick={() => void refresh()} type="button"><PalIcon name="refresh" />刷新列表</button></section>
+
+    <section className="backup-operations" aria-label="自动备份与存储健康">
+      <article className="backup-panel backup-schedule"><header><div><p className="eyebrow">AUTOMATED RECOVERY</p><h2>自动备份</h2><p>由 Ubuntu 宿主机的 systemd timer 执行。时间固定为中国标准时间，创建时仍会短暂停止服务器以保证存档一致性。</p></div><span className={`backup-schedule-state ${schedule.enabled ? "online" : "offline"}`}><i />{schedule.enabled ? "已启用" : "未启用"}</span></header><div className="backup-schedule-controls"><label><span>每日执行时间（中国时区）</span><div><input aria-label="自动备份小时" disabled={savingSchedule} max={23} min={0} onChange={(event) => setSchedule((current) => ({ ...current, hour: Math.max(0, Math.min(23, Number(event.target.value) || 0)) }))} type="number" value={schedule.hour} /><b>:</b><input aria-label="自动备份分钟" disabled={savingSchedule} max={59} min={0} onChange={(event) => setSchedule((current) => ({ ...current, minute: Math.max(0, Math.min(59, Number(event.target.value) || 0)) }))} type="number" value={schedule.minute} /></div></label><label className="backup-schedule-toggle"><input checked={schedule.enabled} disabled={savingSchedule} onChange={(event) => setSchedule((current) => ({ ...current, enabled: event.target.checked }))} type="checkbox" /><span><strong>启用每日自动备份</strong><small>{schedule.enabled ? `将在每日 ${String(schedule.hour).padStart(2, "0")}:${String(schedule.minute).padStart(2, "0")} 自动运行。` : "保持关闭；不会创建任何定时任务。"}</small></span></label><button className="button button-primary" disabled={savingSchedule || loading || running !== null} onClick={() => void saveSchedule()} type="button">{savingSchedule ? "正在保存…" : "保存自动备份设置"}</button></div></article>
+      <article className="backup-panel backup-storage"><p className="eyebrow">HOST STORAGE</p><h2>存储健康</h2>{storage ? <><strong>{bytes(storage.disk_free_bytes)} <small>可用空间</small></strong><div aria-label={`磁盘已使用 ${percent(storage.disk_used_bytes, storage.disk_total_bytes)}%`} className="storage-meter"><i style={{ width: `${percent(storage.disk_used_bytes, storage.disk_total_bytes)}%` }} /></div><dl><div><dt>磁盘已用</dt><dd>{percent(storage.disk_used_bytes, storage.disk_total_bytes)}%</dd></div><div><dt>备份库</dt><dd>{bytes(storage.backup_bytes)} · {storage.backup_count} 份</dd></div></dl></> : <p className="backup-storage-empty">正在读取宿主机磁盘状态…</p>}</article>
+    </section>
 
     <section className="backup-panel" aria-labelledby="backup-list-title">
       <header className="backup-panel-heading"><div><p className="eyebrow">RECOVERY POINTS</p><h2 id="backup-list-title">世界恢复点</h2><p>保留最近 {retention} 份面板创建的备份；创建新备份时会自动清理更早版本。</p></div><button className="button button-primary backup-create" disabled={loading || running !== null} onClick={() => { setDraftName(defaultBackupName()); setPending({ kind: "create" }); }} type="button"><PalIcon name="backup" />{running === "create" ? "正在备份…" : "立即备份"}</button></header>
