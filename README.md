@@ -60,7 +60,7 @@ runtime/       面板运行时数据、备份与日志（不提交）
 
 ## GitHub Actions 镜像发布
 
-每次推送到 `main`，工作流会构建并推送两个 Docker Hub 镜像：`api-latest` / `web-latest`，以及对应 Git commit SHA 的不可变标签。
+每次推送到 `main`，工作流会构建并推送一个包含前端、Nginx 与 FastAPI 的 Docker 镜像。标签只有 `latest` 与版本号（例如 `v0.1.0.42`）；版本基础值来自根目录的 `VERSION` 文件，末尾数字是 Actions run number。
 
 在 GitHub 仓库的 **Settings → Secrets and variables → Actions** 中添加：
 
@@ -68,4 +68,4 @@ runtime/       面板运行时数据、备份与日志（不提交）
 - Secret `DOCKERHUB_TOKEN`：Docker Hub access token，最小权限为 Read & Write。
 - Variable `DOCKERHUB_REPOSITORY`：Docker Hub 仓库名，例如 `palworld-server-manager`。
 
-配置完成后，在 **Actions → Publish manager images → Run workflow** 手动运行一次，或推送一次 `main`。工作流随后会发布 `用户名/仓库名:api-latest` 与 `用户名/仓库名:web-latest`。
+配置完成后，在 **Actions → Publish manager images → Run workflow** 手动运行一次，或推送一次 `main`。工作流随后会发布 `用户名/仓库名:latest` 与一个版本标签。
