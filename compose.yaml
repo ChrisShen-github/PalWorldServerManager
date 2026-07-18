@@ -6,7 +6,6 @@ services:
     volumes:
       - ./data:/var/lib/palworld-manager
       - ./host-agent:/opt/palworld-server-manager/host-agent
-      - /opt/palworld-server-manager:/host-agent-runtime
       - /run/palworld-server-manager:/run/palworld-server-manager
     extra_hosts:
       - "host.docker.internal:host-gateway"

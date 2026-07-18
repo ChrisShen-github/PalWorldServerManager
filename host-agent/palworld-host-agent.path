@@ -2,7 +2,7 @@
 Description=Restart Palworld host agent when its bundled code changes
 
 [Path]
-PathChanged=/opt/palworld-server-manager/agent.py
+PathChanged=__HOST_AGENT_SOURCE__
 Unit=palworld-host-agent.service
 
 [Install]

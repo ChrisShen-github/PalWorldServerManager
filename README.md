@@ -55,7 +55,9 @@ sudo ./host-agent/install.sh
 
 该代理只接受状态检查、安装、更新、启动、停止、重启以及服务器配置读取/写入等固定操作；不会执行来自面板的任意命令。它使用 Unix Socket 与面板容器通信。安装目录必须位于 `/opt` 下，配置读写固定限制在 `Pal/Saved/Config/LinuxServer/PalWorldSettings.ini`。
 
-完成上述首次安装后，无需再通过 Git 更新代理。每次执行 `docker compose pull` 并执行 `docker compose up -d` 时，管理面板会将镜像内最新的代理代码同步到 `/opt/palworld-server-manager/agent.py`；systemd 监视器会自动重启代理以加载新版本。
+完成上述首次安装后，无需再通过 Git 更新或手动复制代理。systemd 直接运行 Compose 同级 `./host-agent/agent.py`（`/opt/palworld-server-manager/agent.py` 是指向它的兼容链接）。每次执行 `docker compose pull` 并执行 `docker compose up -d` 时，容器会同步镜像内最新代理，systemd 监视器随后自动重启代理并加载新版本。
+
+从早期复制式 Agent 升级到该自动更新方案时，只需在拉取包含新安装脚本的镜像后额外执行一次 `sudo ./host-agent/install.sh`。此后更新镜像无需再次运行安装脚本。
 
 ## 结构
 

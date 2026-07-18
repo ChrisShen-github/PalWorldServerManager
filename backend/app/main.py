@@ -229,6 +229,8 @@ async def _agent(action: str, extra: dict[str, object] | None = None) -> dict[st
         response = json.loads((await asyncio.wait_for(reader.readline(), timeout=900)).decode())
         writer.close()
         await writer.wait_closed()
+        if not response.get("ok") and response.get("message") == "ValueError: 不允许的操作":
+            response["message"] = "宿主机 Agent 版本过旧。更新管理器镜像后，请执行一次 sudo ./host-agent/install.sh；后续 Agent 将随镜像自动更新。"
         response["agent_connected"] = True
         return response
     except (OSError, asyncio.TimeoutError, json.JSONDecodeError) as error:
