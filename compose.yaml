@@ -5,6 +5,7 @@ services:
     image: akwangdao/palworldservermanager:latest
     volumes:
       - ./data:/var/lib/palworld-manager
+      - ./backups:/backups:ro
       - ./host-agent:/opt/palworld-server-manager/host-agent
       - /run/palworld-server-manager:/run/palworld-server-manager
     extra_hosts:

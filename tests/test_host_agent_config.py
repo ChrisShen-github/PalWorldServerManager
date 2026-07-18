@@ -97,9 +97,12 @@ class HostAgentConfigTests(unittest.TestCase):
             backup_root = Path(directory) / "runtime" / "backups"
 
             with patch.object(AGENT, "BACKUP_ROOT", backup_root), patch.object(AGENT, "status", return_value="inactive"), patch.object(AGENT, "run", return_value=""):
-                created = AGENT.create_backup(server)
+                created = AGENT.create_backup(server, "更新前手动备份")
                 backup_id = created["backup"]["id"]
                 self.assertTrue((backup_root / backup_id).is_file())
+                self.assertEqual(created["backup"]["name"], "更新前手动备份")
+                renamed = AGENT.rename_backup(backup_id, "准备恢复的版本")
+                self.assertEqual(renamed["name"], "准备恢复的版本")
                 world.write_text("after", encoding="utf-8")
 
                 restored = AGENT.restore_backup(server, backup_id, confirmed=True)

@@ -180,9 +180,39 @@ def backup_path(backup_id: str) -> Path:
     return BACKUP_ROOT / backup_id
 
 
+def backup_metadata_path() -> Path:
+    return BACKUP_ROOT / "metadata.json"
+
+
+def clean_backup_name(value: object) -> str:
+    if not isinstance(value, str):
+        raise ValueError("备份名称格式无效")
+    name = value.strip()
+    if not name or len(name) > 80 or any(character in name for character in "\\/\x00\r\n"):
+        raise ValueError("备份名称需为 1 到 80 个字符，且不能包含路径或换行")
+    return name
+
+
+def read_backup_metadata() -> dict[str, str]:
+    try:
+        raw = json.loads(backup_metadata_path().read_text(encoding="utf-8"))
+        return {key: value for key, value in raw.items() if BACKUP_ID_RE.fullmatch(key) and isinstance(value, str)} if isinstance(raw, dict) else {}
+    except (FileNotFoundError, OSError, json.JSONDecodeError):
+        return {}
+
+
+def write_backup_metadata(metadata: dict[str, str]) -> None:
+    BACKUP_ROOT.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=BACKUP_ROOT, prefix=".metadata-", delete=False) as temporary:
+        json.dump(metadata, temporary, ensure_ascii=False, sort_keys=True)
+        temporary_path = Path(temporary.name)
+    os.replace(temporary_path, backup_metadata_path())
+
+
 def backup_records() -> list[dict[str, object]]:
     if not BACKUP_ROOT.exists():
         return []
+    metadata = read_backup_metadata()
     records: list[dict[str, object]] = []
     for archive in BACKUP_ROOT.glob("world-*.tar.gz"):
         if not BACKUP_ID_RE.fullmatch(archive.name) or not archive.is_file():
@@ -190,6 +220,7 @@ def backup_records() -> list[dict[str, object]]:
         stat = archive.stat()
         records.append({
             "id": archive.name,
+            "name": metadata.get(archive.name, f"世界备份 {archive.stem.removeprefix('world-')}"),
             "created_at": datetime.fromtimestamp(stat.st_mtime, timezone.utc).isoformat(),
             "size_bytes": stat.st_size,
         })
@@ -198,13 +229,18 @@ def backup_records() -> list[dict[str, object]]:
 
 def prune_backups(output: Callable[[str], None] | None = None) -> None:
     stale = backup_records()[MAX_MANAGED_BACKUPS:]
+    metadata = read_backup_metadata()
     for record in stale:
-        backup_path(str(record["id"])).unlink(missing_ok=True)
+        backup_id = str(record["id"])
+        backup_path(backup_id).unlink(missing_ok=True)
+        metadata.pop(backup_id, None)
+    if stale:
+        write_backup_metadata(metadata)
     if stale:
         emit(output, f"已按保留策略清理 {len(stale)} 份较早的备份。")
 
 
-def create_backup(server: Path, output: Callable[[str], None] | None = None) -> dict[str, object]:
+def create_backup(server: Path, name: object = None, output: Callable[[str], None] | None = None) -> dict[str, object]:
     saves = save_games_path(server)
     if not saves.is_dir():
         raise FileNotFoundError("未找到世界存档目录，请确认服务器已启动过并生成存档")
@@ -221,6 +257,9 @@ def create_backup(server: Path, output: Callable[[str], None] | None = None) -> 
         with tarfile.open(temporary, "w:gz") as bundle:
             bundle.add(saves, arcname="SaveGames", recursive=True)
         os.replace(temporary, archive)
+        metadata = read_backup_metadata()
+        metadata[archive.name] = clean_backup_name(name) if name is not None else f"世界备份 {stamp}"
+        write_backup_metadata(metadata)
         prune_backups(output)
         emit(output, f"备份完成：{archive.name}")
         record = next(item for item in backup_records() if item["id"] == archive.name)
@@ -258,7 +297,7 @@ def restore_backup(server: Path, backup_id: str, confirmed: bool, output: Callab
     staging = Path(tempfile.mkdtemp(prefix=".palworld-restore-", dir=saves.parent))
     try:
         emit(output, "正在为当前存档创建恢复前保护备份…")
-        restore_safety_backup = create_backup(server, output)
+        restore_safety_backup = create_backup(server, output=output)
         emit(output, "正在校验并解压选择的备份…")
         with tarfile.open(archive, "r:gz") as bundle:
             safe_extract(bundle, staging)
@@ -293,7 +332,20 @@ def delete_backup(backup_id: str, confirmed: bool) -> dict[str, object]:
     if not archive.is_file():
         raise FileNotFoundError("备份不存在或已被清理")
     archive.unlink()
+    metadata = read_backup_metadata()
+    metadata.pop(backup_id, None)
+    write_backup_metadata(metadata)
     return {"message": "备份已删除。", "deleted": backup_id}
+
+
+def rename_backup(backup_id: str, name: object) -> dict[str, object]:
+    archive = backup_path(backup_id)
+    if not archive.is_file():
+        raise FileNotFoundError("备份不存在或已被清理")
+    metadata = read_backup_metadata()
+    metadata[backup_id] = clean_backup_name(name)
+    write_backup_metadata(metadata)
+    return {"message": "备份名称已更新。", "backup_id": backup_id, "name": metadata[backup_id]}
 
 
 def default_config_file(server: Path) -> Path:
@@ -543,9 +595,10 @@ def operate(action: str, payload: dict[str, object], output: Callable[[str], Non
     if action == "get_config": return read_server_config(payload)
     if action == "set_config": return write_server_config(payload)
     if action == "list_backups": return list_backups(checked_path(str(payload["server_path"])))
-    if action == "create_backup": return create_backup(checked_path(str(payload["server_path"])), output)
+    if action == "create_backup": return create_backup(checked_path(str(payload["server_path"])), payload.get("name"), output)
     if action == "restore_backup": return restore_backup(checked_path(str(payload["server_path"])), str(payload.get("backup_id", "")), payload.get("confirmed") is True, output)
     if action == "delete_backup": return delete_backup(str(payload.get("backup_id", "")), payload.get("confirmed") is True)
+    if action == "rename_backup": return rename_backup(str(payload.get("backup_id", "")), payload.get("name"))
     if action == "install": return install(payload, output)
     if action == "update":
         steamcmd, server = checked_path(payload["steamcmd_path"]), checked_path(payload["server_path"])
@@ -588,7 +641,7 @@ async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> 
     try:
         payload = json.loads((await reader.readline()).decode())
         action = payload.get("action")
-        if action not in {"status", "install", "update", "start", "stop", "restart", "get_config", "set_config", "list_backups", "create_backup", "restore_backup", "delete_backup"}:
+        if action not in {"status", "install", "update", "start", "stop", "restart", "get_config", "set_config", "list_backups", "create_backup", "restore_backup", "delete_backup", "rename_backup"}:
             raise ValueError("不允许的操作")
         streaming = bool(payload.get("stream"))
         async with OPERATION_LOCK:

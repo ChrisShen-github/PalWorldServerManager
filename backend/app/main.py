@@ -9,7 +9,7 @@ from typing import Literal
 
 import httpx
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field, field_validator
 
 from .config import Settings, SettingsStore
@@ -58,6 +58,8 @@ store = SettingsStore()
 AGENT_SOCKET = "/run/palworld-server-manager/agent.sock"
 SERVICE_STATES = {"active", "inactive", "failed", "activating", "deactivating"}
 SYSTEMD_ACTIVE_RE = re.compile(r"(?:^|\n)\s*Active:\s+(active|inactive|failed|activating|deactivating)\b")
+BACKUP_ID_RE = re.compile(r"^world-\d{8}T\d{6}(?:\d{6})?Z\.tar\.gz$")
+BACKUPS_DIR = Path("/backups")
 
 
 class SettingsInput(BaseModel):
@@ -88,6 +90,18 @@ class ServerConfigInput(BaseModel):
 
 class BackupRestoreInput(BaseModel):
     confirmed: bool = False
+
+
+class BackupNameInput(BaseModel):
+    name: str
+
+    @field_validator("name")
+    @classmethod
+    def valid_name(cls, value: str) -> str:
+        name = value.strip()
+        if not name or len(name) > 80 or any(character in name for character in "\\/\x00\r\n"):
+            raise ValueError("备份名称需为 1 到 80 个字符，且不能包含路径或换行")
+        return name
 
 
 def _demo_overview() -> ServerOverview:
@@ -344,8 +358,9 @@ async def backups() -> dict[str, object]:
 
 
 @app.post("/api/backups/create/stream")
-async def create_backup_stream() -> StreamingResponse:
-    return StreamingResponse(_agent_stream("create_backup"), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+async def create_backup_stream(value: BackupNameInput | None = None) -> StreamingResponse:
+    extra = {"name": value.name} if value else None
+    return StreamingResponse(_agent_stream("create_backup", extra), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
 
 @app.post("/api/backups/{backup_id}/restore/stream")
@@ -358,6 +373,24 @@ async def restore_backup_stream(backup_id: str, value: BackupRestoreInput) -> St
 @app.delete("/api/backups/{backup_id}")
 async def delete_backup(backup_id: str) -> dict[str, object]:
     return await _agent("delete_backup", {"backup_id": backup_id, "confirmed": True})
+
+
+@app.patch("/api/backups/{backup_id}")
+async def rename_backup(backup_id: str, value: BackupNameInput) -> dict[str, object]:
+    return await _agent("rename_backup", {"backup_id": backup_id, "name": value.name})
+
+
+@app.get("/api/backups/{backup_id}/download")
+async def download_backup(backup_id: str) -> FileResponse:
+    if not BACKUP_ID_RE.fullmatch(backup_id):
+        raise HTTPException(status_code=404, detail="备份不存在。")
+    response = await _agent("list_backups")
+    record = next((item for item in response.get("backups", []) if isinstance(item, dict) and item.get("id") == backup_id), None)
+    archive = BACKUPS_DIR / backup_id
+    if not response.get("ok") or not record or not archive.is_file():
+        raise HTTPException(status_code=404, detail="备份不存在或尚未挂载到面板。")
+    name = str(record.get("name", backup_id)).replace('"', "'")
+    return FileResponse(archive, media_type="application/gzip", filename=f"{name}.tar.gz")
 
 
 @app.post("/api/host/{operation}/stream")

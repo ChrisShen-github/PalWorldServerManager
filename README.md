@@ -39,7 +39,7 @@ npm run dev
 
 如果目标 `PalWorldSettings.ini` 尚未创建、为空或不包含 `OptionSettings`，面板会从服务器自带的 `DefaultPalWorldSettings.ini` 载入当前版本默认模板；首次保存前仍会备份原目标文件。游戏升级新增的未知配置项会在读写时原样保留。若存档包含 `WorldOption.sav`，面板会提示其可能优先于 INI 配置。
 
-在“存档与备份”页面创建的世界恢复点会放在 Compose YAML 同级的 `backups/`。创建或恢复时会短暂停止 `palworld-server.service` 以确保一致性，完成后自动重新启动；恢复前还会自动备份当前存档。面板保留最近 12 份自己创建的归档，`backups/` 默认不提交到 Git。
+在“存档与备份”页面创建的世界恢复点会放在 Compose YAML 同级的 `backups/`。可在创建后修改显示名称并直接下载 `.tar.gz` 归档。创建或恢复时会短暂停止 `palworld-server.service` 以确保一致性，完成后自动重新启动；恢复前还会自动备份当前存档。面板保留最近 12 份自己创建的归档，`backups/` 默认不提交到 Git。
 
 ## 连接面板到原生服务器
 
