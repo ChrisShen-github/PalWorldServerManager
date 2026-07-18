@@ -5,7 +5,9 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 install -d -m 0755 /opt/palworld-server-manager /run/palworld-server-manager
 install -m 0755 "$SCRIPT_DIR/agent.py" /opt/palworld-server-manager/agent.py
 install -m 0644 "$SCRIPT_DIR/palworld-host-agent.service" /etc/systemd/system/palworld-host-agent.service
+install -m 0644 "$SCRIPT_DIR/palworld-host-agent.path" /etc/systemd/system/palworld-host-agent.path
 systemctl daemon-reload
 systemctl enable palworld-host-agent.service
+systemctl enable --now palworld-host-agent.path
 systemctl restart palworld-host-agent.service
 echo "Host agent installed. Start the manager container next."

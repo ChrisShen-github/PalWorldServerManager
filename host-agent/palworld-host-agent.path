@@ -1,0 +1,9 @@
+[Unit]
+Description=Restart Palworld host agent when its bundled code changes
+
+[Path]
+PathChanged=/opt/palworld-server-manager/agent.py
+Unit=palworld-host-agent.service
+
+[Install]
+WantedBy=multi-user.target

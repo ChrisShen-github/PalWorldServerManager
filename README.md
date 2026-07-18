@@ -61,6 +61,8 @@ sudo ./host-agent/install.sh
 
 该代理只接受状态检查、安装、更新、启动、停止和重启六种固定操作；不会执行来自面板的任意命令。它使用 Unix Socket 与面板容器通信。安装目录由面板设置指定，且必须位于 `/opt` 下。
 
+完成上述首次安装后，无需再通过 Git 更新代理。每次执行 `docker compose pull` 并执行 `docker compose up -d` 时，管理面板会将镜像内最新的代理代码同步到 `/opt/palworld-server-manager/agent.py`；systemd 监视器会自动重启代理以加载新版本。
+
 ## 结构
 
 ```text
