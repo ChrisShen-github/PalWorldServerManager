@@ -12,7 +12,7 @@ type Settings = {
 };
 
 type Operation = "install" | "update" | "start" | "stop" | "restart";
-type HostReply = { ok: boolean; agent_connected: boolean; service_installed: boolean; message: string };
+type HostReply = { ok: boolean; agent_connected: boolean; service_installed: boolean | null; message: string };
 type StreamEvent = { event: "progress" | "complete"; ok?: boolean; message: string };
 
 const initial: Settings = {
@@ -193,7 +193,8 @@ export default function SettingsPanel() {
   };
 
   const agentReady = host?.agent_connected === true;
-  const serverInstalled = host?.service_installed === true;
+  const serviceMissing = host?.service_installed === false;
+  const serviceStatusUnknown = agentReady && host?.service_installed === null;
   const busy = saving || operation !== null;
 
   return (
@@ -253,7 +254,7 @@ export default function SettingsPanel() {
               </div>
               <button aria-label="重新检查宿主机代理" className="button button-secondary" disabled={checkingHost || busy} onClick={() => void refreshHost()} type="button">{checkingHost ? "检查中…" : "重新检查"}</button>
             </div>
-            <p className={`agent-state ${agentReady ? "ready" : "missing"}`} role="status"><i />{checkingHost ? "正在检查代理状态…" : agentReady ? serverInstalled ? "代理与服务器已就绪" : "代理已连接 · 服务未安装" : "代理未连接"}</p>
+            <p className={`agent-state ${agentReady ? "ready" : "missing"}`} role="status"><i />{checkingHost ? "正在检查代理状态…" : agentReady ? serviceMissing ? "代理已连接 · 服务未安装" : serviceStatusUnknown ? "代理已连接 · 状态待确认" : "代理与服务器已就绪" : "代理未连接"}</p>
             <p className="agent-message">{host?.message ?? "正在读取状态…"}</p>
             {!agentReady && !checkingHost && <p className="agent-hint">先在 Ubuntu 的 Compose 目录执行 <code>sudo ./host-agent/install.sh</code>，然后点击“重新检查”。</p>}
           </section>
@@ -262,13 +263,14 @@ export default function SettingsPanel() {
             <p className="eyebrow">SERVER OPERATIONS</p>
             <h2>服务器操作</h2>
             <p>安装会保存上方路径，并通过受限代理执行固定的系统操作。</p>
-            {agentReady && !serverInstalled && <p className="operations-hint" role="status">服务尚未安装；请先使用下方“安装 SteamCMD 与服务器”。其他服务操作会在安装完成后开放。</p>}
+            {agentReady && serviceMissing && <p className="operations-hint" role="status">服务尚未安装；请先使用下方“安装 SteamCMD 与服务器”。其他服务操作会在安装完成后开放。</p>}
+            {serviceStatusUnknown && <p className="operations-hint" role="status">当前代理未能确认服务状态。服务操作仍可使用；请先尝试“启动”，随后重新检查。</p>}
             <div className="operation-actions">
               <button className="button button-primary operation-install" disabled={!agentReady || busy} onClick={() => requestOperation("install")} type="button">{operation === "install" ? "正在安装…" : "安装 SteamCMD 与服务器"}</button>
-              <button className="button button-secondary" disabled={!agentReady || !serverInstalled || busy} onClick={() => requestOperation("update")} type="button">{operation === "update" ? "正在更新…" : "更新服务器"}</button>
-              <button className="button button-secondary" disabled={!agentReady || !serverInstalled || busy} onClick={() => requestOperation("start")} type="button">{operation === "start" ? "正在启动…" : "启动"}</button>
-              <button className="button button-secondary" disabled={!agentReady || !serverInstalled || busy} onClick={() => requestOperation("restart")} type="button">{operation === "restart" ? "正在重启…" : "重启"}</button>
-              <button className="button button-danger" disabled={!agentReady || !serverInstalled || busy} onClick={() => requestOperation("stop")} type="button">{operation === "stop" ? "正在停止…" : "停止"}</button>
+              <button className="button button-secondary" disabled={!agentReady || serviceMissing || busy} onClick={() => requestOperation("update")} type="button">{operation === "update" ? "正在更新…" : "更新服务器"}</button>
+              <button className="button button-secondary" disabled={!agentReady || serviceMissing || busy} onClick={() => requestOperation("start")} type="button">{operation === "start" ? "正在启动…" : "启动"}</button>
+              <button className="button button-secondary" disabled={!agentReady || serviceMissing || busy} onClick={() => requestOperation("restart")} type="button">{operation === "restart" ? "正在重启…" : "重启"}</button>
+              <button className="button button-danger" disabled={!agentReady || serviceMissing || busy} onClick={() => requestOperation("stop")} type="button">{operation === "stop" ? "正在停止…" : "停止"}</button>
             </div>
           </section>
         </aside>
