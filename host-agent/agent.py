@@ -220,7 +220,7 @@ def backup_records() -> list[dict[str, object]]:
         stat = archive.stat()
         records.append({
             "id": archive.name,
-            "name": metadata.get(archive.name, f"世界备份 {archive.stem.removeprefix('world-')}"),
+            "name": metadata.get(archive.name, f"世界备份 {archive.name.removesuffix('.tar.gz').removeprefix('world-')}"),
             "created_at": datetime.fromtimestamp(stat.st_mtime, timezone.utc).isoformat(),
             "size_bytes": stat.st_size,
         })
