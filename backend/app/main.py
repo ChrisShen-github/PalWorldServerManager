@@ -8,9 +8,9 @@ from pathlib import Path
 from typing import Literal
 
 import httpx
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from .config import Settings, SettingsStore
 
@@ -69,6 +69,29 @@ class SettingsInput(BaseModel):
     server_path: str
 
 
+class ServerConfigInput(BaseModel):
+    server_name: str = Field(min_length=1, max_length=128)
+    server_description: str = Field(default="", max_length=512)
+    server_password: str | None = Field(default=None, max_length=128)
+    admin_password: str | None = Field(default=None, max_length=128)
+    server_player_max_num: int = Field(ge=1, le=32)
+    rest_api_port: int = Field(ge=1024, le=65535)
+    backup_save_data: bool = True
+    exp_rate: float = Field(ge=0.1, le=20)
+    pal_capture_rate: float = Field(ge=0.1, le=20)
+    pal_spawn_num_rate: float = Field(ge=0.1, le=20)
+    day_time_speed_rate: float = Field(ge=0.1, le=20)
+    night_time_speed_rate: float = Field(ge=0.1, le=20)
+    death_penalty: Literal["None", "Item", "ItemAndEquipment", "All"] = "All"
+
+    @field_validator("server_name", "server_description", "server_password", "admin_password")
+    @classmethod
+    def single_line(cls, value: str | None) -> str | None:
+        if value is not None and ("\n" in value or "\r" in value):
+            raise ValueError("配置文本不能包含换行")
+        return value
+
+
 def _demo_overview() -> ServerOverview:
     return ServerOverview(
         status="demo",
@@ -111,12 +134,19 @@ def _offline_overview(message: str) -> ServerOverview:
     )
 
 
+def _rest_api_base(url: str) -> str:
+    base = url.rstrip("/")
+    if not base.endswith("/v1/api"):
+        base += "/v1/api"
+    return base + "/"
+
+
 async def _fetch_overview(settings: Settings) -> ServerOverview:
     auth = (settings.rest_username, settings.rest_password) if settings.rest_password else None
     timeout = httpx.Timeout(5.0, connect=2.0)
     try:
-        async with httpx.AsyncClient(base_url=settings.rest_url, auth=auth, timeout=timeout) as client:
-            info_response, metrics_response, players_response = await client.get("/info"), await client.get("/metrics"), await client.get("/players")
+        async with httpx.AsyncClient(base_url=_rest_api_base(settings.rest_url), auth=auth, timeout=timeout) as client:
+            info_response, metrics_response, players_response = await client.get("info"), await client.get("metrics"), await client.get("players")
             info_response.raise_for_status()
             metrics_response.raise_for_status()
             players_response.raise_for_status()
@@ -185,11 +215,13 @@ async def put_settings(value: SettingsInput) -> Settings:
     return store.save(Settings(**value.model_dump()))
 
 
-async def _agent(action: str) -> dict[str, object]:
+async def _agent(action: str, extra: dict[str, object] | None = None) -> dict[str, object]:
     if not Path(AGENT_SOCKET).exists():
         return {"ok": False, "agent_connected": False, "message": "宿主机代理未安装。请先在 Ubuntu 执行 host-agent/install.sh。"}
     settings = store.get()
-    payload = {"action": action, "steamcmd_path": settings.steamcmd_path, "server_path": settings.server_path}
+    payload: dict[str, object] = {"action": action, "steamcmd_path": settings.steamcmd_path, "server_path": settings.server_path}
+    if extra:
+        payload.update(extra)
     try:
         reader, writer = await asyncio.wait_for(asyncio.open_unix_connection(AGENT_SOCKET), timeout=2)
         writer.write((json.dumps(payload) + "\n").encode())
@@ -238,6 +270,33 @@ def _service_state(message: str) -> str:
         return normalized
     match = SYSTEMD_ACTIVE_RE.search(message)
     return match.group(1) if match else "unknown"
+
+
+@app.get("/api/server/config")
+async def get_server_config() -> dict[str, object]:
+    return await _agent("get_config")
+
+
+@app.put("/api/server/config")
+async def put_server_config(value: ServerConfigInput) -> dict[str, object]:
+    current = store.get()
+    admin_password = value.admin_password or current.rest_password
+    if not admin_password:
+        raise HTTPException(status_code=422, detail="首次启用 REST API 时必须设置管理员密码。")
+    response = await _agent("set_config", {"config": value.model_dump(exclude_none=True)})
+    if response.get("ok"):
+        rest_url = f"http://host.docker.internal:{value.rest_api_port}/v1/api"
+        store.save(Settings(
+            demo_mode=False,
+            rest_url=rest_url,
+            rest_username="admin",
+            rest_password=admin_password,
+            steamcmd_path=current.steamcmd_path,
+            server_path=current.server_path,
+        ))
+        response["rest_url"] = rest_url
+        response["demo_mode"] = False
+    return response
 
 
 @app.get("/api/host/status")

@@ -28,24 +28,18 @@ npm run dev
 
 ## 安装并运行原生帕鲁专服
 
-在 Ubuntu 宿主机上完成一次 SteamCMD 安装：
+首次部署宿主机代理后，打开面板的“世界规则与安装”：
 
-```bash
-mkdir -p ~/steamcmd ~/palserver
-cd ~/steamcmd
-./steamcmd.sh +login anonymous +force_install_dir ~/palserver +app_update 2394010 validate +quit
-cd ~/palserver
-./PalServer.sh -port=8211 -useperfthreads -NoAsyncLoadingThread -UseMultithreadForDS
-```
+1. 保存 `/opt/steamcmd` 与 `/opt/palserver` 等安装目录。
+2. 点击“安装 SteamCMD 与服务器”，面板会在 Ubuntu 宿主机原生安装依赖、SteamCMD、PalServer 和 systemd 服务。
+3. 在“服务器配置”中设置服务器名称、管理员密码、REST API 端口与世界倍率。
+4. 保存配置后点击“启动”；以后可在面板中执行更新、启动、停止和重启。
 
-更新时先停止服务器、备份存档，然后重复 `app_update 2394010 validate` 命令。游戏配置和存档位于 `~/palserver/Pal/Saved/`。
+游戏配置位于 `/opt/palserver/Pal/Saved/Config/LinuxServer/PalWorldSettings.ini`，存档位于 `/opt/palserver/Pal/Saved/`。配置写入前会自动生成带时间戳的 `.bak` 文件。
 
 ## 连接面板到原生服务器
 
-1. 启动一次原生服务器，让 `Pal/Saved/Config/LinuxServer/PalWorldSettings.ini` 自动生成。
-2. 在该文件的 `OptionSettings` 中设置 `AdminPassword`、`RESTAPIEnabled=True`、`RESTAPIPort=8212`。
-3. 打开面板的“世界规则与安装”页面，关闭演示模式，并保存 REST 地址、用户名与管理员密码。
-4. 拉取并重启面板：先执行 `docker compose pull`，再执行 `docker compose up -d`。
+在“服务器配置”中保存设置时，面板会自动写入 `RESTAPIEnabled=True`，使用管理员密码连接 `http://host.docker.internal:<端口>/v1/api`，并关闭演示模式。配置需要重启 Palworld 服务后生效。
 
 Compose 为 `manager` 配置了 `host.docker.internal:host-gateway`，因此它可从容器访问 Ubuntu 宿主机的 `8212` REST 端口。不要将该 REST 端口公开到互联网；应以 UFW 或安全组限制访问来源。
 
@@ -59,7 +53,7 @@ docker compose up -d
 sudo ./host-agent/install.sh
 ```
 
-该代理只接受状态检查、安装、更新、启动、停止和重启六种固定操作；不会执行来自面板的任意命令。它使用 Unix Socket 与面板容器通信。安装目录由面板设置指定，且必须位于 `/opt` 下。
+该代理只接受状态检查、安装、更新、启动、停止、重启以及服务器配置读取/写入等固定操作；不会执行来自面板的任意命令。它使用 Unix Socket 与面板容器通信。安装目录必须位于 `/opt` 下，配置读写固定限制在 `Pal/Saved/Config/LinuxServer/PalWorldSettings.ini`。
 
 完成上述首次安装后，无需再通过 Git 更新代理。每次执行 `docker compose pull` 并执行 `docker compose up -d` 时，管理面板会将镜像内最新的代理代码同步到 `/opt/palworld-server-manager/agent.py`；systemd 监视器会自动重启代理以加载新版本。
 

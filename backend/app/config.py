@@ -8,7 +8,7 @@ from pathlib import Path
 @dataclass(frozen=True)
 class Settings:
     demo_mode: bool = True
-    rest_url: str = "http://host.docker.internal:8212"
+    rest_url: str = "http://host.docker.internal:8212/v1/api"
     rest_username: str = "admin"
     rest_password: str = ""
     steamcmd_path: str = "/opt/steamcmd"
@@ -23,7 +23,7 @@ class SettingsStore:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with sqlite3.connect(self.path) as connection:
             connection.execute("CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY CHECK(id=1), demo_mode INTEGER NOT NULL, rest_url TEXT NOT NULL, rest_username TEXT NOT NULL, rest_password TEXT NOT NULL, steamcmd_path TEXT NOT NULL, server_path TEXT NOT NULL)")
-            connection.execute("INSERT OR IGNORE INTO settings VALUES (1, 1, 'http://host.docker.internal:8212', 'admin', '', '/opt/steamcmd', '/opt/palserver')")
+            connection.execute("INSERT OR IGNORE INTO settings VALUES (1, 1, 'http://host.docker.internal:8212/v1/api', 'admin', '', '/opt/steamcmd', '/opt/palserver')")
 
     def get(self) -> Settings:
         with sqlite3.connect(self.path) as connection:

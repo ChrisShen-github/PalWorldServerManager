@@ -1,5 +1,6 @@
 import { FormEvent, useCallback, useEffect, useState, type ChangeEvent } from "react";
 import ThemeToggle from "./ThemeToggle";
+import ServerConfigPanel from "./ServerConfigPanel";
 import "./settings.css";
 import "./settings-overrides.css";
 
@@ -18,7 +19,7 @@ type StreamEvent = { event: "progress" | "complete"; ok?: boolean; message: stri
 
 const initial: Settings = {
   demo_mode: true,
-  rest_url: "http://host.docker.internal:8212",
+  rest_url: "http://host.docker.internal:8212/v1/api",
   rest_username: "admin",
   rest_password: "",
   steamcmd_path: "/opt/steamcmd",
@@ -80,19 +81,18 @@ export default function SettingsPanel() {
     }
   }, []);
 
+  const refreshSettings = useCallback(async () => {
+    const response = await fetch("/api/settings");
+    if (!response.ok) throw new Error("settings");
+    setValues(await response.json() as Settings);
+  }, []);
+
   useEffect(() => {
-    void fetch("/api/settings")
-      .then((response) => {
-        if (!response.ok) throw new Error("settings");
-        return response.json() as Promise<Settings>;
-      })
-      .then((loaded) => {
-        setValues(loaded);
-        setFeedback("");
-      })
+    void refreshSettings()
+      .then(() => setFeedback(""))
       .catch(() => setFeedback("无法读取设置，请确认管理面板 API 可用。"));
     void refreshHost();
-  }, [refreshHost]);
+  }, [refreshHost, refreshSettings]);
 
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
@@ -288,6 +288,8 @@ export default function SettingsPanel() {
           </section>
         </aside>
       </div>
+
+      <ServerConfigPanel disabled={!agentReady || serviceMissing || busy} onSaved={refreshSettings} restPasswordReady={Boolean(values.rest_password)} />
 
       <section aria-live="polite" className={`operation-feedback ${feedback.includes("失败") || feedback.includes("未完成") || feedback.includes("无法") ? "error" : ""}`}>
         <p className="eyebrow">OPERATION FEEDBACK</p>
