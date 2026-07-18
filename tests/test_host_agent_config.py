@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import importlib.util
+import asyncio
+import os
 import re
 import tempfile
 import unittest
@@ -70,6 +72,20 @@ class HostAgentConfigTests(unittest.TestCase):
         self.assertEqual(len(frontend_keys), len(set(frontend_keys)), "frontend config keys must be unique")
         self.assertGreaterEqual(len(frontend_keys), 80)
         self.assertEqual(set(frontend_keys) - AGENT.EDITABLE_OPTION_KEYS, set())
+
+    def test_agent_detects_atomic_source_update(self) -> None:
+        async def scenario() -> None:
+            with tempfile.TemporaryDirectory() as directory:
+                source = Path(directory) / "agent.py"
+                replacement = Path(directory) / "agent.py.new"
+                source.write_text("old", encoding="utf-8")
+                task = asyncio.create_task(AGENT.wait_for_agent_update(source, interval=0.01))
+                await asyncio.sleep(0.02)
+                replacement.write_text("new version", encoding="utf-8")
+                os.replace(replacement, source)
+                await asyncio.wait_for(task, timeout=1)
+
+        asyncio.run(scenario())
 
 
 if __name__ == "__main__":

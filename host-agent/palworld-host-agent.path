@@ -1,5 +1,5 @@
 [Unit]
-Description=Restart Palworld host agent when its bundled code changes
+Description=Compatibility watcher for Palworld host agent updates
 
 [Path]
 PathChanged=__HOST_AGENT_SOURCE__

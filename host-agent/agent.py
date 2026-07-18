@@ -473,12 +473,33 @@ async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> 
     await writer.wait_closed()
 
 
+def source_signature(path: Path) -> tuple[int, int, int, int]:
+    stat = path.stat()
+    return stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns
+
+
+async def wait_for_agent_update(path: Path | None = None, interval: float = 2.0) -> None:
+    source = path or Path(__file__)
+    initial = source_signature(source)
+    while True:
+        await asyncio.sleep(interval)
+        try:
+            current = source_signature(source)
+        except FileNotFoundError:
+            continue
+        if current != initial:
+            return
+
+
 async def main() -> None:
     SOCKET.parent.mkdir(parents=True, exist_ok=True)
     if SOCKET.exists(): SOCKET.unlink()
     server = await asyncio.start_unix_server(handle, path=str(SOCKET))
     os.chmod(SOCKET, 0o660)
-    async with server: await server.serve_forever()
+    # The manager image atomically replaces this file. Exiting lets the existing
+    # systemd Restart=always policy load the new code without a privileged hook.
+    async with server:
+        await wait_for_agent_update()
 
 
 if __name__ == "__main__":
