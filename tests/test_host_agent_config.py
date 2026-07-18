@@ -139,6 +139,27 @@ class HostAgentConfigTests(unittest.TestCase):
                 records = AGENT.backup_records()
             self.assertEqual(records[0]["name"], "世界备份 20260718T165951612412Z")
 
+    def test_stream_completion_keeps_structured_result_out_of_message(self) -> None:
+        class Writer:
+            def __init__(self) -> None:
+                self.lines: list[bytes] = []
+
+            def write(self, value: bytes) -> None:
+                self.lines.append(value)
+
+            async def drain(self) -> None:
+                return None
+
+        async def scenario() -> None:
+            writer = Writer()
+            with patch.object(AGENT, "operate", return_value={"message": "存档备份已创建。", "backup": {"id": "world-test"}}):
+                await AGENT.stream_operation("create_backup", {}, writer)
+            complete = json.loads(writer.lines[-1])
+            self.assertEqual(complete["message"], "存档备份已创建。")
+            self.assertEqual(complete["result"]["backup"]["id"], "world-test")
+
+        asyncio.run(scenario())
+
 
 if __name__ == "__main__":
     unittest.main()

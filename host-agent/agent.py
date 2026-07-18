@@ -656,7 +656,17 @@ async def stream_operation(action: str, payload: dict[str, str], writer: asyncio
         await write_event(writer, {"event": "progress", "message": message})
     try:
         result = await task
-        await write_event(writer, {"event": "complete", "ok": True, "message": result or "操作完成。"})
+        if isinstance(result, dict):
+            # Streaming clients render message directly. Keep structured operation
+            # data available separately instead of passing it as a React child.
+            await write_event(writer, {
+                "event": "complete",
+                "ok": True,
+                "message": str(result.get("message") or "操作完成。"),
+                "result": result,
+            })
+        else:
+            await write_event(writer, {"event": "complete", "ok": True, "message": result or "操作完成。"})
     except Exception as error:
         await write_event(writer, {"event": "complete", "ok": False, "message": f"{error.__class__.__name__}: {error}"})
 
