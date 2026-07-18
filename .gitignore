@@ -1,0 +1,37 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Node / frontend build output
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Runtime data — may contain saves, backups, logs, and player data
+runtime/
+data/
+backups/
+Saved/
+
+# Coverage and operating-system files
+coverage/
+htmlcov/
+.coverage
+.DS_Store
+Thumbs.db

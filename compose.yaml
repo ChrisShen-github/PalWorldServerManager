@@ -1,0 +1,53 @@
+name: palworld-server-manager
+
+services:
+  manager-api:
+    build:
+      context: ./backend
+    environment:
+      PMSM_DEMO_MODE: ${PMSM_DEMO_MODE:-true}
+      PALWORLD_REST_URL: ${PALWORLD_REST_URL:-http://palworld-server:8212}
+      PALWORLD_REST_USERNAME: ${PALWORLD_REST_USERNAME:-admin}
+      PALWORLD_REST_PASSWORD: ${PALWORLD_REST_PASSWORD:-}
+    volumes:
+      - manager-data:/var/lib/palworld-manager
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
+  manager-web:
+    build:
+      context: ./frontend
+    depends_on:
+      manager-api:
+        condition: service_healthy
+    ports:
+      - "${PMSM_HTTP_PORT:-8080}:80"
+    restart: unless-stopped
+
+  # The official server image is opt-in: a real server needs its passwords,
+  # ports, and backups to be reviewed before the large image is downloaded.
+  palworld-server:
+    image: ghcr.io/pocketpairjp/palserver:${PALWORLD_IMAGE_TAG:-v1.0.1.100619}
+    profiles: ["game-server"]
+    entrypoint: /pal/manager-start.sh
+    command:
+      - -port=${PALWORLD_GAME_PORT:-8211}
+      - -useperfthreads
+      - -NoAsyncLoadingThread
+      - -UseMultithreadForDS
+    ports:
+      - "${PALWORLD_GAME_PORT:-8211}:8211/udp"
+      - "127.0.0.1:${PALWORLD_REST_PORT:-8212}:8212"
+    volumes:
+      - ./infra/palworld/manager-start.sh:/pal/manager-start.sh:ro
+      - ./runtime/palworld/Saved:/pal/Package/Pal/Saved
+    restart: unless-stopped
+
+volumes:
+  manager-data:
