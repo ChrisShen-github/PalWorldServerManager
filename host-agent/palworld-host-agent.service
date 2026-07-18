@@ -1,0 +1,11 @@
+[Unit]
+Description=Palworld Server Manager Host Agent
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/palworld-server-manager/agent.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

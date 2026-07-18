@@ -6,6 +6,7 @@ services:
       context: .
     volumes:
       - manager-data:/var/lib/palworld-manager
+      - /run/palworld-server-manager:/run/palworld-server-manager
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:

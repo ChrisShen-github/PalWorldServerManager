@@ -48,6 +48,17 @@ cd ~/palserver
 
 Compose 为 `manager-api` 配置了 `host.docker.internal:host-gateway`，因此它可从容器访问 Ubuntu 宿主机的 `8212` REST 端口。不要将该 REST 端口公开到互联网；应以 UFW 或安全组限制访问来源。
 
+## 启用原生安装代理
+
+管理面板以 Docker 容器运行，而 SteamCMD 与 PalServer 必须原生运行在 Ubuntu 宿主机。首次部署时，在项目根目录执行一次：
+
+```bash
+sudo ./host-agent/install.sh
+docker compose up -d --build
+```
+
+该代理只接受状态检查、安装、更新、启动、停止和重启六种固定操作；不会执行来自面板的任意命令。它使用 Unix Socket 与面板容器通信。安装目录由面板设置指定，且必须位于 `/opt` 下。
+
 ## 结构
 
 ```text

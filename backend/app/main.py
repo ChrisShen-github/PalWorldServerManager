@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import asyncio
+import json
+from pathlib import Path
 from typing import Literal
 
 import httpx
@@ -50,6 +53,7 @@ class ServerOverview(BaseModel):
 
 app = FastAPI(title="Palworld Server Manager API", version="0.1.0")
 store = SettingsStore()
+AGENT_SOCKET = "/run/palworld-server-manager/agent.sock"
 
 
 class SettingsInput(BaseModel):
@@ -177,7 +181,38 @@ async def put_settings(value: SettingsInput) -> Settings:
     return store.save(Settings(**value.model_dump()))
 
 
-@app.get("/api/installer/plan")
-async def installer_plan() -> dict[str, object]:
+async def _agent(action: str) -> dict[str, object]:
+    if not Path(AGENT_SOCKET).exists():
+        return {"ok": False, "message": "宿主机代理未安装。请先在 Ubuntu 执行 host-agent/install.sh。"}
     settings = store.get()
-    return {"agent_required": True, "steamcmd_path": settings.steamcmd_path, "server_path": settings.server_path, "message": "原生安装需要受限宿主机代理；面板不会获取 Docker 特权或完整宿主机权限。"}
+    payload = {"action": action, "steamcmd_path": settings.steamcmd_path, "server_path": settings.server_path}
+    try:
+        reader, writer = await asyncio.wait_for(asyncio.open_unix_connection(AGENT_SOCKET), timeout=2)
+        writer.write((json.dumps(payload) + "\n").encode())
+        await writer.drain()
+        response = json.loads((await asyncio.wait_for(reader.readline(), timeout=900)).decode())
+        writer.close()
+        await writer.wait_closed()
+        return response
+    except (OSError, asyncio.TimeoutError, json.JSONDecodeError) as error:
+        return {"ok": False, "message": f"宿主机代理调用失败：{error.__class__.__name__}"}
+
+
+@app.get("/api/host/status")
+async def host_status() -> dict[str, object]:
+    return await _agent("status")
+
+
+@app.post("/api/host/install")
+async def host_install() -> dict[str, object]:
+    return await _agent("install")
+
+
+@app.post("/api/host/update")
+async def host_update() -> dict[str, object]:
+    return await _agent("update")
+
+
+@app.post("/api/host/{operation}")
+async def host_service(operation: Literal["start", "stop", "restart"]) -> dict[str, object]:
+    return await _agent(operation)
