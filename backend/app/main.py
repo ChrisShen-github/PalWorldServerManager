@@ -231,8 +231,11 @@ async def _agent_stream(action: str):
 @app.get("/api/host/status")
 async def host_status() -> dict[str, object]:
     response = await _agent("status")
-    if response.get("agent_connected") and not response.get("ok") and "CalledProcessError" in str(response.get("message", "")):
-        response["message"] = "代理已连接；Palworld systemd 服务尚未安装。可以直接开始安装。"
+    message = str(response.get("message", ""))
+    service_missing = message in {"not-installed", "unknown"} or (not response.get("ok") and "CalledProcessError" in message)
+    response["service_installed"] = bool(response.get("agent_connected")) and not service_missing
+    if response.get("agent_connected") and service_missing:
+        response["message"] = "代理已连接；Palworld systemd 服务尚未安装。请先执行安装。"
     return response
 
 

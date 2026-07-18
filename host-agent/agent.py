@@ -109,6 +109,9 @@ def install(payload: dict[str, str], output: Callable[[str], None] | None = None
 def status(_: dict[str, str]) -> str:
     if not shutil.which("systemctl"):
         return "systemd 不可用"
+    load_state = subprocess.run(("systemctl", "show", SERVICE, "--property=LoadState", "--value"), check=False, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    if load_state.stdout.strip() in {"not-found", ""}:
+        return "not-installed"
     result = subprocess.run(("systemctl", "is-active", SERVICE), check=False, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     return result.stdout.strip() or "unknown"
 
