@@ -11,6 +11,21 @@ docker compose up -d --build
 
 打开 `http://<服务器 IP>:8080`。默认是演示模式，不会下载游戏镜像。
 
+## 本地开发（不使用 Docker）
+
+在两个终端中分别运行。后端默认使用 `8010`，避免与本开发机上已常见占用的 `8000` 冲突：
+
+```powershell
+# 终端 1：项目根目录
+.\.venv\Scripts\python.exe -m uvicorn backend.app.main:app --reload --port 8010
+
+# 终端 2：项目根目录
+cd frontend
+npm run dev
+```
+
+浏览器打开 Vite 显示的地址（通常为 `http://localhost:5173`）。前端会将 `/api` 代理到 `http://localhost:8010`；如需改端口，可在启动前设置 `VITE_DEV_API_URL=http://localhost:<端口>`。
+
 ## 连接真实服务器
 
 1. 在 `.env` 设置 `PMSM_DEMO_MODE=false` 与 `PALWORLD_REST_PASSWORD`。
