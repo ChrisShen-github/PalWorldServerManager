@@ -1,27 +1,36 @@
 from __future__ import annotations
 
-import os
+import sqlite3
 from dataclasses import dataclass
-
-
-def _as_bool(value: str | None, *, default: bool) -> bool:
-    if value is None:
-        return default
-    return value.strip().lower() in {"1", "true", "yes", "on"}
+from pathlib import Path
 
 
 @dataclass(frozen=True)
 class Settings:
-    demo_mode: bool
-    rest_url: str
-    rest_username: str
-    rest_password: str
+    demo_mode: bool = True
+    rest_url: str = "http://host.docker.internal:8212"
+    rest_username: str = "admin"
+    rest_password: str = ""
+    steamcmd_path: str = "/opt/steamcmd"
+    server_path: str = "/opt/palserver"
 
-    @classmethod
-    def from_environment(cls) -> "Settings":
-        return cls(
-            demo_mode=_as_bool(os.getenv("PMSM_DEMO_MODE"), default=True),
-            rest_url=os.getenv("PALWORLD_REST_URL", "http://host.docker.internal:8212").rstrip("/"),
-            rest_username=os.getenv("PALWORLD_REST_USERNAME", "admin"),
-            rest_password=os.getenv("PALWORLD_REST_PASSWORD", ""),
-        )
+
+class SettingsStore:
+    def __init__(self) -> None:
+        self.path = Path("/var/lib/palworld-manager/settings.db")
+        if not self.path.parent.exists():
+            self.path = Path.cwd() / "data" / "settings.db"
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        with sqlite3.connect(self.path) as connection:
+            connection.execute("CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY CHECK(id=1), demo_mode INTEGER NOT NULL, rest_url TEXT NOT NULL, rest_username TEXT NOT NULL, rest_password TEXT NOT NULL, steamcmd_path TEXT NOT NULL, server_path TEXT NOT NULL)")
+            connection.execute("INSERT OR IGNORE INTO settings VALUES (1, 1, 'http://host.docker.internal:8212', 'admin', '', '/opt/steamcmd', '/opt/palserver')")
+
+    def get(self) -> Settings:
+        with sqlite3.connect(self.path) as connection:
+            row = connection.execute("SELECT demo_mode, rest_url, rest_username, rest_password, steamcmd_path, server_path FROM settings WHERE id=1").fetchone()
+        return Settings(bool(row[0]), *row[1:])
+
+    def save(self, value: Settings) -> Settings:
+        with sqlite3.connect(self.path) as connection:
+            connection.execute("UPDATE settings SET demo_mode=?, rest_url=?, rest_username=?, rest_password=?, steamcmd_path=?, server_path=? WHERE id=1", (int(value.demo_mode), value.rest_url.rstrip('/'), value.rest_username, value.rest_password, value.steamcmd_path, value.server_path))
+        return self.get()

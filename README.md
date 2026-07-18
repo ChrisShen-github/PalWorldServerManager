@@ -5,7 +5,6 @@
 ## 快速开始
 
 ```bash
-cp .env.example .env
 docker compose up -d --build
 ```
 
@@ -44,7 +43,7 @@ cd ~/palserver
 
 1. 启动一次原生服务器，让 `Pal/Saved/Config/LinuxServer/PalWorldSettings.ini` 自动生成。
 2. 在该文件的 `OptionSettings` 中设置 `AdminPassword`、`RESTAPIEnabled=True`、`RESTAPIPort=8212`。
-3. 在面板项目的 `.env` 设置 `PMSM_DEMO_MODE=false` 与同一个 `PALWORLD_REST_PASSWORD`。
+3. 打开面板的“世界规则与安装”页面，关闭演示模式，并保存 REST 地址、用户名与管理员密码。
 4. 重启面板：`docker compose up -d --build`。
 
 Compose 为 `manager-api` 配置了 `host.docker.internal:host-gateway`，因此它可从容器访问 Ubuntu 宿主机的 `8212` REST 端口。不要将该 REST 端口公开到互联网；应以 UFW 或安全组限制访问来源。

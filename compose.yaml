@@ -4,11 +4,6 @@ services:
   manager-api:
     build:
       context: ./backend
-    environment:
-      PMSM_DEMO_MODE: ${PMSM_DEMO_MODE:-true}
-      PALWORLD_REST_URL: ${PALWORLD_REST_URL:-http://host.docker.internal:8212}
-      PALWORLD_REST_USERNAME: ${PALWORLD_REST_USERNAME:-admin}
-      PALWORLD_REST_PASSWORD: ${PALWORLD_REST_PASSWORD:-}
     volumes:
       - manager-data:/var/lib/palworld-manager
     extra_hosts:
@@ -29,7 +24,7 @@ services:
       manager-api:
         condition: service_healthy
     ports:
-      - "${PMSM_HTTP_PORT:-8080}:80"
+      - "8080:80"
     restart: unless-stopped
 
 volumes:

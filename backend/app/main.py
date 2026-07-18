@@ -7,7 +7,7 @@ import httpx
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
-from .config import Settings
+from .config import Settings, SettingsStore
 
 
 class ServerInfo(BaseModel):
@@ -49,6 +49,16 @@ class ServerOverview(BaseModel):
 
 
 app = FastAPI(title="Palworld Server Manager API", version="0.1.0")
+store = SettingsStore()
+
+
+class SettingsInput(BaseModel):
+    demo_mode: bool
+    rest_url: str
+    rest_username: str
+    rest_password: str
+    steamcmd_path: str
+    server_path: str
 
 
 def _demo_overview() -> ServerOverview:
@@ -151,7 +161,23 @@ async def health() -> dict[str, str]:
 
 @app.get("/api/server/overview", response_model=ServerOverview)
 async def server_overview() -> ServerOverview:
-    settings = Settings.from_environment()
+    settings = store.get()
     if settings.demo_mode:
         return _demo_overview()
     return await _fetch_overview(settings)
+
+
+@app.get("/api/settings", response_model=SettingsInput)
+async def get_settings() -> Settings:
+    return store.get()
+
+
+@app.put("/api/settings", response_model=SettingsInput)
+async def put_settings(value: SettingsInput) -> Settings:
+    return store.save(Settings(**value.model_dump()))
+
+
+@app.get("/api/installer/plan")
+async def installer_plan() -> dict[str, object]:
+    settings = store.get()
+    return {"agent_required": True, "steamcmd_path": settings.steamcmd_path, "server_path": settings.server_path, "message": "原生安装需要受限宿主机代理；面板不会获取 Docker 特权或完整宿主机权限。"}
