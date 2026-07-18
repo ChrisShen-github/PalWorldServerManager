@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import asyncio
+import json
 import os
 import re
 import tempfile
@@ -124,6 +125,19 @@ class HostAgentConfigTests(unittest.TestCase):
             AGENT.default_backup_name("world-20260718T085951612412Z.tar.gz"),
             "世界备份 20260718T165951612412Z",
         )
+
+    def test_generic_legacy_name_is_replaced_with_china_time_name(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            backup_root = Path(directory) / "backups"
+            backup_root.mkdir()
+            archive = backup_root / "world-20260718T085951612412Z.tar.gz"
+            archive.write_bytes(b"test")
+            (backup_root / "metadata.json").write_text(
+                json.dumps({archive.name: "世界备份"}, ensure_ascii=False), encoding="utf-8"
+            )
+            with patch.object(AGENT, "BACKUP_ROOT", backup_root):
+                records = AGENT.backup_records()
+            self.assertEqual(records[0]["name"], "世界备份 20260718T165951612412Z")
 
 
 if __name__ == "__main__":

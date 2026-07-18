@@ -242,9 +242,10 @@ def backup_records() -> list[dict[str, object]]:
         if not BACKUP_ID_RE.fullmatch(archive.name) or not archive.is_file():
             continue
         stat = archive.stat()
+        stored_name = metadata.get(archive.name)
         records.append({
             "id": archive.name,
-            "name": metadata.get(archive.name, default_backup_name(archive.name)),
+            "name": default_backup_name(archive.name) if not stored_name or stored_name == "世界备份" else stored_name,
             "created_at": datetime.fromtimestamp(stat.st_mtime, timezone.utc).isoformat(),
             "size_bytes": stat.st_size,
         })
