@@ -1,6 +1,6 @@
 # Palworld Server Manager
 
-面向 Ubuntu + Docker + SteamCMD 的《幻兽帕鲁》专用服务器管理面板。第一阶段提供 Docker 化的 React 仪表盘、FastAPI 状态聚合和官方服务器镜像的可选 Compose profile。
+面向 Ubuntu + SteamCMD 的《幻兽帕鲁》专用服务器管理面板。管理面板运行在 Docker 中；帕鲁专服始终由宿主机原生 SteamCMD 安装、更新和运行。
 
 ## 快速开始
 
@@ -26,21 +26,35 @@ npm run dev
 
 浏览器打开 Vite 显示的地址（通常为 `http://localhost:5173`）。前端会将 `/api` 代理到 `http://localhost:8010`；如需改端口，可在启动前设置 `VITE_DEV_API_URL=http://localhost:<端口>`。
 
-## 连接真实服务器
+## 安装并运行原生帕鲁专服
 
-1. 在 `.env` 设置 `PMSM_DEMO_MODE=false` 与 `PALWORLD_REST_PASSWORD`。
-2. 在 `runtime/palworld/Saved/Config/LinuxServer/PalWorldSettings.ini` 启用 `RESTAPIEnabled=True`。
-3. 启动游戏服务：`docker compose --profile game-server up -d`。
+在 Ubuntu 宿主机上完成一次 SteamCMD 安装：
 
-游戏存档持久化于 `runtime/palworld/Saved`；修改 `PALWORLD_IMAGE_TAG` 更新前必须备份。REST API 默认只绑定 `127.0.0.1:8212`，不可直接暴露公网。
+```bash
+mkdir -p ~/steamcmd ~/palserver
+cd ~/steamcmd
+./steamcmd.sh +login anonymous +force_install_dir ~/palserver +app_update 2394010 validate +quit
+cd ~/palserver
+./PalServer.sh -port=8211 -useperfthreads -NoAsyncLoadingThread -UseMultithreadForDS
+```
+
+更新时先停止服务器、备份存档，然后重复 `app_update 2394010 validate` 命令。游戏配置和存档位于 `~/palserver/Pal/Saved/`。
+
+## 连接面板到原生服务器
+
+1. 启动一次原生服务器，让 `Pal/Saved/Config/LinuxServer/PalWorldSettings.ini` 自动生成。
+2. 在该文件的 `OptionSettings` 中设置 `AdminPassword`、`RESTAPIEnabled=True`、`RESTAPIPort=8212`。
+3. 在面板项目的 `.env` 设置 `PMSM_DEMO_MODE=false` 与同一个 `PALWORLD_REST_PASSWORD`。
+4. 重启面板：`docker compose up -d --build`。
+
+Compose 为 `manager-api` 配置了 `host.docker.internal:host-gateway`，因此它可从容器访问 Ubuntu 宿主机的 `8212` REST 端口。不要将该 REST 端口公开到互联网；应以 UFW 或安全组限制访问来源。
 
 ## 结构
 
 ```text
 backend/       FastAPI：状态聚合与后续运维工作流
 frontend/      React + Vite：管理仪表盘
-infra/         官方游戏镜像兼容启动包装器
-runtime/       生成的配置、存档、日志与备份（不提交）
+runtime/       面板运行时数据、备份与日志（不提交）
 ```
 
 参考：[官方服务器文档](https://docs.palworldgame.com/)、[官方 Docker 示例](https://github.com/pocketpairjp/palworld-dedicated-server-docker)。

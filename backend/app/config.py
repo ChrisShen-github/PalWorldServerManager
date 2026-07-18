@@ -21,7 +21,7 @@ class Settings:
     def from_environment(cls) -> "Settings":
         return cls(
             demo_mode=_as_bool(os.getenv("PMSM_DEMO_MODE"), default=True),
-            rest_url=os.getenv("PALWORLD_REST_URL", "http://palworld-server:8212").rstrip("/"),
+            rest_url=os.getenv("PALWORLD_REST_URL", "http://host.docker.internal:8212").rstrip("/"),
             rest_username=os.getenv("PALWORLD_REST_USERNAME", "admin"),
             rest_password=os.getenv("PALWORLD_REST_PASSWORD", ""),
         )
