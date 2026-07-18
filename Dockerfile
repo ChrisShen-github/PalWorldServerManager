@@ -10,6 +10,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends nginx supervisor \
     && rm -rf /var/lib/apt/lists/* \
+    && rm -f /etc/nginx/sites-enabled/default \
     && useradd --create-home --uid 10001 appuser \
     && mkdir -p /var/lib/palworld-manager /run/nginx \
     && chown -R appuser:appuser /app /var/lib/palworld-manager
