@@ -1,0 +1,57 @@
+name: Publish manager images
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: docker-publish-main
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - id: config
+        name: Check Docker Hub configuration
+        env:
+          USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          REPOSITORY: ${{ vars.DOCKERHUB_REPOSITORY }}
+        run: |
+          if [ -n "$USERNAME" ] && [ -n "$TOKEN" ] && [ -n "$REPOSITORY" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "Docker Hub secrets or repository variable are not configured; image publishing is skipped."
+          fi
+      - uses: docker/setup-buildx-action@v3
+        if: steps.config.outputs.ready == 'true'
+      - name: Log in to Docker Hub
+        if: steps.config.outputs.ready == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and publish API
+        if: steps.config.outputs.ready == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPOSITORY }}:api-latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPOSITORY }}:api-${{ github.sha }}
+      - name: Build and publish web
+        if: steps.config.outputs.ready == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPOSITORY }}:web-latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPOSITORY }}:web-${{ github.sha }}

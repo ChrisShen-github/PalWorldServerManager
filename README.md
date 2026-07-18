@@ -57,3 +57,15 @@ runtime/       面板运行时数据、备份与日志（不提交）
 ```
 
 参考：[官方服务器文档](https://docs.palworldgame.com/)、[官方 Docker 示例](https://github.com/pocketpairjp/palworld-dedicated-server-docker)。
+
+## GitHub Actions 镜像发布
+
+每次推送到 `main`，工作流会构建并推送两个 Docker Hub 镜像：`api-latest` / `web-latest`，以及对应 Git commit SHA 的不可变标签。
+
+在 GitHub 仓库的 **Settings → Secrets and variables → Actions** 中添加：
+
+- Secret `DOCKERHUB_USERNAME`：Docker Hub 用户名。
+- Secret `DOCKERHUB_TOKEN`：Docker Hub access token，最小权限为 Read & Write。
+- Variable `DOCKERHUB_REPOSITORY`：Docker Hub 仓库名，例如 `palworld-server-manager`。
+
+配置完成后，在 **Actions → Publish manager images → Run workflow** 手动运行一次，或推送一次 `main`。工作流随后会发布 `用户名/仓库名:api-latest` 与 `用户名/仓库名:web-latest`。
