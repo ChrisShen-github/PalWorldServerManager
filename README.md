@@ -5,7 +5,8 @@
 ## 快速开始
 
 ```bash
-docker compose up -d --build
+docker compose pull
+docker compose up -d
 ```
 
 打开 `http://<服务器 IP>:8080`。默认是演示模式，不会下载游戏镜像。
@@ -44,9 +45,9 @@ cd ~/palserver
 1. 启动一次原生服务器，让 `Pal/Saved/Config/LinuxServer/PalWorldSettings.ini` 自动生成。
 2. 在该文件的 `OptionSettings` 中设置 `AdminPassword`、`RESTAPIEnabled=True`、`RESTAPIPort=8212`。
 3. 打开面板的“世界规则与安装”页面，关闭演示模式，并保存 REST 地址、用户名与管理员密码。
-4. 重启面板：`docker compose up -d --build`。
+4. 拉取并重启面板：先执行 `docker compose pull`，再执行 `docker compose up -d`。
 
-Compose 为 `manager-api` 配置了 `host.docker.internal:host-gateway`，因此它可从容器访问 Ubuntu 宿主机的 `8212` REST 端口。不要将该 REST 端口公开到互联网；应以 UFW 或安全组限制访问来源。
+Compose 为 `manager` 配置了 `host.docker.internal:host-gateway`，因此它可从容器访问 Ubuntu 宿主机的 `8212` REST 端口。不要将该 REST 端口公开到互联网；应以 UFW 或安全组限制访问来源。
 
 ## 启用原生安装代理
 
@@ -54,7 +55,8 @@ Compose 为 `manager-api` 配置了 `host.docker.internal:host-gateway`，因此
 
 ```bash
 sudo ./host-agent/install.sh
-docker compose up -d --build
+docker compose pull
+docker compose up -d
 ```
 
 该代理只接受状态检查、安装、更新、启动、停止和重启六种固定操作；不会执行来自面板的任意命令。它使用 Unix Socket 与面板容器通信。安装目录由面板设置指定，且必须位于 `/opt` 下。

@@ -2,8 +2,7 @@ name: palworld-server-manager
 
 services:
   manager:
-    build:
-      context: .
+    image: akwangdao/palworldservermanager:latest
     volumes:
       - ./data:/var/lib/palworld-manager
       - /run/palworld-server-manager:/run/palworld-server-manager
