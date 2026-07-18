@@ -67,7 +67,10 @@ def install(payload: dict[str, str]) -> str:
 
 
 def status(_: dict[str, str]) -> str:
-    return run("systemctl", "is-active", SERVICE) if shutil.which("systemctl") else "systemd 不可用"
+    if not shutil.which("systemctl"):
+        return "systemd 不可用"
+    result = subprocess.run(("systemctl", "is-active", SERVICE), check=False, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    return result.stdout.strip() or "unknown"
 
 
 def operate(action: str, payload: dict[str, str]) -> str:
@@ -75,7 +78,9 @@ def operate(action: str, payload: dict[str, str]) -> str:
     if action == "update":
         steamcmd, server = checked_path(payload["steamcmd_path"]), checked_path(payload["server_path"])
         run("systemctl", "stop", SERVICE)
-        return run("runuser", "-u", "palworld", "--", str(steamcmd / "steamcmd.sh"), "+force_install_dir", str(server), "+login", "anonymous", "+app_update", "2394010", "validate", "+quit")
+        output = run("runuser", "-u", "palworld", "--", str(steamcmd / "steamcmd.sh"), "+force_install_dir", str(server), "+login", "anonymous", "+app_update", "2394010", "validate", "+quit")
+        run("systemctl", "start", SERVICE)
+        return output + "\n更新完成；服务器已重新启动。"
     return run("systemctl", action, SERVICE)
 
 

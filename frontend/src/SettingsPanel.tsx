@@ -1,4 +1,258 @@
-import { FormEvent, useEffect, useState, type ChangeEvent } from "react";
-type Settings={demo_mode:boolean;rest_url:string;rest_username:string;rest_password:string;steamcmd_path:string;server_path:string};
-const initial:Settings={demo_mode:true,rest_url:"http://host.docker.internal:8212",rest_username:"admin",rest_password:"",steamcmd_path:"/opt/steamcmd",server_path:"/opt/palserver"};
-export default function SettingsPanel(){const[v,setV]=useState(initial),[msg,setMsg]=useState("正在读取设置…"),[saving,setSaving]=useState(false);useEffect(()=>{void fetch("/api/settings").then(r=>r.json()).then(x=>{setV(x);setMsg("")}).catch(()=>setMsg("无法读取设置。"))},[]);const c=(k:keyof Settings)=>(e:ChangeEvent<HTMLInputElement>)=>setV(x=>({...x,[k]:e.target.type==="checkbox"?e.target.checked:e.target.value}));async function save(e:FormEvent){e.preventDefault();setSaving(true);try{const r=await fetch("/api/settings",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(v)});if(!r.ok)throw Error();setMsg("设置已保存。")}catch{setMsg("保存失败，请重试。")}finally{setSaving(false)}}return <main style={{maxWidth:900,margin:"auto",padding:48}}><a href="/">← 返回指挥台</a><p>HOST & INSTALLATION</p><h1>主机与服务器设置</h1><p>配置保存在面板数据卷中，不使用 .env。</p><form onSubmit={save}><fieldset><legend>连接设置</legend><label><input type="checkbox" checked={v.demo_mode} onChange={c("demo_mode")}/>演示模式</label><p><label>REST 地址 <input value={v.rest_url} onChange={c("rest_url")} required/></label></p><p><label>用户名 <input value={v.rest_username} onChange={c("rest_username")} required/></label></p><p><label>管理员密码 <input type="password" value={v.rest_password} onChange={c("rest_password")}/></label></p></fieldset><fieldset><legend>原生安装目录</legend><p><label>SteamCMD <input value={v.steamcmd_path} onChange={c("steamcmd_path")} required/></label></p><p><label>帕鲁服务器 <input value={v.server_path} onChange={c("server_path")} required/></label></p><p>安装向导将通过受限宿主机代理执行 SteamCMD 下载与 App 2394010 安装。</p></fieldset><p role="status">{msg}</p><button disabled={saving}>{saving?"正在保存…":"保存设置"}</button></form></main>}
+import { FormEvent, useCallback, useEffect, useState, type ChangeEvent } from "react";
+import "./settings.css";
+
+type Settings = {
+  demo_mode: boolean;
+  rest_url: string;
+  rest_username: string;
+  rest_password: string;
+  steamcmd_path: string;
+  server_path: string;
+};
+
+type Operation = "install" | "update" | "start" | "stop" | "restart";
+type HostReply = { ok: boolean; message: string };
+
+const initial: Settings = {
+  demo_mode: true,
+  rest_url: "http://host.docker.internal:8212",
+  rest_username: "admin",
+  rest_password: "",
+  steamcmd_path: "/opt/steamcmd",
+  server_path: "/opt/palserver",
+};
+
+const operationLabel: Record<Operation, string> = {
+  install: "安装 SteamCMD 与服务器",
+  update: "更新服务器",
+  start: "启动服务器",
+  stop: "停止服务器",
+  restart: "重启服务器",
+};
+
+const confirmationCopy: Record<Exclude<Operation, "start">, { title: string; detail: string; confirm: string }> = {
+  install: {
+    title: "开始安装原生专服？",
+    detail: "将以宿主机的 palworld 用户安装系统依赖、SteamCMD 和 PalServer，并创建 systemd 服务。下载过程可能持续数分钟。",
+    confirm: "确认开始安装",
+  },
+  update: {
+    title: "更新服务器？",
+    detail: "更新前会停止 palworld-server 服务，验证完成后自动重新启动。在线玩家将暂时断开。",
+    confirm: "确认更新并重启",
+  },
+  stop: {
+    title: "停止服务器？",
+    detail: "服务器会立即停止，在线玩家将断开连接。建议先完成一次存档备份。",
+    confirm: "确认停止服务器",
+  },
+  restart: {
+    title: "重启服务器？",
+    detail: "服务器会短暂离线，在线玩家将断开连接。",
+    confirm: "确认重启服务器",
+  },
+};
+
+export default function SettingsPanel() {
+  const [values, setValues] = useState(initial);
+  const [feedback, setFeedback] = useState("正在读取设置…");
+  const [saving, setSaving] = useState(false);
+  const [host, setHost] = useState<HostReply | null>(null);
+  const [checkingHost, setCheckingHost] = useState(true);
+  const [operation, setOperation] = useState<Operation | null>(null);
+  const [confirming, setConfirming] = useState<Exclude<Operation, "start"> | null>(null);
+
+  const refreshHost = useCallback(async () => {
+    setCheckingHost(true);
+    try {
+      const response = await fetch("/api/host/status");
+      setHost(await response.json() as HostReply);
+    } catch {
+      setHost({ ok: false, message: "无法连接管理面板 API，请检查容器状态。" });
+    } finally {
+      setCheckingHost(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void fetch("/api/settings")
+      .then((response) => {
+        if (!response.ok) throw new Error("settings");
+        return response.json() as Promise<Settings>;
+      })
+      .then((loaded) => {
+        setValues(loaded);
+        setFeedback("");
+      })
+      .catch(() => setFeedback("无法读取设置，请确认管理面板 API 可用。"));
+    void refreshHost();
+  }, [refreshHost]);
+
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setConfirming(null);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, []);
+
+  const change = (key: keyof Settings) => (event: ChangeEvent<HTMLInputElement>) => {
+    setValues((current) => ({ ...current, [key]: event.target.type === "checkbox" ? event.target.checked : event.target.value }));
+  };
+
+  const persistSettings = useCallback(async (showSuccess = true) => {
+    setSaving(true);
+    try {
+      const response = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      if (!response.ok) throw new Error("save");
+      if (showSuccess) setFeedback("设置已保存。");
+      return true;
+    } catch {
+      setFeedback("保存失败，请检查填写内容后重试。");
+      return false;
+    } finally {
+      setSaving(false);
+    }
+  }, [values]);
+
+  const save = async (event: FormEvent) => {
+    event.preventDefault();
+    await persistSettings();
+  };
+
+  const execute = async (nextOperation: Operation) => {
+    setConfirming(null);
+    setOperation(nextOperation);
+    setFeedback(nextOperation === "install" ? "正在安装 SteamCMD 与 PalServer；下载可能持续数分钟，请保持页面打开。" : `正在${operationLabel[nextOperation]}…`);
+    const saved = await persistSettings(false);
+    if (!saved) {
+      setOperation(null);
+      return;
+    }
+    try {
+      const response = await fetch(`/api/host/${nextOperation}`, { method: "POST" });
+      const result = await response.json() as HostReply;
+      setFeedback(result.ok ? `${operationLabel[nextOperation]}完成。\n${result.message}` : `操作未完成：${result.message}`);
+    } catch {
+      setFeedback("操作请求失败，请检查管理面板与宿主机代理是否正在运行。");
+    } finally {
+      setOperation(null);
+      await refreshHost();
+    }
+  };
+
+  const requestOperation = (nextOperation: Operation) => {
+    if (nextOperation === "start") {
+      void execute(nextOperation);
+      return;
+    }
+    setConfirming(nextOperation);
+  };
+
+  const agentReady = host?.ok === true;
+  const busy = saving || operation !== null;
+
+  return (
+    <main className="settings-page" id="main">
+      <a className="settings-back" href="/">← 返回指挥台</a>
+      <section className="settings-hero" aria-labelledby="settings-title">
+        <p className="eyebrow">HOST · NATIVE INSTALLATION</p>
+        <h1 id="settings-title">主机与服务器设置</h1>
+        <p>面板在 Docker 中运行；SteamCMD 与 PalServer 由 Ubuntu 宿主机原生管理。路径和连接信息保存在面板数据目录，不使用 <code>.env</code>。</p>
+      </section>
+
+      <section className="setup-steps" aria-label="原生服务器配置步骤">
+        <span className="current"><b>1</b>保存路径</span>
+        <span className={agentReady ? "current" : ""}><b>2</b>检查宿主机代理</span>
+        <span><b>3</b>安装并运行</span>
+      </section>
+
+      <div className="settings-grid">
+        <form className="settings-card settings-form" onSubmit={save}>
+          <div className="settings-card-heading">
+            <div>
+              <p className="eyebrow">CONNECTION & PATHS</p>
+              <h2>连接与安装位置</h2>
+            </div>
+            <button className="button button-primary" disabled={busy} type="submit">{saving ? "保存中…" : "保存设置"}</button>
+          </div>
+
+          <fieldset>
+            <legend>连接设置</legend>
+            <label className="switch-row">
+              <input checked={values.demo_mode} onChange={change("demo_mode")} type="checkbox" />
+              <span><strong>演示模式</strong><small>开启时不请求真实帕鲁服务器 REST API。</small></span>
+            </label>
+            <div className="field-grid">
+              <label>REST 地址<input autoComplete="url" disabled={busy} onChange={change("rest_url")} required value={values.rest_url} /></label>
+              <label>用户名<input autoComplete="username" disabled={busy} onChange={change("rest_username")} required value={values.rest_username} /></label>
+              <label className="field-wide">管理员密码<input autoComplete="current-password" disabled={busy} onChange={change("rest_password")} type="password" value={values.rest_password} /></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>原生安装目录</legend>
+            <p className="field-help">仅允许使用 <code>/opt</code> 下的目录，避免面板写入任意宿主机路径。</p>
+            <div className="field-grid">
+              <label>SteamCMD 目录<input disabled={busy} onChange={change("steamcmd_path")} required value={values.steamcmd_path} /></label>
+              <label>帕鲁服务器目录<input disabled={busy} onChange={change("server_path")} required value={values.server_path} /></label>
+            </div>
+          </fieldset>
+        </form>
+
+        <aside className="settings-side" aria-label="宿主机代理与服务器操作">
+          <section className="settings-card agent-card">
+            <div className="settings-card-heading">
+              <div>
+                <p className="eyebrow">HOST AGENT</p>
+                <h2>宿主机代理</h2>
+              </div>
+              <button aria-label="重新检查宿主机代理" className="button button-secondary" disabled={checkingHost || busy} onClick={() => void refreshHost()} type="button">{checkingHost ? "检查中…" : "重新检查"}</button>
+            </div>
+            <p className={`agent-state ${agentReady ? "ready" : "missing"}`} role="status"><i />{checkingHost ? "正在检查代理状态…" : agentReady ? "代理已连接" : "代理未连接"}</p>
+            <p className="agent-message">{host?.message ?? "正在读取状态…"}</p>
+            {!agentReady && !checkingHost && <p className="agent-hint">先在 Ubuntu 的 Compose 目录执行 <code>sudo ./host-agent/install.sh</code>，然后点击“重新检查”。</p>}
+          </section>
+
+          <section className="settings-card operations-card">
+            <p className="eyebrow">SERVER OPERATIONS</p>
+            <h2>服务器操作</h2>
+            <p>安装会保存上方路径，并通过受限代理执行固定的系统操作。</p>
+            <div className="operation-actions">
+              <button className="button button-primary operation-install" disabled={!agentReady || busy} onClick={() => requestOperation("install")} type="button">{operation === "install" ? "正在安装…" : "安装 SteamCMD 与服务器"}</button>
+              <button className="button button-secondary" disabled={!agentReady || busy} onClick={() => requestOperation("update")} type="button">{operation === "update" ? "正在更新…" : "更新服务器"}</button>
+              <button className="button button-secondary" disabled={!agentReady || busy} onClick={() => requestOperation("start")} type="button">{operation === "start" ? "正在启动…" : "启动"}</button>
+              <button className="button button-secondary" disabled={!agentReady || busy} onClick={() => requestOperation("restart")} type="button">{operation === "restart" ? "正在重启…" : "重启"}</button>
+              <button className="button button-danger" disabled={!agentReady || busy} onClick={() => requestOperation("stop")} type="button">{operation === "stop" ? "正在停止…" : "停止"}</button>
+            </div>
+          </section>
+        </aside>
+      </div>
+
+      <section aria-live="polite" className={`operation-feedback ${feedback.includes("失败") || feedback.includes("未完成") || feedback.includes("无法") ? "error" : ""}`}>
+        <p className="eyebrow">OPERATION FEEDBACK</p>
+        <pre>{feedback || "保存设置后，检查宿主机代理并开始安装。"}</pre>
+      </section>
+
+      {confirming && <div aria-labelledby="confirmation-title" aria-modal="true" className="confirmation-scrim" role="dialog">
+        <section className="confirmation-dialog">
+          <p className="eyebrow">CONFIRM OPERATION</p>
+          <h2 id="confirmation-title">{confirmationCopy[confirming].title}</h2>
+          <p>{confirmationCopy[confirming].detail}</p>
+          <dl>
+            <div><dt>SteamCMD</dt><dd>{values.steamcmd_path}</dd></div>
+            <div><dt>服务器</dt><dd>{values.server_path}</dd></div>
+          </dl>
+          <div className="dialog-actions">
+            <button autoFocus className="button button-secondary" onClick={() => setConfirming(null)} type="button">取消</button>
+            <button className={confirming === "stop" ? "button button-danger" : "button button-primary"} onClick={() => void execute(confirming)} type="button">{confirmationCopy[confirming].confirm}</button>
+          </div>
+        </section>
+      </div>}
+    </main>
+  );
+}
