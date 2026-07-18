@@ -5,7 +5,7 @@ services:
     build:
       context: .
     volumes:
-      - manager-data:/var/lib/palworld-manager
+      - ./data:/var/lib/palworld-manager
       - /run/palworld-server-manager:/run/palworld-server-manager
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -17,6 +17,3 @@ services:
       timeout: 3s
       retries: 3
     restart: unless-stopped
-
-volumes:
-  manager-data:
