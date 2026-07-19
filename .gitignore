@@ -31,6 +31,12 @@ backups/
 logs/
 Saved/
 
+# Bundled web knowledge base (the runtime data/ directory above remains ignored)
+!frontend/
+!frontend/public/
+!frontend/public/data/
+!frontend/public/data/**
+
 # Coverage and operating-system files
 coverage/
 htmlcov/

@@ -1,13 +1,16 @@
-# 图鉴与地图数据
+# 图鉴与离线地图资料
 
-图鉴和地图使用两个独立的数据来源，均不把第三方游戏美术资产打包进镜像。
+图鉴与地图的运行时静态资源统一放在 `frontend/public/data/palworld/`，构建后以 `/data/palworld/` 提供：
 
-- **帕鲁图鉴**：构建时保存 [Palworld.tools Paldex](https://www.palworld.tools/pals) 公开索引的本地快照。当前快照对应 1.0 数据，索引更新时间为 2026-07-13，含 288 条可收集帕鲁及变种记录。
-- **世界地图**：页面内嵌 [MapGenie 的 Palworld 互动地图](https://mapgenie.io/palworld/maps/palpagos-islands)。地图内容、搜索与标记由 MapGenie 在其站点中维护；完整地图可从面板的新标签页入口打开。
+- `pals.json`：288 条帕鲁的中文名、英文名、元素、工作适性、伙伴技能、招式和基础数值。
+- `icons/`：图鉴头像。
+- `map/map.json`：区域、分类与 404 个地图点位。
+- `map/icons/`：地图分类图标。
+- `map/tiles/`：离线底图瓦片。
 
-构建产物在 `frontend/public/companion/pals.json`。中文名仅保留已有的已校对历史译名；新加入而暂无中文名的条目会显示官方英文名，避免编造译名。
+资料由 [游民星空帕鲁图鉴](https://app.gamersky.com/tools/palworldwiki/list.html?appNavigationBarStyle=kNoneBar&type=pals) 和 [游民星空互动地图](https://app.gamersky.com/map/?gsAppChannel=diTu&gsGameId=1395719&mapId=26) 的公开数据生成。本次图鉴数据源标识为 Palworld 1.0 local game assets，生成脚本数据版本为 `V1.12.45`；面板运行时不访问第三方图鉴或地图接口。
 
-## 刷新图鉴快照
+## 刷新资料
 
 在项目根目录执行：
 
@@ -15,4 +18,12 @@
 node scripts/import-companion-data.mjs
 ```
 
-脚本会从公开索引下载数据，保留已存在的中文译名，并拒绝用异常的小数据集覆盖图鉴。完成后重新构建镜像即可随镜像发布新的快照；运行中的面板不会直接请求第三方图鉴接口。
+脚本会重新下载图鉴、头像、地图分类图标、点位和离线底图，再写入上述 `/data/palworld/` 目录。脚本在资料数量异常时会中止，不会用不完整的数据覆盖现有快照。
+
+默认内置第 12 级地图瓦片，适合在面板内清晰查看完整世界。若要制作更高分辨率镜像，可在导入时设置 `PALWORLD_MAP_ZOOM`，但层级越高，文件数和镜像体积会呈四倍增长：
+
+```bash
+PALWORLD_MAP_ZOOM=12 node scripts/import-companion-data.mjs
+```
+
+第 16 级是来源的最高层，完整导入约为 6.5 万张瓦片；不建议提交进 Git 仓库或用于日常更新。
