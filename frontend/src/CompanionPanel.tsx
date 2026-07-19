@@ -16,10 +16,13 @@ type Catalog = {
 
 const typeNames: Record<string, string> = { neutral: "无", normal: "无", fire: "火", water: "水", electricity: "雷", leaf: "草", ice: "冰", earth: "地", dark: "暗", dragon: "龙" };
 const statNames: Record<string, string> = { HP: "生命", ATK: "攻击", DEF: "防御", RUN: "跑速", SPRINT: "冲刺", PRICE: "价格" };
-const maps = {
-  palworld: { label: "Palworld 1.0", url: "https://wand.com/maps/palworld/palworld-10", description: "帕洛斯群岛与 1.0 区域" },
-  worldTree: { label: "世界树", url: "https://wand.com/maps/palworld/world-tree", description: "世界树区域与标记" },
-} as const;
+const interactiveMap = {
+  label: "Palworld 1.0",
+  url: "https://mapgenie.io/palworld/maps/palpagos-islands?embed=light",
+  openUrl: "https://mapgenie.io/palworld/maps/palpagos-islands",
+  description: "帕洛斯群岛互动地图",
+  provider: "MapGenie",
+};
 
 function nav(to: string) { location.href = to; }
 function displayName(pal: Pal) { return pal.name_zh || pal.name; }
@@ -113,23 +116,20 @@ function PalDetail({ pal }: { pal: Pal | null }) {
 }
 
 function WorldMap() {
-  const [mapId, setMapId] = useState<keyof typeof maps>("palworld");
   const [loaded, setLoaded] = useState(false);
-  const selected = maps[mapId];
-  useEffect(() => setLoaded(false), [mapId]);
 
-  return <><CompanionHeader crumb="世界地图" action={<a className="refresh external-map-link" href={selected.url} target="_blank" rel="noreferrer"><PalIcon name="map" /><span>在 Wand 打开</span></a>} />
-    <section className="companion-hero panel map-hero"><div><p className="eyebrow">WORLD MAP · THIRD-PARTY INTERACTIVE</p><h1>世界地图</h1><p>内置 Wand 维护的互动地图。地图内可自行搜索帕鲁、资源和传送点；数据与标记更新由地图来源直接维护。</p></div><div className="companion-hero-mark"><PalIcon name="map" /><small>互动地图 · 实时来源</small></div></section>
+  return <><CompanionHeader crumb="世界地图" action={<a className="refresh external-map-link" href={interactiveMap.openUrl} target="_blank" rel="noreferrer"><PalIcon name="map" /><span>打开完整地图</span></a>} />
+    <section className="companion-hero panel map-hero"><div><p className="eyebrow">WORLD MAP · THIRD-PARTY INTERACTIVE</p><h1>世界地图</h1><p>内置 MapGenie 维护的互动地图。地图内可自行搜索帕鲁、资源和传送点；数据与标记更新由地图来源直接维护。</p></div><div className="companion-hero-mark"><PalIcon name="map" /><small>互动地图 · 实时来源</small></div></section>
     <section className="map-layout">
       <section className="world-map panel">
-        <div className="map-toolbar"><label>地图区域<select value={mapId} onChange={(event) => setMapId(event.target.value as keyof typeof maps)}>{Object.entries(maps).map(([key, map]) => <option key={key} value={key}>{map.label} · {map.description}</option>)}</select></label><a href={selected.url} target="_blank" rel="noreferrer" className="map-source-link">无法载入？在新标签页打开</a></div>
+        <div className="map-toolbar"><label>互动地图来源<strong>{interactiveMap.label} · {interactiveMap.description}</strong></label><a href={interactiveMap.openUrl} target="_blank" rel="noreferrer" className="map-source-link">无法载入？在新标签页打开</a></div>
         <div className="embed-map-shell" aria-busy={!loaded}>
-          {!loaded && <div className="embed-map-loading"><PalIcon name="map" /><strong>正在加载 {selected.label} 互动地图…</strong><small>首次加载取决于 Wand 的地图服务。</small></div>}
-          <iframe key={mapId} className="third-party-map" title={`${selected.label} - Wand 互动地图`} src={selected.url} loading="lazy" allow="clipboard-write" referrerPolicy="strict-origin-when-cross-origin" onLoad={() => setLoaded(true)} />
+          {!loaded && <div className="embed-map-loading"><PalIcon name="map" /><strong>正在加载 {interactiveMap.label} 互动地图…</strong><small>首次加载取决于地图来源的服务。</small></div>}
+          <iframe className="third-party-map" title={`${interactiveMap.label} - ${interactiveMap.provider} 互动地图`} src={interactiveMap.url} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" onLoad={() => setLoaded(true)} />
         </div>
-        <footer className="map-foot"><span><i />数据与地图标记由 Wand 维护</span><small>地图在独立站点运行，面板不会读取你的地图操作或账号信息。</small></footer>
+        <footer className="map-foot"><span><i />数据与地图标记由 {interactiveMap.provider} 维护</span><small>地图在独立站点运行，面板不会读取你的地图操作或账号信息。</small></footer>
       </section>
-      <aside className="map-info panel"><p className="eyebrow">MAP SOURCE</p><div className="pal-detail-title"><span className="pal-monogram large"><PalIcon name="map" /></span><div><h2>{selected.label}</h2><small>Wand 互动地图</small></div></div><dl><div><dt>覆盖区域</dt><dd>{selected.description}</dd></div><div><dt>嵌入方式</dt><dd>第三方 iframe</dd></div><div><dt>标记数据</dt><dd>来源站点维护</dd></div></dl><a className="button-primary companion-link source-link" href={selected.url} target="_blank" rel="noreferrer">在 Wand 完整打开</a><p className="map-source">若网络策略阻止嵌入，请使用上方链接。该地图不是服务器实时状态，也不会改动你的游戏世界。</p></aside>
+      <aside className="map-info panel"><p className="eyebrow">MAP SOURCE</p><div className="pal-detail-title"><span className="pal-monogram large"><PalIcon name="map" /></span><div><h2>{interactiveMap.label}</h2><small>{interactiveMap.provider} 互动地图</small></div></div><dl><div><dt>覆盖区域</dt><dd>{interactiveMap.description}</dd></div><div><dt>嵌入方式</dt><dd>第三方 iframe</dd></div><div><dt>标记数据</dt><dd>来源站点维护</dd></div></dl><a className="button-primary companion-link source-link" href={interactiveMap.openUrl} target="_blank" rel="noreferrer">打开完整互动地图</a><p className="map-source">首次打开可能显示第三方隐私提示。若网络策略阻止嵌入，请使用上方链接；该地图不会改动你的游戏世界。</p></aside>
     </section>
   </>;
 }

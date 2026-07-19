@@ -3,7 +3,7 @@
 图鉴和地图使用两个独立的数据来源，均不把第三方游戏美术资产打包进镜像。
 
 - **帕鲁图鉴**：构建时保存 [Palworld.tools Paldex](https://www.palworld.tools/pals) 公开索引的本地快照。当前快照对应 1.0 数据，索引更新时间为 2026-07-13，含 288 条可收集帕鲁及变种记录。
-- **世界地图**：页面内嵌 [Wand 的 Palworld 1.0 互动地图](https://wand.com/maps/palworld/palworld-10)，并可切换至 [世界树互动地图](https://wand.com/maps/palworld/world-tree)。地图内容、搜索与标记由 Wand 在其站点中维护。
+- **世界地图**：页面内嵌 [MapGenie 的 Palworld 互动地图](https://mapgenie.io/palworld/maps/palpagos-islands)。地图内容、搜索与标记由 MapGenie 在其站点中维护；完整地图可从面板的新标签页入口打开。
 
 构建产物在 `frontend/public/companion/pals.json`。中文名仅保留已有的已校对历史译名；新加入而暂无中文名的条目会显示官方英文名，避免编造译名。
 
