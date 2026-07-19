@@ -1,16 +1,18 @@
 # 图鉴与地图数据
 
-图鉴和地图不从第三方互动地图页面抓取数据或图片。首版内置两份可追溯的公开仓库数据：
+图鉴和地图使用两个独立的数据来源，均不把第三方游戏美术资产打包进镜像。
 
-- 帕鲁中文名称、元素、工作适性、成长数值与招式：[`EternalWraith/PalEdit`](https://github.com/EternalWraith/PalEdit)，MIT。
-- 帕鲁昼夜分布坐标：[`mlg404/palworld-paldex-api`](https://github.com/mlg404/palworld-paldex-api)，MIT。
+- **帕鲁图鉴**：构建时保存 [Palworld.tools Paldex](https://www.palworld.tools/pals) 公开索引的本地快照。当前快照对应 1.0 数据，索引更新时间为 2026-07-13，含 288 条可收集帕鲁及变种记录。
+- **世界地图**：页面内嵌 [Wand 的 Palworld 1.0 互动地图](https://wand.com/maps/palworld/palworld-10)，并可切换至 [世界树互动地图](https://wand.com/maps/palworld/world-tree)。地图内容、搜索与标记由 Wand 在其站点中维护。
 
-构建产物位于 `frontend/public/companion/`。仓库不内置上述项目的游戏图片；角色与地图美术的权利仍归《幻兽帕鲁》权利人所有。
+构建产物在 `frontend/public/companion/pals.json`。中文名仅保留已有的已校对历史译名；新加入而暂无中文名的条目会显示官方英文名，避免编造译名。
 
-更新数据时，分别取得两个仓库的工作副本后执行：
+## 刷新图鉴快照
+
+在项目根目录执行：
 
 ```bash
-node scripts/import-companion-data.mjs /path/to/PalEdit /path/to/palworld-paldex-api
+node scripts/import-companion-data.mjs
 ```
 
-脚本会把世界坐标压缩为相对坐标，并按每只帕鲁、昼夜和地图网格去重，以降低浏览器渲染开销。地图显示的是分布坐标层；不把未明确授权的第三方地图底图打包进镜像。
+脚本会从公开索引下载数据，保留已存在的中文译名，并拒绝用异常的小数据集覆盖图鉴。完成后重新构建镜像即可随镜像发布新的快照；运行中的面板不会直接请求第三方图鉴接口。
