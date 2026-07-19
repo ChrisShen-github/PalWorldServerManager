@@ -865,6 +865,7 @@ def status(_: dict[str, str]) -> str:
 
 
 def operate(action: str, payload: dict[str, object], output: Callable[[str], None] | None = None) -> str | dict[str, object]:
+    if action == "status": return status({})
     if action == "monitor": return monitor_host(payload)
     if action == "get_config": return read_server_config(payload)
     if action == "set_config": return write_server_config(payload)

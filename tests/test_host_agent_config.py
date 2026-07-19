@@ -202,6 +202,13 @@ class HostAgentConfigTests(unittest.TestCase):
         self.assertGreater(metrics["disk_total_bytes"], 0)
         self.assertIn("pid", metrics["palworld"])
 
+    def test_status_action_uses_non_throwing_is_active_check(self) -> None:
+        with patch.object(AGENT, "status", return_value="inactive") as status:
+            result = AGENT.operate("status", {})
+
+        self.assertEqual(result, "inactive")
+        status.assert_called_once_with({})
+
 
 if __name__ == "__main__":
     unittest.main()
