@@ -1,4 +1,4 @@
-export type PalIconName = "sphere" | "dashboard" | "server" | "trainers" | "backup" | "settings" | "logs" | "refresh" | "search" | "sun" | "moon" | "pulse";
+export type PalIconName = "sphere" | "dashboard" | "server" | "trainers" | "backup" | "settings" | "logs" | "refresh" | "search" | "sun" | "moon" | "pulse" | "paldex" | "map";
 
 export function PalIcon({ name, className = "" }: { name: PalIconName; className?: string }) {
   const paths: Record<PalIconName, React.ReactNode> = {
@@ -14,6 +14,8 @@ export function PalIcon({ name, className = "" }: { name: PalIconName; className
     sun: <><circle cx="12" cy="12" r="3.5" /><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4m0-14.2-1.4 1.4M6.3 17.7l-1.4 1.4" /></>,
     moon: <path d="M20 15.2A8.2 8.2 0 0 1 8.8 4a8.4 8.4 0 1 0 11.2 11.2Z" />,
     pulse: <><path d="M3 12h4l2-5 3.5 10 2.5-6 1.5 1H21" /><path d="M6 4.5A9 9 0 1 1 3 12" /></>,
+    paldex: <><path d="M6 4.5h9.2l2.8 2.8v12.2H6z" /><path d="M15.2 4.5v2.8H18M9 10h6m-6 3h4" /><circle cx="9.2" cy="16.5" r="1.7" /><path d="M12.2 16.5h3.8" /></>,
+    map: <><path d="m3.5 6 5.4-2 6.1 2 5-2v14l-5 2-6.1-2-5.4 2z" /><path d="M8.9 4v14m6.1-12v14" /><path d="M12 9.3c1.4 0 2.5 1 2.5 2.3 0 1.9-2.5 4.1-2.5 4.1S9.5 13.5 9.5 11.6C9.5 10.3 10.6 9.3 12 9.3Z" /></>,
   };
 
   return <svg aria-hidden="true" className={className} focusable="false" viewBox="0 0 24 24">{paths[name]}</svg>;

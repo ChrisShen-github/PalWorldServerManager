@@ -1,0 +1,10200 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-19T02:47:18.023Z",
+  "source": {
+    "repository": "https://github.com/EternalWraith/PalEdit",
+    "license": "MIT"
+  },
+  "pals": [
+    {
+      "code": "Anubis",
+      "name": "阿努比斯",
+      "english_name": "Anubis",
+      "types": [
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 4
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 3
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 120,
+        "PHY": 130,
+        "MAG": 130,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "StoneShotgun",
+          "level": 1
+        },
+        {
+          "skill": "PowerBall",
+          "level": 7
+        },
+        {
+          "skill": "SandTornado",
+          "level": 15
+        },
+        {
+          "skill": "Unique_Anubis_LowRoundKick",
+          "level": 22
+        },
+        {
+          "skill": "Unique_Anubis_Tackle",
+          "level": 30
+        },
+        {
+          "skill": "Unique_Anubis_GroundPunch",
+          "level": 40
+        },
+        {
+          "skill": "RockLance",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Baphomet_Dark",
+      "name": "暗魔羊",
+      "english_name": "Incineram Noct",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 95,
+        "PHY": 150,
+        "MAG": 105,
+        "DEF": 85
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "FireSeed",
+          "level": 7
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 15
+        },
+        {
+          "skill": "Unique_Baphomet_SwallowKite",
+          "level": 22
+        },
+        {
+          "skill": "DarkWave",
+          "level": 30
+        },
+        {
+          "skill": "FireBall",
+          "level": 40
+        },
+        {
+          "skill": "Inferno",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "CatMage",
+      "name": "暗巫猫",
+      "english_name": "Katress",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 100,
+        "MAG": 105,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "DarkBall",
+          "level": 7
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 15
+        },
+        {
+          "skill": "DarkWave",
+          "level": 22
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 30
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "GuardianDog",
+      "name": "八云犬",
+      "english_name": "Yakumo",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 85,
+        "PHY": 80,
+        "MAG": 85,
+        "DEF": 85
+      },
+      "moves": [
+        {
+          "skill": "MudShot",
+          "level": 1
+        },
+        {
+          "skill": "PowerShot",
+          "level": 7
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 15
+        },
+        {
+          "skill": "PowerBall",
+          "level": 22
+        },
+        {
+          "skill": "AirBlade",
+          "level": 30
+        },
+        {
+          "skill": "HolyBlast",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Yeti",
+      "name": "白绒雪怪",
+      "english_name": "Wumpo",
+      "types": [
+        "ice"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 3
+        },
+        {
+          "key": "Cool",
+          "name": "冷却",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 4
+        }
+      ],
+      "stats": {
+        "HP": 140,
+        "PHY": 100,
+        "MAG": 80,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "IceMissile",
+          "level": 1
+        },
+        {
+          "skill": "WindCutter",
+          "level": 7
+        },
+        {
+          "skill": "IceBlade",
+          "level": 15
+        },
+        {
+          "skill": "BlizzardLance",
+          "level": 22
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 30
+        },
+        {
+          "skill": "Unique_Yeti_SnowBall",
+          "level": 35
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "LilyQueen",
+      "name": "百合女王",
+      "english_name": "Lyleen",
+      "types": [
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 4
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 3
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 110,
+        "PHY": 100,
+        "MAG": 110,
+        "DEF": 105
+      },
+      "moves": [
+        {
+          "skill": "WindCutter",
+          "level": 1
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 7
+        },
+        {
+          "skill": "SeedMine",
+          "level": 15
+        },
+        {
+          "skill": "WaterBall",
+          "level": 22
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 30
+        },
+        {
+          "skill": "RootAttack",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        },
+        {
+          "skill": "Unique_LilyQueen_LilyHealing",
+          "level": 55
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "ElecPanda",
+      "name": "暴电熊",
+      "english_name": "Grizzbolt",
+      "types": [
+        "electricity"
+      ],
+      "work": [
+        {
+          "key": "GenerateElectricity",
+          "name": "发电",
+          "level": 3
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 105,
+        "PHY": 120,
+        "MAG": 100,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "SpreadPulse",
+          "level": 1
+        },
+        {
+          "skill": "ElecWave",
+          "level": 7
+        },
+        {
+          "skill": "Unique_ElecPanda_ElecScratch",
+          "level": 15
+        },
+        {
+          "skill": "LineThunder",
+          "level": 22
+        },
+        {
+          "skill": "ThreeThunder",
+          "level": 30
+        },
+        {
+          "skill": "LightningStrike",
+          "level": 40
+        },
+        {
+          "skill": "Thunderbolt",
+          "level": 50
+        },
+        {
+          "skill": "Unique_ElecPanda_GatlingAttack",
+          "level": 55
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "NightLady_Dark",
+      "name": "贝菈露洁",
+      "english_name": "Bellanoir Libero",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 4
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 120,
+        "PHY": 100,
+        "MAG": 150,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "DarkCanon",
+          "level": 1
+        },
+        {
+          "skill": "DarkPulse",
+          "level": 7
+        },
+        {
+          "skill": "DarkArrow",
+          "level": 15
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 22
+        },
+        {
+          "skill": "Apocalypse",
+          "level": 30
+        },
+        {
+          "skill": "Unique_NightLady_FlameNightmare",
+          "level": 40
+        },
+        {
+          "skill": "Unique_NightLady_WarpBeam",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "NightLady",
+      "name": "贝菈诺娃",
+      "english_name": "Bellanoir",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 4
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 120,
+        "PHY": 100,
+        "MAG": 150,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "DarkCanon",
+          "level": 1
+        },
+        {
+          "skill": "DarkPulse",
+          "level": 7
+        },
+        {
+          "skill": "DarkArrow",
+          "level": 15
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 22
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 30
+        },
+        {
+          "skill": "Apocalypse",
+          "level": 40
+        },
+        {
+          "skill": "Unique_NightLady_WarpBeam_Straight",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "BlueDragon",
+      "name": "碧海龙",
+      "english_name": "Azurobe",
+      "types": [
+        "water",
+        "dragon"
+      ],
+      "work": [
+        {
+          "key": "Watering",
+          "name": "浇水",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 110,
+        "PHY": 70,
+        "MAG": 100,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "WaterGun",
+          "level": 1
+        },
+        {
+          "skill": "DragonCanon",
+          "level": 7
+        },
+        {
+          "skill": "BubbleShot",
+          "level": 15
+        },
+        {
+          "skill": "DragonWave",
+          "level": 22
+        },
+        {
+          "skill": "DragonBreath",
+          "level": 30
+        },
+        {
+          "skill": "HydroPump",
+          "level": 40
+        },
+        {
+          "skill": "DragonMeteor",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Hedgehog_Ice",
+      "name": "冰刺鼠",
+      "english_name": "Jolthog Cryst",
+      "types": [
+        "ice"
+      ],
+      "work": [
+        {
+          "key": "Cool",
+          "name": "冷却",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 70,
+        "PHY": 70,
+        "MAG": 75,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "IceMissile",
+          "level": 1
+        },
+        {
+          "skill": "PowerShot",
+          "level": 7
+        },
+        {
+          "skill": "BlizzardLance",
+          "level": 15
+        },
+        {
+          "skill": "PowerBall",
+          "level": 22
+        },
+        {
+          "skill": "IceBlade",
+          "level": 30
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 40
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "KingAlpaca_Ice",
+      "name": "冰帝美露帕",
+      "english_name": "Kingpaca Cryst",
+      "types": [
+        "ice"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Cool",
+          "name": "冷却",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 120,
+        "PHY": 100,
+        "MAG": 85,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "IceMissile",
+          "level": 1
+        },
+        {
+          "skill": "IceBlade",
+          "level": 7
+        },
+        {
+          "skill": "BlizzardLance",
+          "level": 15
+        },
+        {
+          "skill": "Unique_KingAlpaca_BodyPress",
+          "level": 22
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 30
+        },
+        {
+          "skill": "WaterBall",
+          "level": 40
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "WindChimes_Ice",
+      "name": "冰缚灵",
+      "english_name": "Hangyu Cryst",
+      "types": [
+        "ice"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Cool",
+          "name": "冷却",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 80,
+        "PHY": 70,
+        "MAG": 80,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "IceMissile",
+          "level": 7
+        },
+        {
+          "skill": "PowerShot",
+          "level": 15
+        },
+        {
+          "skill": "IceBlade",
+          "level": 22
+        },
+        {
+          "skill": "BlizzardLance",
+          "level": 30
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 40
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "WhiteTiger",
+      "name": "冰棘兽",
+      "english_name": "Cryolinx",
+      "types": [
+        "ice"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        },
+        {
+          "key": "Cool",
+          "name": "冷却",
+          "level": 3
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 140,
+        "MAG": 100,
+        "DEF": 110
+      },
+      "moves": [
+        {
+          "skill": "PowerShot",
+          "level": 1
+        },
+        {
+          "skill": "IceMissile",
+          "level": 7
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 15
+        },
+        {
+          "skill": "IceBlade",
+          "level": 22
+        },
+        {
+          "skill": "BlizzardLance",
+          "level": 30
+        },
+        {
+          "skill": "Unique_WhiteTiger_IceScratch",
+          "level": 35
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 40
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Bastet_Ice",
+      "name": "冰丝特",
+      "english_name": "Mau Cryst",
+      "types": [
+        "ice"
+      ],
+      "work": [
+        {
+          "key": "Cool",
+          "name": "冷却",
+          "level": 1
+        },
+        {
+          "key": "MonsterFarm",
+          "name": "牧场",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 70,
+        "PHY": 70,
+        "MAG": 65,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "IceMissile",
+          "level": 1
+        },
+        {
+          "skill": "AirCanon",
+          "level": 7
+        },
+        {
+          "skill": "MudShot",
+          "level": 15
+        },
+        {
+          "skill": "IceBlade",
+          "level": 22
+        },
+        {
+          "skill": "BlizzardLance",
+          "level": 30
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 40
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "CowPal",
+      "name": "波霸牛",
+      "english_name": "Mozzarina",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "MonsterFarm",
+          "name": "牧场",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 100,
+        "MAG": 50,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "PowerShot",
+          "level": 1
+        },
+        {
+          "skill": "MudShot",
+          "level": 7
+        },
+        {
+          "skill": "AirCanon",
+          "level": 15
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 22
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 30
+        },
+        {
+          "skill": "PowerBall",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "ThunderDragonMan",
+      "name": "波鲁杰克斯",
+      "english_name": "Orserk",
+      "types": [
+        "dragon",
+        "electricity"
+      ],
+      "work": [
+        {
+          "key": "GenerateElectricity",
+          "name": "发电",
+          "level": 4
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 100,
+        "MAG": 130,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "Unique_ThunderDragonMan_ThunderSwordAttack",
+          "level": 1
+        },
+        {
+          "skill": "LightningStrike",
+          "level": 7
+        },
+        {
+          "skill": "SpreadPulse",
+          "level": 15
+        },
+        {
+          "skill": "DragonBreath",
+          "level": 22
+        },
+        {
+          "skill": "LineThunder",
+          "level": 30
+        },
+        {
+          "skill": "ThreeThunder",
+          "level": 40
+        },
+        {
+          "skill": "Thunderbolt",
+          "level": 50
+        },
+        {
+          "skill": "Unique_ThunderDragonMan_NumerousSwordAttack",
+          "level": 55
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "FlowerRabbit",
+      "name": "波娜兔",
+      "english_name": "Flopie",
+      "types": [
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 1
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 75,
+        "PHY": 100,
+        "MAG": 65,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "WindCutter",
+          "level": 1
+        },
+        {
+          "skill": "AirCanon",
+          "level": 7
+        },
+        {
+          "skill": "AquaJet",
+          "level": 15
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 22
+        },
+        {
+          "skill": "BubbleShot",
+          "level": 30
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "PinkLizard",
+      "name": "博爱蜥",
+      "english_name": "Lovander",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 1
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 120,
+        "PHY": 70,
+        "MAG": 70,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "PowerShot",
+          "level": 1
+        },
+        {
+          "skill": "PoisonShot",
+          "level": 7
+        },
+        {
+          "skill": "DarkWave",
+          "level": 15
+        },
+        {
+          "skill": "AcidRain",
+          "level": 22
+        },
+        {
+          "skill": "PowerBall",
+          "level": 30
+        },
+        {
+          "skill": "SelfDestruct",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "AmaterasuWolf",
+      "name": "苍焰狼",
+      "english_name": "Kitsun",
+      "types": [
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 70,
+        "MAG": 115,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "FireSeed",
+          "level": 7
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 15
+        },
+        {
+          "skill": "Unique_AmaterasuWolf_FireCharge",
+          "level": 22
+        },
+        {
+          "skill": "FlareTornado",
+          "level": 30
+        },
+        {
+          "skill": "Inferno",
+          "level": 40
+        },
+        {
+          "skill": "FireBall",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Boar",
+      "name": "草莽猪",
+      "english_name": "Rushoar",
+      "types": [
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 80,
+        "PHY": 100,
+        "MAG": 70,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "Unique_Boar_Tackle",
+          "level": 1
+        },
+        {
+          "skill": "MudShot",
+          "level": 7
+        },
+        {
+          "skill": "PowerShot",
+          "level": 15
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 22
+        },
+        {
+          "skill": "PowerBall",
+          "level": 30
+        },
+        {
+          "skill": "RockLance",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "CatMage_Fire",
+      "name": "炽巫猫",
+      "english_name": "Katress Ignis",
+      "types": [
+        "dark",
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 2
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 95,
+        "PHY": 100,
+        "MAG": 105,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "DarkCanon",
+          "level": 7
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 15
+        },
+        {
+          "skill": "FlareTornado",
+          "level": 22
+        },
+        {
+          "skill": "FlameWall",
+          "level": 30
+        },
+        {
+          "skill": "FlameFunnel",
+          "level": 40
+        },
+        {
+          "skill": "FireBall",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "FlameBuffalo",
+      "name": "炽焰牛",
+      "english_name": "Arsox",
+      "types": [
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 2
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 85,
+        "PHY": 100,
+        "MAG": 95,
+        "DEF": 95
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "Unique_FlameBuffalo_FlameHorn",
+          "level": 7
+        },
+        {
+          "skill": "FireSeed",
+          "level": 15
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 22
+        },
+        {
+          "skill": "Flamethrower",
+          "level": 30
+        },
+        {
+          "skill": "Inferno",
+          "level": 40
+        },
+        {
+          "skill": "FireBall",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "BluePlatypus",
+      "name": "冲浪鸭",
+      "english_name": "Fuack",
+      "types": [
+        "water"
+      ],
+      "work": [
+        {
+          "key": "Watering",
+          "name": "浇水",
+          "level": 1
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 60,
+        "PHY": 80,
+        "MAG": 80,
+        "DEF": 60
+      },
+      "moves": [
+        {
+          "skill": "WaterGun",
+          "level": 1
+        },
+        {
+          "skill": "PowerShot",
+          "level": 7
+        },
+        {
+          "skill": "AquaJet",
+          "level": 15
+        },
+        {
+          "skill": "IceMissile",
+          "level": 22
+        },
+        {
+          "skill": "BubbleShot",
+          "level": 30
+        },
+        {
+          "skill": "WaterBall",
+          "level": 40
+        },
+        {
+          "skill": "HydroPump",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "WhiteMoth",
+      "name": "绸笠蛾",
+      "english_name": "Sibelyx",
+      "types": [
+        "ice"
+      ],
+      "work": [
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 2
+        },
+        {
+          "key": "Cool",
+          "name": "冷却",
+          "level": 2
+        },
+        {
+          "key": "MonsterFarm",
+          "name": "牧场",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 110,
+        "PHY": 90,
+        "MAG": 90,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "IceMissile",
+          "level": 1
+        },
+        {
+          "skill": "IceBlade",
+          "level": 7
+        },
+        {
+          "skill": "BlizzardLance",
+          "level": 15
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 22
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 30
+        },
+        {
+          "skill": "WaterBall",
+          "level": 40
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "NegativeKoala",
+      "name": "瞅什魔",
+      "english_name": "Depresso",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 70,
+        "PHY": 70,
+        "MAG": 70,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "PoisonShot",
+          "level": 1
+        },
+        {
+          "skill": "MudShot",
+          "level": 7
+        },
+        {
+          "skill": "DarkBall",
+          "level": 15
+        },
+        {
+          "skill": "IceMissile",
+          "level": 22
+        },
+        {
+          "skill": "DarkWave",
+          "level": 30
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "IceFox",
+      "name": "吹雪狐",
+      "english_name": "Foxcicle",
+      "types": [
+        "ice"
+      ],
+      "work": [
+        {
+          "key": "Cool",
+          "name": "冷却",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 100,
+        "MAG": 95,
+        "DEF": 105
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "IceMissile",
+          "level": 7
+        },
+        {
+          "skill": "IceBlade",
+          "level": 15
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 22
+        },
+        {
+          "skill": "BlizzardLance",
+          "level": 30
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 40
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "LeafPrincess",
+      "name": "春彩娘",
+      "english_name": "Lullu",
+      "types": [
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 2
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 100,
+        "MAG": 90,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "WindCutter",
+          "level": 1
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 7
+        },
+        {
+          "skill": "SpecialCutter",
+          "level": 15
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 22
+        },
+        {
+          "skill": "HolyBlast",
+          "level": 30
+        },
+        {
+          "skill": "RootLance",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Carbunclo",
+      "name": "翠叶鼠",
+      "english_name": "Lifmunk",
+      "types": [
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 1
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 1
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 75,
+        "PHY": 70,
+        "MAG": 70,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "WindCutter",
+          "level": 1
+        },
+        {
+          "skill": "AirCanon",
+          "level": 7
+        },
+        {
+          "skill": "PowerShot",
+          "level": 15
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 22
+        },
+        {
+          "skill": "PowerBall",
+          "level": 30
+        },
+        {
+          "skill": "RootAttack",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "SkyDragon_Grass",
+      "name": "翠羽龙",
+      "english_name": "Quivern Botan",
+      "types": [
+        "dragon",
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 2
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 105,
+        "PHY": 100,
+        "MAG": 105,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "DragonCanon",
+          "level": 1
+        },
+        {
+          "skill": "WindCutter",
+          "level": 7
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 15
+        },
+        {
+          "skill": "DragonBreath",
+          "level": 22
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 30
+        },
+        {
+          "skill": "Commet",
+          "level": 40
+        },
+        {
+          "skill": "RootLance",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "PinkCat",
+      "name": "捣蛋猫",
+      "english_name": "Cattiva",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 70,
+        "PHY": 70,
+        "MAG": 70,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "Unique_PinkCat_CatPunch",
+          "level": 1
+        },
+        {
+          "skill": "AirCanon",
+          "level": 7
+        },
+        {
+          "skill": "MudShot",
+          "level": 15
+        },
+        {
+          "skill": "PowerShot",
+          "level": 22
+        },
+        {
+          "skill": "WindCutter",
+          "level": 30
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Hedgehog",
+      "name": "電棘鼠",
+      "english_name": "Jolthog",
+      "types": [
+        "electricity"
+      ],
+      "work": [
+        {
+          "key": "GenerateElectricity",
+          "name": "发电",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 70,
+        "PHY": 70,
+        "MAG": 75,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "ElecWave",
+          "level": 1
+        },
+        {
+          "skill": "PowerShot",
+          "level": 7
+        },
+        {
+          "skill": "ThunderBall",
+          "level": 15
+        },
+        {
+          "skill": "PowerBall",
+          "level": 22
+        },
+        {
+          "skill": "ThreeThunder",
+          "level": 30
+        },
+        {
+          "skill": "LineThunder",
+          "level": 40
+        },
+        {
+          "skill": "Thunderbolt",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "WindChimes",
+      "name": "吊缚灵",
+      "english_name": "Hangyu",
+      "types": [
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 80,
+        "PHY": 70,
+        "MAG": 70,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "MudShot",
+          "level": 1
+        },
+        {
+          "skill": "AirCanon",
+          "level": 7
+        },
+        {
+          "skill": "WindCutter",
+          "level": 15
+        },
+        {
+          "skill": "PowerShot",
+          "level": 22
+        },
+        {
+          "skill": "PowerBall",
+          "level": 30
+        },
+        {
+          "skill": "SandTornado",
+          "level": 40
+        },
+        {
+          "skill": "RockLance",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "CuteMole",
+      "name": "遁地鼠",
+      "english_name": "Fuddler",
+      "types": [
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 65,
+        "PHY": 100,
+        "MAG": 80,
+        "DEF": 50
+      },
+      "moves": [
+        {
+          "skill": "MudShot",
+          "level": 1
+        },
+        {
+          "skill": "PowerShot",
+          "level": 7
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 15
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 22
+        },
+        {
+          "skill": "PowerBall",
+          "level": 30
+        },
+        {
+          "skill": "SandTornado",
+          "level": 40
+        },
+        {
+          "skill": "RockLance",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "BirdDragon",
+      "name": "烽歌龙",
+      "english_name": "Vanwyrm",
+      "types": [
+        "fire",
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 100,
+        "MAG": 115,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "FireBlast",
+          "level": 7
+        },
+        {
+          "skill": "FireSeed",
+          "level": 15
+        },
+        {
+          "skill": "Flamethrower",
+          "level": 22
+        },
+        {
+          "skill": "Unique_BirdDragon_FireBreath",
+          "level": 26
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 30
+        },
+        {
+          "skill": "FireBall",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "ElecCat",
+      "name": "伏特喵",
+      "english_name": "Sparkit",
+      "types": [
+        "electricity"
+      ],
+      "work": [
+        {
+          "key": "GenerateElectricity",
+          "name": "发电",
+          "level": 1
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 60,
+        "PHY": 60,
+        "MAG": 75,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "SpreadPulse",
+          "level": 1
+        },
+        {
+          "skill": "MudShot",
+          "level": 7
+        },
+        {
+          "skill": "ElecWave",
+          "level": 15
+        },
+        {
+          "skill": "ThunderBall",
+          "level": 22
+        },
+        {
+          "skill": "ThreeThunder",
+          "level": 30
+        },
+        {
+          "skill": "LineThunder",
+          "level": 40
+        },
+        {
+          "skill": "Thunderbolt",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Umihebi",
+      "name": "覆海龙",
+      "english_name": "Jormuntide",
+      "types": [
+        "dragon",
+        "water"
+      ],
+      "work": [
+        {
+          "key": "Watering",
+          "name": "浇水",
+          "level": 4
+        }
+      ],
+      "stats": {
+        "HP": 130,
+        "PHY": 150,
+        "MAG": 120,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "WaterGun",
+          "level": 1
+        },
+        {
+          "skill": "DragonCanon",
+          "level": 7
+        },
+        {
+          "skill": "DragonBreath",
+          "level": 15
+        },
+        {
+          "skill": "WaterBall",
+          "level": 22
+        },
+        {
+          "skill": "ThreeThunder",
+          "level": 30
+        },
+        {
+          "skill": "Unique_Umihebi_WindingTackle",
+          "level": 35
+        },
+        {
+          "skill": "HydroPump",
+          "level": 40
+        },
+        {
+          "skill": "DragonMeteor",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "NegativeOctopus",
+      "name": "勾魂鱿",
+      "english_name": "Killamari",
+      "types": [
+        "dark",
+        "water"
+      ],
+      "work": [
+        {
+          "key": "Watering",
+          "name": "浇水",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 60,
+        "PHY": 100,
+        "MAG": 60,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "AquaJet",
+          "level": 1
+        },
+        {
+          "skill": "PoisonShot",
+          "level": 7
+        },
+        {
+          "skill": "DarkBall",
+          "level": 15
+        },
+        {
+          "skill": "DarkWave",
+          "level": 22
+        },
+        {
+          "skill": "AcidRain",
+          "level": 30
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "MushroomDragon_Dark",
+      "name": "菇波",
+      "english_name": "Shroomer Noct",
+      "types": [
+        "leaf",
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 2
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 110,
+        "PHY": 100,
+        "MAG": 85,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "PoisonShot",
+          "level": 1
+        },
+        {
+          "skill": "DarkWave",
+          "level": 7
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 15
+        },
+        {
+          "skill": "SeedMine",
+          "level": 22
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 30
+        },
+        {
+          "skill": "RootLance",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "MushroomDragon",
+      "name": "菇咚",
+      "english_name": "Shroomer",
+      "types": [
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 2
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 110,
+        "PHY": 100,
+        "MAG": 80,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "PoisonShot",
+          "level": 1
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 7
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 15
+        },
+        {
+          "skill": "SeedMine",
+          "level": 22
+        },
+        {
+          "skill": "RootAttack",
+          "level": 30
+        },
+        {
+          "skill": "RootLance",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "ScorpionMan",
+      "name": "蛊刺妖",
+      "english_name": "Prixter",
+      "types": [
+        "dark",
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 3
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 100,
+        "MAG": 110,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "PoisonShot",
+          "level": 1
+        },
+        {
+          "skill": "DarkCanon",
+          "level": 7
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 15
+        },
+        {
+          "skill": "SandTornado",
+          "level": 22
+        },
+        {
+          "skill": "Unique_ScorpionMan_Uppercut",
+          "level": 30
+        },
+        {
+          "skill": "RockLance",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "BerryGoat",
+      "name": "灌木羊",
+      "english_name": "Caprity",
+      "types": [
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 2
+        },
+        {
+          "key": "MonsterFarm",
+          "name": "牧场",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 70,
+        "MAG": 70,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "WindCutter",
+          "level": 1
+        },
+        {
+          "skill": "AirCanon",
+          "level": 7
+        },
+        {
+          "skill": "MudShot",
+          "level": 15
+        },
+        {
+          "skill": "PowerShot",
+          "level": 22
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 30
+        },
+        {
+          "skill": "RootAttack",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Ronin_Dark",
+      "name": "鬼刃武士",
+      "english_name": "Bushi Noct",
+      "types": [
+        "fire",
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 2
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 3
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 80,
+        "PHY": 100,
+        "MAG": 130,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "FireSeed",
+          "level": 1
+        },
+        {
+          "skill": "DarkPulse",
+          "level": 7
+        },
+        {
+          "skill": "DarkCanon",
+          "level": 15
+        },
+        {
+          "skill": "Unique_Ronin_Iai",
+          "level": 18
+        },
+        {
+          "skill": "DarkArrow",
+          "level": 22
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 30
+        },
+        {
+          "skill": "FlameWall",
+          "level": 40
+        },
+        {
+          "skill": "Apocalypse",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "SakuraSaurus_Water",
+      "name": "海誓龙",
+      "english_name": "Broncherry Aqua",
+      "types": [
+        "leaf",
+        "water"
+      ],
+      "work": [
+        {
+          "key": "Watering",
+          "name": "浇水",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 120,
+        "PHY": 80,
+        "MAG": 95,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "WaterGun",
+          "level": 1
+        },
+        {
+          "skill": "BubbleShot",
+          "level": 7
+        },
+        {
+          "skill": "Unique_SakuraSaurus_SideTackle",
+          "level": 15
+        },
+        {
+          "skill": "SeedMine",
+          "level": 22
+        },
+        {
+          "skill": "RootAttack",
+          "level": 30
+        },
+        {
+          "skill": "WaterBall",
+          "level": 40
+        },
+        {
+          "skill": "HydroPump",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "VolcanicMonster_Ice",
+      "name": "寒霜兽",
+      "english_name": "Reptyro Cryst",
+      "types": [
+        "ice",
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 3
+        },
+        {
+          "key": "Cool",
+          "name": "冷却",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 110,
+        "PHY": 100,
+        "MAG": 105,
+        "DEF": 130
+      },
+      "moves": [
+        {
+          "skill": "IceMissile",
+          "level": 1
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 7
+        },
+        {
+          "skill": "BlizzardLance",
+          "level": 15
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 22
+        },
+        {
+          "skill": "Unique_VolcanicMonster_Ice_IceAttack",
+          "level": 30
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 40
+        },
+        {
+          "skill": "RockLance",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "Horus",
+      "name": "荷鲁斯",
+      "english_name": "Faleris",
+      "types": [
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 3
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 100,
+        "MAG": 105,
+        "DEF": 110
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 7
+        },
+        {
+          "skill": "FireSeed",
+          "level": 15
+        },
+        {
+          "skill": "Flamethrower",
+          "level": 22
+        },
+        {
+          "skill": "Unique_Horus_FlareBird",
+          "level": 30
+        },
+        {
+          "skill": "Inferno",
+          "level": 40
+        },
+        {
+          "skill": "FireBall",
+          "level": 50
+        },
+        {
+          "skill": "Unique_Horus_PerfectStorm",
+          "level": 55
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "DarkCrow",
+      "name": "黑鸦隐士",
+      "english_name": "Cawgnito",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 75,
+        "PHY": 80,
+        "MAG": 95,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "DarkBall",
+          "level": 7
+        },
+        {
+          "skill": "Unique_DarkCrow_TelePoke",
+          "level": 15
+        },
+        {
+          "skill": "DarkWave",
+          "level": 22
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 30
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "LilyQueen_Dark",
+      "name": "黑月女王",
+      "english_name": "Lyleen Noct",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 3
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 110,
+        "PHY": 100,
+        "MAG": 110,
+        "DEF": 115
+      },
+      "moves": [
+        {
+          "skill": "DarkBall",
+          "level": 1
+        },
+        {
+          "skill": "IceBlade",
+          "level": 7
+        },
+        {
+          "skill": "DarkWave",
+          "level": 15
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 22
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 30
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "SharkKid_Fire",
+      "name": "红小鲨",
+      "english_name": "Gobfin Ignis",
+      "types": [
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 2
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 90,
+        "MAG": 90,
+        "DEF": 75
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "PowerShot",
+          "level": 7
+        },
+        {
+          "skill": "FireSeed",
+          "level": 15
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 22
+        },
+        {
+          "skill": "LineThunder",
+          "level": 30
+        },
+        {
+          "skill": "FireBall",
+          "level": 40
+        },
+        {
+          "skill": "Inferno",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "Ganesha",
+      "name": "壶小象",
+      "english_name": "Teafant",
+      "types": [
+        "water"
+      ],
+      "work": [
+        {
+          "key": "Watering",
+          "name": "浇水",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 70,
+        "PHY": 70,
+        "MAG": 60,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "WaterGun",
+          "level": 1
+        },
+        {
+          "skill": "AquaJet",
+          "level": 7
+        },
+        {
+          "skill": "MudShot",
+          "level": 15
+        },
+        {
+          "skill": "BubbleShot",
+          "level": 22
+        },
+        {
+          "skill": "AcidRain",
+          "level": 30
+        },
+        {
+          "skill": "WaterBall",
+          "level": 40
+        },
+        {
+          "skill": "HydroPump",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "FlowerDinosaur",
+      "name": "花冠龙",
+      "english_name": "Dinossom",
+      "types": [
+        "leaf",
+        "dragon"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 2
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 110,
+        "PHY": 90,
+        "MAG": 85,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "WindCutter",
+          "level": 1
+        },
+        {
+          "skill": "Unique_FlowerDinosaur_Whip",
+          "level": 7
+        },
+        {
+          "skill": "DragonWave",
+          "level": 15
+        },
+        {
+          "skill": "SeedMine",
+          "level": 22
+        },
+        {
+          "skill": "DragonBreath",
+          "level": 30
+        },
+        {
+          "skill": "RootAttack",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "FlowerDoll",
+      "name": "花丽娜",
+      "english_name": "Petallia",
+      "types": [
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 3
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 100,
+        "MAG": 95,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "WindCutter",
+          "level": 1
+        },
+        {
+          "skill": "WaterGun",
+          "level": 7
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 15
+        },
+        {
+          "skill": "BubbleShot",
+          "level": 22
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 30
+        },
+        {
+          "skill": "RootAttack",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Serpent",
+      "name": "滑水蛇",
+      "english_name": "Surfent",
+      "types": [
+        "water"
+      ],
+      "work": [
+        {
+          "key": "Watering",
+          "name": "浇水",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 70,
+        "MAG": 90,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "AquaJet",
+          "level": 1
+        },
+        {
+          "skill": "DragonCanon",
+          "level": 7
+        },
+        {
+          "skill": "WaterGun",
+          "level": 15
+        },
+        {
+          "skill": "BubbleShot",
+          "level": 22
+        },
+        {
+          "skill": "DragonWave",
+          "level": 30
+        },
+        {
+          "skill": "DragonBreath",
+          "level": 40
+        },
+        {
+          "skill": "HydroPump",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "CuteButterfly",
+      "name": "幻悦蝶",
+      "english_name": "Cinnamoth",
+      "types": [
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 2
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 70,
+        "PHY": 100,
+        "MAG": 80,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "WindCutter",
+          "level": 7
+        },
+        {
+          "skill": "PoisonFog",
+          "level": 15
+        },
+        {
+          "skill": "SandTornado",
+          "level": 22
+        },
+        {
+          "skill": "SeedMine",
+          "level": 30
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "IceHorse",
+      "name": "唤冬兽",
+      "english_name": "Frostallion",
+      "types": [
+        "ice"
+      ],
+      "work": [
+        {
+          "key": "Cool",
+          "name": "冷却",
+          "level": 4
+        }
+      ],
+      "stats": {
+        "HP": 140,
+        "PHY": 100,
+        "MAG": 140,
+        "DEF": 120
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "IceMissile",
+          "level": 7
+        },
+        {
+          "skill": "IceBlade",
+          "level": 15
+        },
+        {
+          "skill": "BlizzardLance",
+          "level": 22
+        },
+        {
+          "skill": "Unique_IceHorse_IceBladeAttack",
+          "level": 30
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 40
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 50
+        },
+        {
+          "skill": "HolyBlast",
+          "level": 55
+        },
+        {
+          "skill": "DoubleIcicleThrow",
+          "level": 60
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "IceHorse_Dark",
+      "name": "唤夜兽",
+      "english_name": "Frostallion Noct",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 4
+        }
+      ],
+      "stats": {
+        "HP": 140,
+        "PHY": 100,
+        "MAG": 140,
+        "DEF": 135
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "DarkBall",
+          "level": 7
+        },
+        {
+          "skill": "DarkWave",
+          "level": 15
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 22
+        },
+        {
+          "skill": "Unique_IceHorse_IceBladeAttack",
+          "level": 30
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        },
+        {
+          "skill": "DoubleIcicleThrow",
+          "level": 55
+        },
+        {
+          "skill": "DarkLegion",
+          "level": 60
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "MoonQueen",
+      "name": "辉月伊",
+      "english_name": "Selyne",
+      "types": [
+        "dark",
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 4
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 3
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 130,
+        "PHY": 100,
+        "MAG": 115,
+        "DEF": 110
+      },
+      "moves": [
+        {
+          "skill": "DarkCanon",
+          "level": 1
+        },
+        {
+          "skill": "DarkArrow",
+          "level": 7
+        },
+        {
+          "skill": "AirBlade",
+          "level": 15
+        },
+        {
+          "skill": "HolyBlast",
+          "level": 22
+        },
+        {
+          "skill": "Unique_MoonQueen_MoonBlade",
+          "level": 30
+        },
+        {
+          "skill": "StarMine",
+          "level": 40
+        },
+        {
+          "skill": "Unique_MoonQueen_MoonBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "BlackCentaur",
+      "name": "混沌骑士",
+      "english_name": "Necromus",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 130,
+        "PHY": 100,
+        "MAG": 145,
+        "DEF": 120
+      },
+      "moves": [
+        {
+          "skill": "DarkWave",
+          "level": 1
+        },
+        {
+          "skill": "FireSeed",
+          "level": 7
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 15
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 22
+        },
+        {
+          "skill": "RockLance",
+          "level": 30
+        },
+        {
+          "skill": "Unique_BlackCentaur_TwoSpearRushes",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        },
+        {
+          "skill": "Apocalypse",
+          "level": 55
+        },
+        {
+          "skill": "RockBeat",
+          "level": 60
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Kelpie_Fire",
+      "name": "火灵儿",
+      "english_name": "Kelpsea Ignis",
+      "types": [
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 1
+        },
+        {
+          "key": "MonsterFarm",
+          "name": "牧场",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 70,
+        "PHY": 100,
+        "MAG": 70,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "DragonCanon",
+          "level": 7
+        },
+        {
+          "skill": "FireSeed",
+          "level": 15
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 22
+        },
+        {
+          "skill": "DragonWave",
+          "level": 30
+        },
+        {
+          "skill": "Flamethrower",
+          "level": 40
+        },
+        {
+          "skill": "FireBall",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "FireKirin",
+      "name": "火麒麟",
+      "english_name": "Pyrin",
+      "types": [
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 2
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 110,
+        "MAG": 95,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "MudShot",
+          "level": 1
+        },
+        {
+          "skill": "FireBlast",
+          "level": 7
+        },
+        {
+          "skill": "FireSeed",
+          "level": 15
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 22
+        },
+        {
+          "skill": "Unique_FireKirin_Tackle",
+          "level": 30
+        },
+        {
+          "skill": "Inferno",
+          "level": 40
+        },
+        {
+          "skill": "FireBall",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Kitsunebi",
+      "name": "火绒狐",
+      "english_name": "Foxparks",
+      "types": [
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 65,
+        "PHY": 70,
+        "MAG": 75,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "MudShot",
+          "level": 7
+        },
+        {
+          "skill": "FireSeed",
+          "level": 15
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 22
+        },
+        {
+          "skill": "Flamethrower",
+          "level": 30
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 40
+        },
+        {
+          "skill": "FireBall",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "PinkRabbit",
+      "name": "姬小兔",
+      "english_name": "Ribbuny",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 75,
+        "PHY": 100,
+        "MAG": 65,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "PowerShot",
+          "level": 7
+        },
+        {
+          "skill": "IceMissile",
+          "level": 15
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 22
+        },
+        {
+          "skill": "PowerBall",
+          "level": 30
+        },
+        {
+          "skill": "BlizzardLance",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "HawkBird",
+      "name": "疾风隼",
+      "english_name": "Nitewing",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 100,
+        "MAG": 95,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "Unique_HawkBird_Storm",
+          "level": 7
+        },
+        {
+          "skill": "WindCutter",
+          "level": 15
+        },
+        {
+          "skill": "PowerBall",
+          "level": 22
+        },
+        {
+          "skill": "SandTornado",
+          "level": 30
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "WeaselDragon",
+      "name": "疾旋鼬",
+      "english_name": "Chillet",
+      "types": [
+        "ice",
+        "dragon"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Cool",
+          "name": "冷却",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 100,
+        "MAG": 80,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "IceMissile",
+          "level": 1
+        },
+        {
+          "skill": "DragonCanon",
+          "level": 7
+        },
+        {
+          "skill": "Unique_WeaselDragon_FlyingTackle",
+          "level": 11
+        },
+        {
+          "skill": "DragonWave",
+          "level": 15
+        },
+        {
+          "skill": "IceBlade",
+          "level": 22
+        },
+        {
+          "skill": "DragonBreath",
+          "level": 30
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 40
+        },
+        {
+          "skill": "DragonMeteor",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "DarkAlien",
+      "name": "杰诺贝达",
+      "english_name": "Xenovader",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 100,
+        "MAG": 125,
+        "DEF": 85
+      },
+      "moves": [
+        {
+          "skill": "PowerShot",
+          "level": 1
+        },
+        {
+          "skill": "PoisonShot",
+          "level": 7
+        },
+        {
+          "skill": "DarkPulse",
+          "level": 15
+        },
+        {
+          "skill": "DarkArrow",
+          "level": 22
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 30
+        },
+        {
+          "skill": "Unique_DarkAlien_JumpScractch",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "WhiteAlienDragon",
+      "name": "杰诺路达",
+      "english_name": "Xenogard",
+      "types": [
+        "dragon"
+      ],
+      "work": [
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 110,
+        "PHY": 100,
+        "MAG": 120,
+        "DEF": 130
+      },
+      "moves": [
+        {
+          "skill": "DragonCanon",
+          "level": 1
+        },
+        {
+          "skill": "DragonWave",
+          "level": 7
+        },
+        {
+          "skill": "AirBlade",
+          "level": 15
+        },
+        {
+          "skill": "DragonBreath",
+          "level": 22
+        },
+        {
+          "skill": "IcicleLine",
+          "level": 30
+        },
+        {
+          "skill": "Commet",
+          "level": 40
+        },
+        {
+          "skill": "BeamSlicer",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "DarkScorpion_Ground",
+      "name": "金铠蝎",
+      "english_name": "Menasting Terra",
+      "types": [
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 100,
+        "MAG": 105,
+        "DEF": 130
+      },
+      "moves": [
+        {
+          "skill": "MudShot",
+          "level": 1
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 7
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 15
+        },
+        {
+          "skill": "SandTornado",
+          "level": 22
+        },
+        {
+          "skill": "Unique_DarkScorpion_Pierce",
+          "level": 30
+        },
+        {
+          "skill": "RockLance",
+          "level": 40
+        },
+        {
+          "skill": "Tremor",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "LittleBriarRose",
+      "name": "荊棘魔仙",
+      "english_name": "Bristla",
+      "types": [
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 1
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 80,
+        "PHY": 80,
+        "MAG": 80,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "WindCutter",
+          "level": 1
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 7
+        },
+        {
+          "skill": "IceMissile",
+          "level": 15
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 22
+        },
+        {
+          "skill": "BlizzardLance",
+          "level": 30
+        },
+        {
+          "skill": "RootAttack",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "FairyDragon",
+      "name": "精灵龙",
+      "english_name": "Elphidran",
+      "types": [
+        "dragon"
+      ],
+      "work": [
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 110,
+        "PHY": 80,
+        "MAG": 80,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "DragonCanon",
+          "level": 1
+        },
+        {
+          "skill": "DragonWave",
+          "level": 7
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 15
+        },
+        {
+          "skill": "Unique_FairyDragon_FairyTornado",
+          "level": 22
+        },
+        {
+          "skill": "DragonBreath",
+          "level": 30
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 40
+        },
+        {
+          "skill": "DragonMeteor",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "KingAlpaca",
+      "name": "君王美露帕",
+      "english_name": "Kingpaca",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 120,
+        "PHY": 100,
+        "MAG": 85,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "MudShot",
+          "level": 1
+        },
+        {
+          "skill": "PowerShot",
+          "level": 7
+        },
+        {
+          "skill": "PowerBall",
+          "level": 15
+        },
+        {
+          "skill": "Unique_KingAlpaca_BodyPress",
+          "level": 22
+        },
+        {
+          "skill": "ThreeThunder",
+          "level": 30
+        },
+        {
+          "skill": "RockLance",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "HerculesBeetle",
+      "name": "铠格力斯",
+      "english_name": "Warsect",
+      "types": [
+        "earth",
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 1
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 3
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 120,
+        "PHY": 100,
+        "MAG": 100,
+        "DEF": 120
+      },
+      "moves": [
+        {
+          "skill": "WindCutter",
+          "level": 1
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 7
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 15
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 22
+        },
+        {
+          "skill": "Unique_HerculesBeetle_BeetleTackle",
+          "level": 30
+        },
+        {
+          "skill": "RockLance",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "JetDragon",
+      "name": "空涡龙",
+      "english_name": "Jetragon",
+      "types": [
+        "dragon"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 110,
+        "PHY": 100,
+        "MAG": 140,
+        "DEF": 110
+      },
+      "moves": [
+        {
+          "skill": "FireSeed",
+          "level": 1
+        },
+        {
+          "skill": "DragonWave",
+          "level": 7
+        },
+        {
+          "skill": "FlareTornado",
+          "level": 15
+        },
+        {
+          "skill": "DragonBreath",
+          "level": 22
+        },
+        {
+          "skill": "Unique_JetDragon_JumpBeam",
+          "level": 30
+        },
+        {
+          "skill": "FireBall",
+          "level": 40
+        },
+        {
+          "skill": "DragonMeteor",
+          "level": 50
+        },
+        {
+          "skill": "BeamSlicer",
+          "level": 55
+        },
+        {
+          "skill": "CommetRain",
+          "level": 60
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "CandleGhost",
+      "name": "恐炬灵",
+      "english_name": "Sootseer",
+      "types": [
+        "dark",
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 3
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 2
+        },
+        {
+          "key": "MonsterFarm",
+          "name": "牧场",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 105,
+        "PHY": 100,
+        "MAG": 125,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "DarkBall",
+          "level": 7
+        },
+        {
+          "skill": "FireSeed",
+          "level": 15
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 22
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 30
+        },
+        {
+          "skill": "FlameFunnel",
+          "level": 40
+        },
+        {
+          "skill": "Eruption",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Ronin",
+      "name": "浪刃武士",
+      "english_name": "Bushi",
+      "types": [
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 2
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 3
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 80,
+        "PHY": 100,
+        "MAG": 125,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "WindCutter",
+          "level": 7
+        },
+        {
+          "skill": "IceBlade",
+          "level": 15
+        },
+        {
+          "skill": "Unique_Ronin_Iai",
+          "level": 22
+        },
+        {
+          "skill": "Flamethrower",
+          "level": 30
+        },
+        {
+          "skill": "LightningStrike",
+          "level": 40
+        },
+        {
+          "skill": "Inferno",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "FlowerDinosaur_Electric",
+      "name": "雷冠龙",
+      "english_name": "Dinossom Lux",
+      "types": [
+        "electricity",
+        "dragon"
+      ],
+      "work": [
+        {
+          "key": "GenerateElectricity",
+          "name": "发电",
+          "level": 2
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 110,
+        "PHY": 90,
+        "MAG": 90,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "ElecWave",
+          "level": 1
+        },
+        {
+          "skill": "ThunderFunnel",
+          "level": 7
+        },
+        {
+          "skill": "Unique_FlowerDinosaur_Whip",
+          "level": 15
+        },
+        {
+          "skill": "DragonBreath",
+          "level": 22
+        },
+        {
+          "skill": "ThreeThunder",
+          "level": 30
+        },
+        {
+          "skill": "LightningStrike",
+          "level": 40
+        },
+        {
+          "skill": "Thunderbolt",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "Kirin",
+      "name": "雷角马",
+      "english_name": "Univolt",
+      "types": [
+        "electricity"
+      ],
+      "work": [
+        {
+          "key": "GenerateElectricity",
+          "name": "发电",
+          "level": 2
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 80,
+        "PHY": 110,
+        "MAG": 105,
+        "DEF": 105
+      },
+      "moves": [
+        {
+          "skill": "SpreadPulse",
+          "level": 1
+        },
+        {
+          "skill": "ElecWave",
+          "level": 7
+        },
+        {
+          "skill": "Unique_Kirin_LightningTackle",
+          "level": 11
+        },
+        {
+          "skill": "LockonLaser",
+          "level": 15
+        },
+        {
+          "skill": "LineThunder",
+          "level": 22
+        },
+        {
+          "skill": "ThreeThunder",
+          "level": 30
+        },
+        {
+          "skill": "LightningStrike",
+          "level": 40
+        },
+        {
+          "skill": "Thunderbolt",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "HadesBird_Electric",
+      "name": "雷鸣鸟",
+      "english_name": "Helzephyr Lux",
+      "types": [
+        "dark",
+        "electricity"
+      ],
+      "work": [
+        {
+          "key": "GenerateElectricity",
+          "name": "发电",
+          "level": 3
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 105,
+        "PHY": 100,
+        "MAG": 125,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "SpreadPulse",
+          "level": 1
+        },
+        {
+          "skill": "ElecWave",
+          "level": 7
+        },
+        {
+          "skill": "DarkArrow",
+          "level": 15
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 22
+        },
+        {
+          "skill": "TriSpark",
+          "level": 30
+        },
+        {
+          "skill": "ThunderRain",
+          "level": 40
+        },
+        {
+          "skill": "ThunderStorm",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "RaijinDaughter",
+      "name": "雷鸣童子",
+      "english_name": "Dazzi",
+      "types": [
+        "electricity"
+      ],
+      "work": [
+        {
+          "key": "GenerateElectricity",
+          "name": "发电",
+          "level": 1
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 70,
+        "PHY": 110,
+        "MAG": 80,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "ElecWave",
+          "level": 7
+        },
+        {
+          "skill": "AcidRain",
+          "level": 15
+        },
+        {
+          "skill": "LineThunder",
+          "level": 22
+        },
+        {
+          "skill": "ThreeThunder",
+          "level": 30
+        },
+        {
+          "skill": "LightningStrike",
+          "level": 40
+        },
+        {
+          "skill": "Thunderbolt",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "HadesBird",
+      "name": "雷冥鸟",
+      "english_name": "Helzephyr",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 100,
+        "MAG": 125,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "FireSeed",
+          "level": 1
+        },
+        {
+          "skill": "DarkBall",
+          "level": 7
+        },
+        {
+          "skill": "DarkWave",
+          "level": 15
+        },
+        {
+          "skill": "FlareTornado",
+          "level": 22
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 30
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "GrassPanda_Electric",
+      "name": "雷胖达",
+      "english_name": "Mossanda Lux",
+      "types": [
+        "electricity"
+      ],
+      "work": [
+        {
+          "key": "GenerateElectricity",
+          "name": "发电",
+          "level": 2
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 100,
+        "MAG": 100,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "SpreadPulse",
+          "level": 1
+        },
+        {
+          "skill": "ElecWave",
+          "level": 7
+        },
+        {
+          "skill": "LineThunder",
+          "level": 15
+        },
+        {
+          "skill": "Unique_GrassPanda_Electric_ElectricPunch",
+          "level": 22
+        },
+        {
+          "skill": "ThreeThunder",
+          "level": 30
+        },
+        {
+          "skill": "LightningStrike",
+          "level": 40
+        },
+        {
+          "skill": "Thunderbolt",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "SakuraSaurus",
+      "name": "连理龙",
+      "english_name": "Broncherry",
+      "types": [
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 120,
+        "PHY": 80,
+        "MAG": 90,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "WindCutter",
+          "level": 1
+        },
+        {
+          "skill": "MudShot",
+          "level": 7
+        },
+        {
+          "skill": "Unique_SakuraSaurus_SideTackle",
+          "level": 15
+        },
+        {
+          "skill": "SeedMine",
+          "level": 22
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 30
+        },
+        {
+          "skill": "RootAttack",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "FlameBambi",
+      "name": "燎火鹿",
+      "english_name": "Rooby",
+      "types": [
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 75,
+        "PHY": 100,
+        "MAG": 70,
+        "DEF": 75
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "PowerShot",
+          "level": 7
+        },
+        {
+          "skill": "FireSeed",
+          "level": 15
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 22
+        },
+        {
+          "skill": "FlareTornado",
+          "level": 30
+        },
+        {
+          "skill": "Inferno",
+          "level": 40
+        },
+        {
+          "skill": "FireBall",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Garm",
+      "name": "猎狼",
+      "english_name": "Direhowl",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 80,
+        "PHY": 110,
+        "MAG": 90,
+        "DEF": 75
+      },
+      "moves": [
+        {
+          "skill": "Unique_Garm_Bite",
+          "level": 1
+        },
+        {
+          "skill": "MudShot",
+          "level": 7
+        },
+        {
+          "skill": "AirCanon",
+          "level": 15
+        },
+        {
+          "skill": "PowerShot",
+          "level": 22
+        },
+        {
+          "skill": "FireBlast",
+          "level": 30
+        },
+        {
+          "skill": "PowerBall",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Serpent_Ground",
+      "name": "流沙蛇",
+      "english_name": "Surfent Terra",
+      "types": [
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 70,
+        "MAG": 90,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "MudShot",
+          "level": 1
+        },
+        {
+          "skill": "DragonCanon",
+          "level": 7
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 15
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 22
+        },
+        {
+          "skill": "SandTornado",
+          "level": 30
+        },
+        {
+          "skill": "DragonBreath",
+          "level": 40
+        },
+        {
+          "skill": "RockLance",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "FlyingManta",
+      "name": "鲁米儿",
+      "english_name": "Celaray",
+      "types": [
+        "water"
+      ],
+      "work": [
+        {
+          "key": "Watering",
+          "name": "浇水",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 80,
+        "PHY": 100,
+        "MAG": 70,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "AquaJet",
+          "level": 1
+        },
+        {
+          "skill": "WaterGun",
+          "level": 7
+        },
+        {
+          "skill": "PowerShot",
+          "level": 15
+        },
+        {
+          "skill": "BubbleShot",
+          "level": 22
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 30
+        },
+        {
+          "skill": "WaterBall",
+          "level": 40
+        },
+        {
+          "skill": "HydroPump",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "NightFox",
+      "name": "露娜蒂",
+      "english_name": "Nox",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 75,
+        "PHY": 70,
+        "MAG": 85,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "DarkBall",
+          "level": 7
+        },
+        {
+          "skill": "DarkWave",
+          "level": 15
+        },
+        {
+          "skill": "PowerBall",
+          "level": 22
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 30
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Yeti_Grass",
+      "name": "绿苔绒怪",
+      "english_name": "Wumpo Botan",
+      "types": [
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 1
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 3
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 4
+        }
+      ],
+      "stats": {
+        "HP": 140,
+        "PHY": 100,
+        "MAG": 80,
+        "DEF": 110
+      },
+      "moves": [
+        {
+          "skill": "WindCutter",
+          "level": 1
+        },
+        {
+          "skill": "WaterGun",
+          "level": 7
+        },
+        {
+          "skill": "SeedMine",
+          "level": 15
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 22
+        },
+        {
+          "skill": "RootAttack",
+          "level": 30
+        },
+        {
+          "skill": "Unique_Yeti_Grass_GrassBall",
+          "level": 35
+        },
+        {
+          "skill": "WaterBall",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "CatBat",
+      "name": "猫蝠怪",
+      "english_name": "Tombat",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 95,
+        "PHY": 100,
+        "MAG": 95,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "PoisonShot",
+          "level": 7
+        },
+        {
+          "skill": "DarkBall",
+          "level": 15
+        },
+        {
+          "skill": "DarkWave",
+          "level": 22
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 30
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "MopBaby",
+      "name": "毛掸儿",
+      "english_name": "Swee",
+      "types": [
+        "ice"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Cool",
+          "name": "冷却",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 60,
+        "PHY": 100,
+        "MAG": 60,
+        "DEF": 60
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "IceMissile",
+          "level": 7
+        },
+        {
+          "skill": "IceBlade",
+          "level": 15
+        },
+        {
+          "skill": "PowerBall",
+          "level": 22
+        },
+        {
+          "skill": "BlizzardLance",
+          "level": 30
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 40
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "MopKing",
+      "name": "毛老爹",
+      "english_name": "Sweepa",
+      "types": [
+        "ice"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        },
+        {
+          "key": "Cool",
+          "name": "冷却",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 100,
+        "MAG": 90,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "PowerShot",
+          "level": 1
+        },
+        {
+          "skill": "IceMissile",
+          "level": 7
+        },
+        {
+          "skill": "IceBlade",
+          "level": 15
+        },
+        {
+          "skill": "BlizzardLance",
+          "level": 22
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 30
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 40
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Alpaca",
+      "name": "美露帕",
+      "english_name": "Melpaca",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "MonsterFarm",
+          "name": "牧场",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 90,
+        "MAG": 75,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "Unique_Alpaca_Tackle",
+          "level": 7
+        },
+        {
+          "skill": "MudShot",
+          "level": 15
+        },
+        {
+          "skill": "PowerShot",
+          "level": 22
+        },
+        {
+          "skill": "ElecWave",
+          "level": 30
+        },
+        {
+          "skill": "PowerBall",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "DreamDemon",
+      "name": "寐魔",
+      "english_name": "Daedream",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 70,
+        "PHY": 100,
+        "MAG": 75,
+        "DEF": 60
+      },
+      "moves": [
+        {
+          "skill": "DarkBall",
+          "level": 1
+        },
+        {
+          "skill": "PoisonShot",
+          "level": 7
+        },
+        {
+          "skill": "DarkWave",
+          "level": 15
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 22
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 30
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "WoolFox",
+      "name": "米露菲",
+      "english_name": "Cremis",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "MonsterFarm",
+          "name": "牧场",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 70,
+        "PHY": 100,
+        "MAG": 70,
+        "DEF": 75
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "MudShot",
+          "level": 7
+        },
+        {
+          "skill": "SpreadPulse",
+          "level": 15
+        },
+        {
+          "skill": "PowerShot",
+          "level": 22
+        },
+        {
+          "skill": "ElecWave",
+          "level": 30
+        },
+        {
+          "skill": "PowerBall",
+          "level": 40
+        },
+        {
+          "skill": "Thunderbolt",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Mutant",
+      "name": "秘斯媞雅",
+      "english_name": "Lunaris",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 3
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 80,
+        "MAG": 100,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "PowerShot",
+          "level": 7
+        },
+        {
+          "skill": "IceBlade",
+          "level": 15
+        },
+        {
+          "skill": "ThunderFunnel",
+          "level": 22
+        },
+        {
+          "skill": "PowerBall",
+          "level": 30
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "SweetsSheep",
+      "name": "棉花糖",
+      "english_name": "Woolipop",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "MonsterFarm",
+          "name": "牧场",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 70,
+        "PHY": 70,
+        "MAG": 70,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "MudShot",
+          "level": 7
+        },
+        {
+          "skill": "PowerShot",
+          "level": 15
+        },
+        {
+          "skill": "WindCutter",
+          "level": 22
+        },
+        {
+          "skill": "BubbleShot",
+          "level": 30
+        },
+        {
+          "skill": "PowerBall",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Bastet",
+      "name": "喵丝特",
+      "english_name": "Mau",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "MonsterFarm",
+          "name": "牧场",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 70,
+        "PHY": 70,
+        "MAG": 60,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "MudShot",
+          "level": 1
+        },
+        {
+          "skill": "DarkBall",
+          "level": 7
+        },
+        {
+          "skill": "DarkWave",
+          "level": 15
+        },
+        {
+          "skill": "SandTornado",
+          "level": 22
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 30
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "DarkScorpion",
+      "name": "冥铠蝎",
+      "english_name": "Menasting",
+      "types": [
+        "dark",
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 100,
+        "MAG": 100,
+        "DEF": 130
+      },
+      "moves": [
+        {
+          "skill": "MudShot",
+          "level": 1
+        },
+        {
+          "skill": "PoisonShot",
+          "level": 7
+        },
+        {
+          "skill": "DarkWave",
+          "level": 15
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 22
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 30
+        },
+        {
+          "skill": "Unique_DarkScorpion_Pierce",
+          "level": 35
+        },
+        {
+          "skill": "RockLance",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "BlackMetalDragon",
+      "name": "魔渊龙",
+      "english_name": "Astegon",
+      "types": [
+        "dragon",
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 4
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 100,
+        "MAG": 125,
+        "DEF": 125
+      },
+      "moves": [
+        {
+          "skill": "DragonCanon",
+          "level": 1
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 7
+        },
+        {
+          "skill": "DragonWave",
+          "level": 15
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 22
+        },
+        {
+          "skill": "DragonBreath",
+          "level": 30
+        },
+        {
+          "skill": "Unique_BlackMetalDragon_FirePunch",
+          "level": 35
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 40
+        },
+        {
+          "skill": "DragonMeteor",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "KingBahamut_Dragon",
+      "name": "殁殃",
+      "english_name": "Blazamut Ryu",
+      "types": [
+        "dragon",
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 4
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 4
+        }
+      ],
+      "stats": {
+        "HP": 105,
+        "PHY": 150,
+        "MAG": 130,
+        "DEF": 125
+      },
+      "moves": [
+        {
+          "skill": "DragonWave",
+          "level": 1
+        },
+        {
+          "skill": "Flamethrower",
+          "level": 7
+        },
+        {
+          "skill": "FlameWall",
+          "level": 15
+        },
+        {
+          "skill": "Commet",
+          "level": 22
+        },
+        {
+          "skill": "BeamSlicer",
+          "level": 30
+        },
+        {
+          "skill": "Unique_KingBahamut_ArmSmash",
+          "level": 40
+        },
+        {
+          "skill": "Unique_KingBahamut_AirCrash",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "QueenBee",
+      "name": "女皇蜂",
+      "english_name": "Elizabee",
+      "types": [
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 2
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 1
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 100,
+        "MAG": 105,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "WindCutter",
+          "level": 7
+        },
+        {
+          "skill": "PoisonShot",
+          "level": 15
+        },
+        {
+          "skill": "Unique_QueenBee_SpinLance",
+          "level": 22
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 30
+        },
+        {
+          "skill": "RootAttack",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "LazyCatfish",
+      "name": "趴趴鲶",
+      "english_name": "Dumud",
+      "types": [
+        "earth",
+        "water"
+      ],
+      "work": [
+        {
+          "key": "Watering",
+          "name": "浇水",
+          "level": 1
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        },
+        {
+          "key": "MonsterFarm",
+          "name": "牧场",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 100,
+        "MAG": 70,
+        "DEF": 95
+      },
+      "moves": [
+        {
+          "skill": "MudShot",
+          "level": 1
+        },
+        {
+          "skill": "WaterGun",
+          "level": 7
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 15
+        },
+        {
+          "skill": "BubbleShot",
+          "level": 22
+        },
+        {
+          "skill": "WaterBall",
+          "level": 30
+        },
+        {
+          "skill": "RockLance",
+          "level": 40
+        },
+        {
+          "skill": "HydroPump",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "LazyDragon_Electric",
+      "name": "派克龙",
+      "english_name": "Relaxaurus Lux",
+      "types": [
+        "dragon",
+        "electricity"
+      ],
+      "work": [
+        {
+          "key": "GenerateElectricity",
+          "name": "发电",
+          "level": 3
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 110,
+        "PHY": 110,
+        "MAG": 110,
+        "DEF": 75
+      },
+      "moves": [
+        {
+          "skill": "SpreadPulse",
+          "level": 1
+        },
+        {
+          "skill": "DragonCanon",
+          "level": 7
+        },
+        {
+          "skill": "ElecWave",
+          "level": 15
+        },
+        {
+          "skill": "LineThunder",
+          "level": 22
+        },
+        {
+          "skill": "DragonBreath",
+          "level": 30
+        },
+        {
+          "skill": "LightningStrike",
+          "level": 40
+        },
+        {
+          "skill": "Thunderbolt",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "LazyDragon",
+      "name": "佩克龙",
+      "english_name": "Relaxaurus",
+      "types": [
+        "dragon",
+        "water"
+      ],
+      "work": [
+        {
+          "key": "Watering",
+          "name": "浇水",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 110,
+        "PHY": 110,
+        "MAG": 100,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "DragonCanon",
+          "level": 1
+        },
+        {
+          "skill": "WaterGun",
+          "level": 7
+        },
+        {
+          "skill": "DragonWave",
+          "level": 15
+        },
+        {
+          "skill": "BubbleShot",
+          "level": 22
+        },
+        {
+          "skill": "DragonBreath",
+          "level": 30
+        },
+        {
+          "skill": "WaterBall",
+          "level": 40
+        },
+        {
+          "skill": "DragonMeteor",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "LizardMan",
+      "name": "朋克蜥",
+      "english_name": "Leezpunk",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 80,
+        "PHY": 90,
+        "MAG": 80,
+        "DEF": 50
+      },
+      "moves": [
+        {
+          "skill": "PoisonShot",
+          "level": 1
+        },
+        {
+          "skill": "DarkBall",
+          "level": 7
+        },
+        {
+          "skill": "DarkWave",
+          "level": 15
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 22
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 30
+        },
+        {
+          "skill": "Flamethrower",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "ThunderDog",
+      "name": "霹雳犬",
+      "english_name": "Rayhound",
+      "types": [
+        "electricity"
+      ],
+      "work": [
+        {
+          "key": "GenerateElectricity",
+          "name": "发电",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 100,
+        "MAG": 100,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "MudShot",
+          "level": 1
+        },
+        {
+          "skill": "ElecWave",
+          "level": 7
+        },
+        {
+          "skill": "SpreadPulse",
+          "level": 15
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 22
+        },
+        {
+          "skill": "Unique_ThunderDog_InazumaShorai",
+          "level": 26
+        },
+        {
+          "skill": "ThunderBall",
+          "level": 30
+        },
+        {
+          "skill": "LineThunder",
+          "level": 40
+        },
+        {
+          "skill": "Thunderbolt",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "ChickenPal",
+      "name": "皮皮鸡",
+      "english_name": "Chikipi",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "MonsterFarm",
+          "name": "牧场",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 60,
+        "PHY": 70,
+        "MAG": 60,
+        "DEF": 60
+      },
+      "moves": [
+        {
+          "skill": "Unique_ChickenPal_ChickenPeck",
+          "level": 1
+        },
+        {
+          "skill": "AirCanon",
+          "level": 7
+        },
+        {
+          "skill": "PowerShot",
+          "level": 15
+        },
+        {
+          "skill": "SelfDestruct",
+          "level": 22
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 30
+        },
+        {
+          "skill": "SandTornado",
+          "level": 40
+        },
+        {
+          "skill": "FlareTornado",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Deer_Ground",
+      "name": "祇岳鹿",
+      "english_name": "Eikthyrdeer Terra",
+      "types": [
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 95,
+        "PHY": 70,
+        "MAG": 80,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "PowerShot",
+          "level": 1
+        },
+        {
+          "skill": "Unique_Deer_PushupHorn",
+          "level": 7
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 15
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 22
+        },
+        {
+          "skill": "PowerBall",
+          "level": 30
+        },
+        {
+          "skill": "SandTornado",
+          "level": 40
+        },
+        {
+          "skill": "RockLance",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "SoldierBee",
+      "name": "骑士蜂",
+      "english_name": "Beegarde",
+      "types": [
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 1
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 1
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        },
+        {
+          "key": "MonsterFarm",
+          "name": "牧场",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 80,
+        "PHY": 100,
+        "MAG": 90,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "WindCutter",
+          "level": 7
+        },
+        {
+          "skill": "Unique_SoldierBee_NeedleLance",
+          "level": 11
+        },
+        {
+          "skill": "SelfDestruct_Bee",
+          "level": 15
+        },
+        {
+          "skill": "PoisonShot",
+          "level": 22
+        },
+        {
+          "skill": "AcidRain",
+          "level": 30
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Penguin",
+      "name": "企丸丸",
+      "english_name": "Pengullet",
+      "types": [
+        "water",
+        "ice"
+      ],
+      "work": [
+        {
+          "key": "Watering",
+          "name": "浇水",
+          "level": 1
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Cool",
+          "name": "冷却",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 70,
+        "PHY": 70,
+        "MAG": 75,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "IceMissile",
+          "level": 1
+        },
+        {
+          "skill": "AquaJet",
+          "level": 7
+        },
+        {
+          "skill": "WaterGun",
+          "level": 15
+        },
+        {
+          "skill": "IceBlade",
+          "level": 22
+        },
+        {
+          "skill": "BlizzardLance",
+          "level": 30
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 40
+        },
+        {
+          "skill": "HydroPump",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "CaptainPenguin",
+      "name": "企丸王",
+      "english_name": "Penking",
+      "types": [
+        "water",
+        "ice"
+      ],
+      "work": [
+        {
+          "key": "Watering",
+          "name": "浇水",
+          "level": 2
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 2
+        },
+        {
+          "key": "Cool",
+          "name": "冷却",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 95,
+        "PHY": 70,
+        "MAG": 95,
+        "DEF": 95
+      },
+      "moves": [
+        {
+          "skill": "WaterGun",
+          "level": 1
+        },
+        {
+          "skill": "BlizzardLance",
+          "level": 7
+        },
+        {
+          "skill": "Unique_CaptainPenguin_BodySlide",
+          "level": 15
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 22
+        },
+        {
+          "skill": "WaterBall",
+          "level": 30
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 40
+        },
+        {
+          "skill": "HydroPump",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Suzaku_Water",
+      "name": "清雀",
+      "english_name": "Suzaku Aqua",
+      "types": [
+        "water"
+      ],
+      "work": [
+        {
+          "key": "Watering",
+          "name": "浇水",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 125,
+        "PHY": 100,
+        "MAG": 105,
+        "DEF": 105
+      },
+      "moves": [
+        {
+          "skill": "AquaJet",
+          "level": 1
+        },
+        {
+          "skill": "IceMissile",
+          "level": 7
+        },
+        {
+          "skill": "WaterGun",
+          "level": 15
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 22
+        },
+        {
+          "skill": "WaterBall",
+          "level": 30
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 40
+        },
+        {
+          "skill": "HydroPump",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "SmallArmadillo",
+      "name": "球犰",
+      "english_name": "Kikit",
+      "types": [
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 75,
+        "PHY": 100,
+        "MAG": 70,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "PowerShot",
+          "level": 1
+        },
+        {
+          "skill": "MudShot",
+          "level": 7
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 15
+        },
+        {
+          "skill": "PowerBall",
+          "level": 22
+        },
+        {
+          "skill": "SandTornado",
+          "level": 30
+        },
+        {
+          "skill": "Tremor",
+          "level": 40
+        },
+        {
+          "skill": "RockLance",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "LizardMan_Fire",
+      "name": "热血蜥",
+      "english_name": "Leezpunk Ignis",
+      "types": [
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 1
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 80,
+        "PHY": 90,
+        "MAG": 80,
+        "DEF": 50
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "PoisonShot",
+          "level": 7
+        },
+        {
+          "skill": "FireSeed",
+          "level": 15
+        },
+        {
+          "skill": "Flamethrower",
+          "level": 22
+        },
+        {
+          "skill": "FlareTornado",
+          "level": 30
+        },
+        {
+          "skill": "Inferno",
+          "level": 40
+        },
+        {
+          "skill": "FireBall",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "VolcanicMonster",
+      "name": "熔岩兽",
+      "english_name": "Reptyro",
+      "types": [
+        "fire",
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 3
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 110,
+        "PHY": 100,
+        "MAG": 105,
+        "DEF": 120
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 7
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 15
+        },
+        {
+          "skill": "Flamethrower",
+          "level": 22
+        },
+        {
+          "skill": "Unique_VolcanicMonster_MagmaAttack",
+          "level": 30
+        },
+        {
+          "skill": "Inferno",
+          "level": 40
+        },
+        {
+          "skill": "RockLance",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "LavaGirl",
+      "name": "融焰娘",
+      "english_name": "Flambelle",
+      "types": [
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 1
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        },
+        {
+          "key": "MonsterFarm",
+          "name": "牧场",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 60,
+        "PHY": 100,
+        "MAG": 70,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "FireSeed",
+          "level": 7
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 15
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 22
+        },
+        {
+          "skill": "FlareTornado",
+          "level": 30
+        },
+        {
+          "skill": "Inferno",
+          "level": 40
+        },
+        {
+          "skill": "FireBall",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "GrassMammoth",
+      "name": "森猛犸",
+      "english_name": "Mammorest",
+      "types": [
+        "leaf",
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 2
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 150,
+        "PHY": 100,
+        "MAG": 85,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "MudShot",
+          "level": 1
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 7
+        },
+        {
+          "skill": "PowerBall",
+          "level": 15
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 22
+        },
+        {
+          "skill": "Unique_Grassmammoth_Earthquake",
+          "level": 30
+        },
+        {
+          "skill": "RootAttack",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "SharkKid",
+      "name": "鲨小子",
+      "english_name": "Gobfin",
+      "types": [
+        "water"
+      ],
+      "work": [
+        {
+          "key": "Watering",
+          "name": "浇水",
+          "level": 2
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 90,
+        "MAG": 90,
+        "DEF": 75
+      },
+      "moves": [
+        {
+          "skill": "AquaJet",
+          "level": 1
+        },
+        {
+          "skill": "PowerShot",
+          "level": 7
+        },
+        {
+          "skill": "WaterGun",
+          "level": 15
+        },
+        {
+          "skill": "BubbleShot",
+          "level": 22
+        },
+        {
+          "skill": "IceBlade",
+          "level": 30
+        },
+        {
+          "skill": "WaterBall",
+          "level": 40
+        },
+        {
+          "skill": "HydroPump",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "RobinHood_Ground",
+      "name": "山岳射手",
+      "english_name": "Robinquill Terra",
+      "types": [
+        "leaf",
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 1
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 100,
+        "MAG": 105,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "MudShot",
+          "level": 1
+        },
+        {
+          "skill": "WindCutter",
+          "level": 7
+        },
+        {
+          "skill": "Unique_RobinHood_BowSnipe",
+          "level": 15
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 22
+        },
+        {
+          "skill": "SandTornado",
+          "level": 30
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 40
+        },
+        {
+          "skill": "RockLance",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "SaintCentaur",
+      "name": "圣光骑士",
+      "english_name": "Paladius",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 130,
+        "PHY": 110,
+        "MAG": 120,
+        "DEF": 145
+      },
+      "moves": [
+        {
+          "skill": "PowerShot",
+          "level": 1
+        },
+        {
+          "skill": "IceMissile",
+          "level": 7
+        },
+        {
+          "skill": "BlizzardLance",
+          "level": 15
+        },
+        {
+          "skill": "PowerBall",
+          "level": 22
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 30
+        },
+        {
+          "skill": "Unique_SaintCentaur_OneSpearRushes",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        },
+        {
+          "skill": "IceAge",
+          "level": 55
+        },
+        {
+          "skill": "HolyBlast",
+          "level": 60
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Gorilla_Ground",
+      "name": "石掌猿",
+      "english_name": "Gorirat Terra",
+      "types": [
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 110,
+        "MAG": 100,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "PowerShot",
+          "level": 1
+        },
+        {
+          "skill": "MudShot",
+          "level": 7
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 15
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 22
+        },
+        {
+          "skill": "Unique_Gorilla_GroundPunch",
+          "level": 30
+        },
+        {
+          "skill": "Tremor",
+          "level": 40
+        },
+        {
+          "skill": "RockLance",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "GhostBeast",
+      "name": "噬魂兽",
+      "english_name": "Maraith",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 75,
+        "PHY": 50,
+        "MAG": 105,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "DarkBall",
+          "level": 7
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 15
+        },
+        {
+          "skill": "DarkWave",
+          "level": 22
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 30
+        },
+        {
+          "skill": "Unique_GhostBeast_Tossin",
+          "level": 35
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "BirdDragon_Ice",
+      "name": "霜歌龙",
+      "english_name": "Vanwyrm Cryst",
+      "types": [
+        "ice",
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Cool",
+          "name": "冷却",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 100,
+        "MAG": 120,
+        "DEF": 95
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "IceMissile",
+          "level": 7
+        },
+        {
+          "skill": "IceBlade",
+          "level": 15
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 22
+        },
+        {
+          "skill": "Unique_BirdDragon_Ice_IceBreath",
+          "level": 26
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 30
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "Kelpie",
+      "name": "水灵儿",
+      "english_name": "Kelpsea",
+      "types": [
+        "water"
+      ],
+      "work": [
+        {
+          "key": "Watering",
+          "name": "浇水",
+          "level": 1
+        },
+        {
+          "key": "MonsterFarm",
+          "name": "牧场",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 70,
+        "PHY": 100,
+        "MAG": 70,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "AquaJet",
+          "level": 1
+        },
+        {
+          "skill": "DragonCanon",
+          "level": 7
+        },
+        {
+          "skill": "WaterGun",
+          "level": 15
+        },
+        {
+          "skill": "BubbleShot",
+          "level": 22
+        },
+        {
+          "skill": "PowerBall",
+          "level": 30
+        },
+        {
+          "skill": "WaterBall",
+          "level": 40
+        },
+        {
+          "skill": "HydroPump",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "FairyDragon_Water",
+      "name": "水灵龙",
+      "english_name": "Elphidran Aqua",
+      "types": [
+        "dragon",
+        "water"
+      ],
+      "work": [
+        {
+          "key": "Watering",
+          "name": "浇水",
+          "level": 3
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 115,
+        "PHY": 80,
+        "MAG": 80,
+        "DEF": 95
+      },
+      "moves": [
+        {
+          "skill": "WaterGun",
+          "level": 1
+        },
+        {
+          "skill": "DragonCanon",
+          "level": 7
+        },
+        {
+          "skill": "DragonWave",
+          "level": 15
+        },
+        {
+          "skill": "Unique_FairyDragon_FairyTornado",
+          "level": 22
+        },
+        {
+          "skill": "AcidRain",
+          "level": 30
+        },
+        {
+          "skill": "HydroPump",
+          "level": 40
+        },
+        {
+          "skill": "DragonMeteor",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "DrillGame",
+      "name": "碎岩龟",
+      "english_name": "Digtoise",
+      "types": [
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 80,
+        "PHY": 80,
+        "MAG": 95,
+        "DEF": 120
+      },
+      "moves": [
+        {
+          "skill": "WaterGun",
+          "level": 1
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 7
+        },
+        {
+          "skill": "Unique_DrillGame_ShellAttack",
+          "level": 15
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 22
+        },
+        {
+          "skill": "SandTornado",
+          "level": 30
+        },
+        {
+          "skill": "WaterBall",
+          "level": 40
+        },
+        {
+          "skill": "RockLance",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "RedArmorBird",
+      "name": "燧火鸟",
+      "english_name": "Ragnahawk",
+      "types": [
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 3
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 95,
+        "PHY": 100,
+        "MAG": 105,
+        "DEF": 120
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "FireSeed",
+          "level": 7
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 15
+        },
+        {
+          "skill": "SandTornado",
+          "level": 22
+        },
+        {
+          "skill": "Unique_RedArmorBird_TriplePeck",
+          "level": 26
+        },
+        {
+          "skill": "FlareTornado",
+          "level": 30
+        },
+        {
+          "skill": "Flamethrower",
+          "level": 40
+        },
+        {
+          "skill": "FireBall",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "GrassRabbitMan",
+      "name": "踏春兔",
+      "english_name": "Verdash",
+      "types": [
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 2
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 3
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 3
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 100,
+        "MAG": 115,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "WindCutter",
+          "level": 1
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 7
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 15
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 22
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 30
+        },
+        {
+          "skill": "Unique_GrassRabbitMan_GrassRoundKick",
+          "level": 35
+        },
+        {
+          "skill": "RootAttack",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "WingGolem",
+      "name": "泰锋",
+      "english_name": "Knocklem",
+      "types": [
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 3
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 4
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 4
+        }
+      ],
+      "stats": {
+        "HP": 105,
+        "PHY": 100,
+        "MAG": 110,
+        "DEF": 135
+      },
+      "moves": [
+        {
+          "skill": "PowerShot",
+          "level": 1
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 7
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 15
+        },
+        {
+          "skill": "Tremor",
+          "level": 22
+        },
+        {
+          "skill": "RockLance",
+          "level": 30
+        },
+        {
+          "skill": "Unique_WingGolem_RoundCutter",
+          "level": 40
+        },
+        {
+          "skill": "SandTwister",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "WeaselDragon_Fire",
+      "name": "桃旋鼬",
+      "english_name": "Chillet Ignis",
+      "types": [
+        "fire",
+        "dragon"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 2
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 100,
+        "MAG": 85,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "DragonWave",
+          "level": 7
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 15
+        },
+        {
+          "skill": "Flamethrower",
+          "level": 22
+        },
+        {
+          "skill": "Unique_WeaselDragon_FlyingTackle",
+          "level": 30
+        },
+        {
+          "skill": "FlameWall",
+          "level": 40
+        },
+        {
+          "skill": "FireBall",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "Umihebi_Fire",
+      "name": "腾炎龙",
+      "english_name": "Jormuntide Ignis",
+      "types": [
+        "dragon",
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 4
+        }
+      ],
+      "stats": {
+        "HP": 130,
+        "PHY": 150,
+        "MAG": 130,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "DragonCanon",
+          "level": 7
+        },
+        {
+          "skill": "FlareTornado",
+          "level": 15
+        },
+        {
+          "skill": "Flamethrower",
+          "level": 22
+        },
+        {
+          "skill": "ThreeThunder",
+          "level": 30
+        },
+        {
+          "skill": "Unique_Umihebi_Fire_FireWindingTackle",
+          "level": 35
+        },
+        {
+          "skill": "FireBall",
+          "level": 40
+        },
+        {
+          "skill": "DragonMeteor",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "WizardOwl",
+      "name": "啼卡尔",
+      "english_name": "Hoocrates",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 70,
+        "PHY": 70,
+        "MAG": 70,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "DarkBall",
+          "level": 7
+        },
+        {
+          "skill": "DarkWave",
+          "level": 15
+        },
+        {
+          "skill": "SandTornado",
+          "level": 22
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 30
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Eagle",
+      "name": "天擒鸟",
+      "english_name": "Galeclaw",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 75,
+        "PHY": 120,
+        "MAG": 85,
+        "DEF": 60
+      },
+      "moves": [
+        {
+          "skill": "Unique_Eagle_GlidingNail",
+          "level": 1
+        },
+        {
+          "skill": "AirCanon",
+          "level": 7
+        },
+        {
+          "skill": "MudShot",
+          "level": 15
+        },
+        {
+          "skill": "WindCutter",
+          "level": 22
+        },
+        {
+          "skill": "SandTornado",
+          "level": 30
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "SkyDragon",
+      "name": "天羽龙",
+      "english_name": "Quivern",
+      "types": [
+        "dragon"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 105,
+        "PHY": 100,
+        "MAG": 100,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "DragonCanon",
+          "level": 1
+        },
+        {
+          "skill": "FireSeed",
+          "level": 7
+        },
+        {
+          "skill": "AcidRain",
+          "level": 15
+        },
+        {
+          "skill": "DragonBreath",
+          "level": 22
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 30
+        },
+        {
+          "skill": "WaterBall",
+          "level": 40
+        },
+        {
+          "skill": "DragonMeteor",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Gorilla",
+      "name": "铁拳猿",
+      "english_name": "Gorirat",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 110,
+        "MAG": 95,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "MudShot",
+          "level": 1
+        },
+        {
+          "skill": "PowerShot",
+          "level": 7
+        },
+        {
+          "skill": "Unique_Gorilla_GroundPunch",
+          "level": 15
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 22
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 30
+        },
+        {
+          "skill": "PowerBall",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "SifuDog",
+      "name": "汪宗师",
+      "english_name": "Dogen",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 3
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 100,
+        "MAG": 100,
+        "DEF": 100
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "PowerShot",
+          "level": 7
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 15
+        },
+        {
+          "skill": "PowerBall",
+          "level": 22
+        },
+        {
+          "skill": "AirBlade",
+          "level": 30
+        },
+        {
+          "skill": "Unique_SifuDog_Counter",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "MimicDog",
+      "name": "旺财",
+      "english_name": "Mimog",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 60,
+        "PHY": 100,
+        "MAG": 60,
+        "DEF": 130
+      },
+      "moves": [
+        {
+          "skill": "PowerShot",
+          "level": 1
+        },
+        {
+          "skill": "DarkCanon",
+          "level": 7
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 15
+        },
+        {
+          "skill": "PowerBall",
+          "level": 22
+        },
+        {
+          "skill": "AirBlade",
+          "level": 30
+        },
+        {
+          "skill": "HolyBlast",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "VioletFairy",
+      "name": "薇莉塔",
+      "english_name": "Vaelet",
+      "types": [
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 2
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 3
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 100,
+        "MAG": 100,
+        "DEF": 120
+      },
+      "moves": [
+        {
+          "skill": "PoisonFog",
+          "level": 1
+        },
+        {
+          "skill": "WindCutter",
+          "level": 7
+        },
+        {
+          "skill": "PoisonShot",
+          "level": 15
+        },
+        {
+          "skill": "SeedMine",
+          "level": 22
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 30
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "KendoFrog",
+      "name": "武道蛙",
+      "english_name": "Croajiro",
+      "types": [
+        "water"
+      ],
+      "work": [
+        {
+          "key": "Watering",
+          "name": "浇水",
+          "level": 1
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 80,
+        "PHY": 100,
+        "MAG": 100,
+        "DEF": 85
+      },
+      "moves": [
+        {
+          "skill": "WaterGun",
+          "level": 1
+        },
+        {
+          "skill": "BubbleShot",
+          "level": 7
+        },
+        {
+          "skill": "AcidRain",
+          "level": 15
+        },
+        {
+          "skill": "WaterBall",
+          "level": 22
+        },
+        {
+          "skill": "LineGeyser",
+          "level": 30
+        },
+        {
+          "skill": "WallSplash",
+          "level": 40
+        },
+        {
+          "skill": "HydroPump",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "NaughtyCat",
+      "name": "笑魇猫",
+      "english_name": "Grintale",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 110,
+        "PHY": 100,
+        "MAG": 80,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "MudShot",
+          "level": 1
+        },
+        {
+          "skill": "PowerShot",
+          "level": 7
+        },
+        {
+          "skill": "Unique_NaughtyCat_CatPress",
+          "level": 15
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 22
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 30
+        },
+        {
+          "skill": "PowerBall",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "FireKirin_Dark",
+      "name": "邪麒麟",
+      "english_name": "Pyrin Noct",
+      "types": [
+        "fire",
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 2
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 110,
+        "MAG": 95,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "DarkWave",
+          "level": 7
+        },
+        {
+          "skill": "Flamethrower",
+          "level": 15
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 22
+        },
+        {
+          "skill": "Unique_FireKirin_Dark_DarkTossin",
+          "level": 30
+        },
+        {
+          "skill": "Inferno",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "Monkey",
+      "name": "新叶猿",
+      "english_name": "Tanzee",
+      "types": [
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 1
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 80,
+        "PHY": 100,
+        "MAG": 70,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "WindCutter",
+          "level": 1
+        },
+        {
+          "skill": "MudShot",
+          "level": 7
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 15
+        },
+        {
+          "skill": "SeedMine",
+          "level": 22
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 30
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "GrassMammoth_Ice",
+      "name": "雪猛犸",
+      "english_name": "Mammorest Cryst",
+      "types": [
+        "ice",
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 2
+        },
+        {
+          "key": "Cool",
+          "name": "冷却",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 150,
+        "PHY": 100,
+        "MAG": 85,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "ThrowRock",
+          "level": 1
+        },
+        {
+          "skill": "IceBlade",
+          "level": 7
+        },
+        {
+          "skill": "PowerBall",
+          "level": 15
+        },
+        {
+          "skill": "BlizzardLance",
+          "level": 22
+        },
+        {
+          "skill": "Unique_Grassmammoth_Earthquake",
+          "level": 30
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 40
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "ThunderBird",
+      "name": "迅雷鸟",
+      "english_name": "Beakon",
+      "types": [
+        "electricity"
+      ],
+      "work": [
+        {
+          "key": "GenerateElectricity",
+          "name": "发电",
+          "level": 2
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 105,
+        "PHY": 100,
+        "MAG": 115,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "SpreadPulse",
+          "level": 7
+        },
+        {
+          "skill": "ElecWave",
+          "level": 15
+        },
+        {
+          "skill": "LineThunder",
+          "level": 22
+        },
+        {
+          "skill": "Unique_ThunderBird_ThunderStorm",
+          "level": 26
+        },
+        {
+          "skill": "ThreeThunder",
+          "level": 30
+        },
+        {
+          "skill": "SandTornado",
+          "level": 40
+        },
+        {
+          "skill": "Thunderbolt",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "IceDeer",
+      "name": "严冬鹿",
+      "english_name": "Reindrix",
+      "types": [
+        "ice"
+      ],
+      "work": [
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        },
+        {
+          "key": "Cool",
+          "name": "冷却",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 80,
+        "MAG": 85,
+        "DEF": 110
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "IceMissile",
+          "level": 7
+        },
+        {
+          "skill": "IceBlade",
+          "level": 15
+        },
+        {
+          "skill": "Unique_IceDeer_IceHorn",
+          "level": 22
+        },
+        {
+          "skill": "BlizzardLance",
+          "level": 30
+        },
+        {
+          "skill": "FrostBreath",
+          "level": 40
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Baphomet",
+      "name": "炎魔羊",
+      "english_name": "Incineram",
+      "types": [
+        "fire",
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 1
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 95,
+        "PHY": 150,
+        "MAG": 100,
+        "DEF": 85
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "FireSeed",
+          "level": 7
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 15
+        },
+        {
+          "skill": "Unique_Baphomet_SwallowKite",
+          "level": 22
+        },
+        {
+          "skill": "DarkWave",
+          "level": 30
+        },
+        {
+          "skill": "FireBall",
+          "level": 40
+        },
+        {
+          "skill": "Inferno",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "KingBahamut",
+      "name": "焰煌",
+      "english_name": "Blazamut",
+      "types": [
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 3
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 4
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 150,
+        "MAG": 125,
+        "DEF": 120
+      },
+      "moves": [
+        {
+          "skill": "PowerShot",
+          "level": 1
+        },
+        {
+          "skill": "FireBlast",
+          "level": 7
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 15
+        },
+        {
+          "skill": "Flamethrower",
+          "level": 22
+        },
+        {
+          "skill": "Inferno",
+          "level": 30
+        },
+        {
+          "skill": "Unique_KingBahamut_ArmSmash",
+          "level": 35
+        },
+        {
+          "skill": "FireBall",
+          "level": 40
+        },
+        {
+          "skill": "RockLance",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "FoxMage",
+      "name": "焰巫狐",
+      "english_name": "Wixen",
+      "types": [
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 2
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 3
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 50,
+        "MAG": 110,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "FireSeed",
+          "level": 7
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 15
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 22
+        },
+        {
+          "skill": "FlareTornado",
+          "level": 30
+        },
+        {
+          "skill": "FireBall",
+          "level": 40
+        },
+        {
+          "skill": "DragonMeteor",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "PlantSlime",
+      "name": "叶泥泥",
+      "english_name": "Gumoss",
+      "types": [
+        "leaf",
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 70,
+        "PHY": 100,
+        "MAG": 70,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "MudShot",
+          "level": 1
+        },
+        {
+          "skill": "WindCutter",
+          "level": 7
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 15
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 22
+        },
+        {
+          "skill": "SeedMine",
+          "level": 30
+        },
+        {
+          "skill": "SandTornado",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "PlantSlime_Flower",
+      "name": "叶泥泥(头上长花)",
+      "english_name": "Gumoss 🌹",
+      "types": [
+        "leaf",
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 70,
+        "PHY": 100,
+        "MAG": 70,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "MudShot",
+          "level": 1
+        },
+        {
+          "skill": "WindCutter",
+          "level": 7
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 15
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 22
+        },
+        {
+          "skill": "SeedMine",
+          "level": 30
+        },
+        {
+          "skill": "SandTornado",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "GrassPanda",
+      "name": "叶胖达",
+      "english_name": "Mossanda",
+      "types": [
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 2
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 100,
+        "MAG": 90,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "PowerShot",
+          "level": 1
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 7
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 15
+        },
+        {
+          "skill": "Unique_GrassPanda_MusclePunch",
+          "level": 22
+        },
+        {
+          "skill": "SeedMine",
+          "level": 30
+        },
+        {
+          "skill": "RootAttack",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "CatVampire",
+      "name": "夜幕魔蝠",
+      "english_name": "Felbat",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 100,
+        "MAG": 105,
+        "DEF": 110
+      },
+      "moves": [
+        {
+          "skill": "PoisonShot",
+          "level": 1
+        },
+        {
+          "skill": "DarkBall",
+          "level": 7
+        },
+        {
+          "skill": "DarkWave",
+          "level": 15
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 22
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 30
+        },
+        {
+          "skill": "Inferno",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "BlackGriffon",
+      "name": "异构格里芬",
+      "english_name": "Shadowbeak",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 120,
+        "PHY": 130,
+        "MAG": 120,
+        "DEF": 140
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "DarkBall",
+          "level": 7
+        },
+        {
+          "skill": "DarkWave",
+          "level": 15
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 22
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 30
+        },
+        {
+          "skill": "Unique_BlackGriffon_TackleLaser",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        },
+        {
+          "skill": "Unique_BlackGriffon_TackleLaser2",
+          "level": 55
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "FoxMage_Dark",
+      "name": "幽巫狐",
+      "english_name": "Wixen Noct",
+      "types": [
+        "fire",
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 2
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 3
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 50,
+        "MAG": 110,
+        "DEF": 85
+      },
+      "moves": [
+        {
+          "skill": "DarkPulse",
+          "level": 1
+        },
+        {
+          "skill": "DarkCanon",
+          "level": 7
+        },
+        {
+          "skill": "DarkArrow",
+          "level": 15
+        },
+        {
+          "skill": "FlareTornado",
+          "level": 22
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 30
+        },
+        {
+          "skill": "FlameWall",
+          "level": 40
+        },
+        {
+          "skill": "Apocalypse",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "RobinHood",
+      "name": "羽箭射手",
+      "english_name": "Robinquill",
+      "types": [
+        "leaf"
+      ],
+      "work": [
+        {
+          "key": "Seeding",
+          "name": "播种",
+          "level": 1
+        },
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        },
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 1
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 1
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 90,
+        "PHY": 100,
+        "MAG": 105,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "WindCutter",
+          "level": 1
+        },
+        {
+          "skill": "PowerShot",
+          "level": 7
+        },
+        {
+          "skill": "Unique_RobinHood_BowSnipe",
+          "level": 15
+        },
+        {
+          "skill": "SeedMine",
+          "level": 22
+        },
+        {
+          "skill": "GrassTornado",
+          "level": 30
+        },
+        {
+          "skill": "RootAttack",
+          "level": 40
+        },
+        {
+          "skill": "SolarBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "CuteFox",
+      "name": "玉藻狐",
+      "english_name": "Vixy",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        },
+        {
+          "key": "MonsterFarm",
+          "name": "牧场",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 70,
+        "PHY": 70,
+        "MAG": 70,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "MudShot",
+          "level": 7
+        },
+        {
+          "skill": "PowerShot",
+          "level": 15
+        },
+        {
+          "skill": "WindCutter",
+          "level": 22
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 30
+        },
+        {
+          "skill": "PowerBall",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Manticore_Dark",
+      "name": "狱阎王",
+      "english_name": "Blazehowl Noct",
+      "types": [
+        "fire",
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 3
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 105,
+        "PHY": 100,
+        "MAG": 115,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "DarkWave",
+          "level": 1
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 7
+        },
+        {
+          "skill": "Flamethrower",
+          "level": 15
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 22
+        },
+        {
+          "skill": "Inferno",
+          "level": 30
+        },
+        {
+          "skill": "Unique_Manticore_InfernoStrike",
+          "level": 35
+        },
+        {
+          "skill": "FireBall",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    },
+    {
+      "code": "Manticore",
+      "name": "狱焰王",
+      "english_name": "Blazehowl",
+      "types": [
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 3
+        },
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 105,
+        "PHY": 100,
+        "MAG": 110,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "FireBlast",
+          "level": 1
+        },
+        {
+          "skill": "PowerShot",
+          "level": 7
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 15
+        },
+        {
+          "skill": "Flamethrower",
+          "level": 22
+        },
+        {
+          "skill": "Inferno",
+          "level": 30
+        },
+        {
+          "skill": "Unique_Manticore_InfernoStrike",
+          "level": 35
+        },
+        {
+          "skill": "FireBall",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Werewolf",
+      "name": "月镰魔",
+      "english_name": "Loupmoon",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 80,
+        "PHY": 130,
+        "MAG": 100,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "DarkBall",
+          "level": 1
+        },
+        {
+          "skill": "Unique_Werewolf_Scratch",
+          "level": 7
+        },
+        {
+          "skill": "DarkWave",
+          "level": 15
+        },
+        {
+          "skill": "IceBlade",
+          "level": 22
+        },
+        {
+          "skill": "GhostFlame",
+          "level": 30
+        },
+        {
+          "skill": "ShadowBall",
+          "level": 40
+        },
+        {
+          "skill": "DarkLaser",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "FengyunDeeper",
+      "name": "云海鹿",
+      "english_name": "Fenglope",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 110,
+        "PHY": 110,
+        "MAG": 110,
+        "DEF": 90
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "WaterGun",
+          "level": 7
+        },
+        {
+          "skill": "Unique_FengyunDeeper_CloudTempest",
+          "level": 15
+        },
+        {
+          "skill": "AcidRain",
+          "level": 22
+        },
+        {
+          "skill": "WaterBall",
+          "level": 30
+        },
+        {
+          "skill": "IcicleThrow",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "ColorfulBird",
+      "name": "炸蛋鸟",
+      "english_name": "Tocotoco",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 1
+        }
+      ],
+      "stats": {
+        "HP": 60,
+        "PHY": 80,
+        "MAG": 75,
+        "DEF": 70
+      },
+      "moves": [
+        {
+          "skill": "SelfDestruct",
+          "level": 1
+        },
+        {
+          "skill": "AirCanon",
+          "level": 7
+        },
+        {
+          "skill": "PowerShot",
+          "level": 15
+        },
+        {
+          "skill": "SelfExplosion",
+          "level": 22
+        },
+        {
+          "skill": "SandTornado",
+          "level": 30
+        },
+        {
+          "skill": "PowerBall",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "FeatherOstrich",
+      "name": "战冠雀",
+      "english_name": "Dazemu",
+      "types": [
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Collection",
+          "name": "采集",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 95,
+        "PHY": 100,
+        "MAG": 90,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "MudShot",
+          "level": 1
+        },
+        {
+          "skill": "PowerShot",
+          "level": 7
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 15
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 22
+        },
+        {
+          "skill": "Unique_FeatherOstrich_Tossin",
+          "level": 30
+        },
+        {
+          "skill": "Tremor",
+          "level": 40
+        },
+        {
+          "skill": "SandTwister",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Suzaku",
+      "name": "朱雀",
+      "english_name": "Suzaku",
+      "types": [
+        "fire"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 120,
+        "PHY": 100,
+        "MAG": 105,
+        "DEF": 105
+      },
+      "moves": [
+        {
+          "skill": "AirCanon",
+          "level": 1
+        },
+        {
+          "skill": "FireBlast",
+          "level": 7
+        },
+        {
+          "skill": "FireSeed",
+          "level": 15
+        },
+        {
+          "skill": "FlareArrow",
+          "level": 22
+        },
+        {
+          "skill": "Flamethrower",
+          "level": 30
+        },
+        {
+          "skill": "FlareTornado",
+          "level": 40
+        },
+        {
+          "skill": "FireBall",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "Deer",
+      "name": "紫霞鹿",
+      "english_name": "Eikthyrdeer",
+      "types": [
+        "normal"
+      ],
+      "work": [
+        {
+          "key": "Deforest",
+          "name": "伐木",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 95,
+        "PHY": 70,
+        "MAG": 80,
+        "DEF": 80
+      },
+      "moves": [
+        {
+          "skill": "PowerShot",
+          "level": 1
+        },
+        {
+          "skill": "Unique_Deer_PushupHorn",
+          "level": 7
+        },
+        {
+          "skill": "StoneShotgun",
+          "level": 15
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 22
+        },
+        {
+          "skill": "PowerBall",
+          "level": 30
+        },
+        {
+          "skill": "RockLance",
+          "level": 40
+        },
+        {
+          "skill": "HyperBeam",
+          "level": 50
+        }
+      ],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "ElecLion",
+      "name": "Boltmane",
+      "english_name": "Boltmane",
+      "types": [
+        "electricity"
+      ],
+      "work": [
+        {
+          "key": "EmitFlame",
+          "name": "生火",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 100,
+        "MAG": 110,
+        "DEF": 70
+      },
+      "moves": [],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "DarkMutant",
+      "name": "Dark Mutant",
+      "english_name": "Dark Mutant",
+      "types": [
+        "dark"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 3
+        },
+        {
+          "key": "ProductMedicine",
+          "name": "制药",
+          "level": 3
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 2
+        }
+      ],
+      "stats": {
+        "HP": 100,
+        "PHY": 100,
+        "MAG": 100,
+        "DEF": 100
+      },
+      "moves": [],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "BlackFurDragon",
+      "name": "Dragostrophe",
+      "english_name": "Dragostrophe",
+      "types": [
+        "dark",
+        "dragon"
+      ],
+      "work": [
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 130,
+        "PHY": 100,
+        "MAG": 130,
+        "DEF": 110
+      },
+      "moves": [],
+      "variant": false,
+      "boss": false
+    },
+    {
+      "code": "HerculesBeetle_Ground",
+      "name": "Warsect Terra",
+      "english_name": "Warsect Terra",
+      "types": [
+        "earth"
+      ],
+      "work": [
+        {
+          "key": "Handcraft",
+          "name": "手工作业",
+          "level": 1
+        },
+        {
+          "key": "Mining",
+          "name": "采矿",
+          "level": 3
+        },
+        {
+          "key": "Transport",
+          "name": "搬运",
+          "level": 3
+        }
+      ],
+      "stats": {
+        "HP": 120,
+        "PHY": 100,
+        "MAG": 105,
+        "DEF": 120
+      },
+      "moves": [
+        {
+          "skill": "MudShot",
+          "level": 1
+        },
+        {
+          "skill": "SeedMachinegun",
+          "level": 7
+        },
+        {
+          "skill": "Unique_HerculesBeetle_BeetleTackle",
+          "level": 15
+        },
+        {
+          "skill": "ThrowRock",
+          "level": 22
+        },
+        {
+          "skill": "WindEdge",
+          "level": 30
+        },
+        {
+          "skill": "Tremor",
+          "level": 40
+        },
+        {
+          "skill": "RockBeat",
+          "level": 50
+        }
+      ],
+      "variant": true,
+      "boss": false
+    }
+  ]
+}

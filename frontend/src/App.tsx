@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import SettingsPanel from "./SettingsPanel";
 import BackupPanel from "./BackupPanel";
 import OperationLogPanel from "./OperationLogPanel";
+import CompanionPanel from "./CompanionPanel";
 import { PalIcon, type PalIconName } from "./PalIcons";
 import ThemeToggle from "./ThemeToggle";
 import "./dashboard-overrides.css";
@@ -90,6 +91,8 @@ export default function App() {
   if (new URLSearchParams(location.search).get("view") === "settings") return <SettingsPanel />;
   if (new URLSearchParams(location.search).get("view") === "backups") return <BackupPanel />;
   if (new URLSearchParams(location.search).get("view") === "operations") return <OperationLogPanel />;
+  if (new URLSearchParams(location.search).get("view") === "paldex") return <CompanionPanel view="paldex" />;
+  if (new URLSearchParams(location.search).get("view") === "map") return <CompanionPanel view="map" />;
 
   const [overview, setOverview] = useState(empty);
   const [host, setHost] = useState(disconnectedHost);
@@ -135,8 +138,8 @@ export default function App() {
       <div className="brand"><b className="brand-mark"><PalIcon name="sphere" /></b><span><strong>PALWORLD</strong><small>SERVER MANAGER</small></span></div>
       <nav>
         <button aria-current="page" className="active"><PalIcon className="nav-icon" name="dashboard" /><span>指挥台</span></button>
-        <button><PalIcon className="nav-icon" name="server" /><span>服务器</span></button>
-        <button><PalIcon className="nav-icon" name="trainers" /><span>训练家</span></button>
+        <button onClick={() => { location.href = "?view=paldex"; }}><PalIcon className="nav-icon" name="paldex" /><span>帕鲁图鉴</span></button>
+        <button onClick={() => { location.href = "?view=map"; }}><PalIcon className="nav-icon" name="map" /><span>世界地图</span></button>
         <button onClick={() => { location.href = "?view=backups"; }}><PalIcon className="nav-icon" name="backup" /><span>存档与备份</span></button>
         <button onClick={() => { location.href = "?view=operations"; }}><PalIcon className="nav-icon" name="logs" /><span>运行日志</span></button>
         <button onClick={() => { location.href = "?view=settings"; }}><PalIcon className="nav-icon" name="settings" /><span>世界规则与安装</span></button>
