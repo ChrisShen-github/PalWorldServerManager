@@ -149,7 +149,12 @@ function pointPosition(map: MapCatalog, x: number, y: number) {
 function WorldMap() {
   const { map, error } = useMapCatalog();
   const viewportRef = useRef<HTMLDivElement>(null);
+  const scalerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ pointerId: number; x: number; y: number; left: number; top: number; moved: boolean } | null>(null);
+  const wheelRef = useRef<{ factor: number; focalPoint: { x: number; y: number } } | null>(null);
+  const wheelFrameRef = useRef<number | null>(null);
+  const zoomCommitRef = useRef<number | null>(null);
   const selectionInitializedRef = useRef(false);
   const mapPositionedRef = useRef(false);
   const zoomRef = useRef(0.5);
@@ -189,9 +194,22 @@ function WorldMap() {
       viewport.scrollTop = Math.max(0, (mapHeight * zoomRef.current - viewport.clientHeight) / 2);
     });
   }, [map, mapHeight, mapWidth]);
+  useEffect(() => () => {
+    if (wheelFrameRef.current !== null) cancelAnimationFrame(wheelFrameRef.current);
+    if (zoomCommitRef.current !== null) window.clearTimeout(zoomCommitRef.current);
+  }, []);
+  const commitZoomLabel = (zoom: number) => {
+    if (zoomCommitRef.current !== null) window.clearTimeout(zoomCommitRef.current);
+    zoomCommitRef.current = window.setTimeout(() => {
+      setMapZoom(zoomRef.current);
+      zoomCommitRef.current = null;
+    }, 120);
+  };
   const applyMapZoom = (nextZoom: number, focalPoint?: { x: number; y: number }) => {
     const viewport = viewportRef.current;
-    if (!viewport) return;
+    const scaler = scalerRef.current;
+    const canvas = canvasRef.current;
+    if (!viewport || !scaler || !canvas) return;
     const previousZoom = zoomRef.current;
     const zoom = Math.min(2.5, Math.max(0.12, nextZoom));
     if (Math.abs(zoom - previousZoom) < 0.001) return;
@@ -200,18 +218,32 @@ function WorldMap() {
     const mapX = (viewport.scrollLeft + focalX) / previousZoom;
     const mapY = (viewport.scrollTop + focalY) / previousZoom;
     zoomRef.current = zoom;
-    setMapZoom(zoom);
-    requestAnimationFrame(() => {
-      viewport.scrollLeft = Math.max(0, mapX * zoom - focalX);
-      viewport.scrollTop = Math.max(0, mapY * zoom - focalY);
-    });
+    // Keep the heavy tile and marker tree out of React's high-frequency render path.
+    // The map is one composited layer; only the small zoom label is committed after input pauses.
+    scaler.style.width = `${mapWidth * zoom}px`;
+    scaler.style.height = `${mapHeight * zoom}px`;
+    canvas.style.transform = `translate3d(0, 0, 0) scale(${zoom})`;
+    viewport.scrollLeft = Math.max(0, mapX * zoom - focalX);
+    viewport.scrollTop = Math.max(0, mapY * zoom - focalY);
+    commitZoomLabel(zoom);
   };
   const zoomWithWheel = (event: ReactWheelEvent<HTMLDivElement>) => {
     event.preventDefault();
     const viewport = viewportRef.current;
     if (!viewport) return;
     const bounds = viewport.getBoundingClientRect();
-    applyMapZoom(zoomRef.current * (event.deltaY < 0 ? 1.16 : 1 / 1.16), { x: event.clientX - bounds.left, y: event.clientY - bounds.top });
+    const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? viewport.clientHeight : 1);
+    const pending = wheelRef.current ?? { factor: 1, focalPoint: { x: 0, y: 0 } };
+    pending.factor *= Math.exp(-delta * 0.0015);
+    pending.focalPoint = { x: event.clientX - bounds.left, y: event.clientY - bounds.top };
+    wheelRef.current = pending;
+    if (wheelFrameRef.current !== null) return;
+    wheelFrameRef.current = requestAnimationFrame(() => {
+      const current = wheelRef.current;
+      wheelRef.current = null;
+      wheelFrameRef.current = null;
+      if (current) applyMapZoom(zoomRef.current * current.factor, current.focalPoint);
+    });
   };
   const startMapDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (event.button !== 0 || (event.target as HTMLElement).closest("button")) return;
@@ -262,8 +294,8 @@ function WorldMap() {
         <div className="map-toolbar"><div><small>当前显示</small><strong>{markers.length} 个标记</strong></div><div className="map-toolbar-actions"><span className="map-drag-hint">滚轮缩放 · 左键拖动</span><div className="map-zoom-controls" role="group" aria-label="地图缩放"><button type="button" onClick={() => applyMapZoom(zoomRef.current / 1.3)} aria-label="缩小地图">缩小</button><output aria-live="polite">{Math.round(mapZoom * 100)}%</output><button type="button" onClick={() => applyMapZoom(zoomRef.current * 1.3)} aria-label="放大地图">放大</button><button type="button" onClick={() => applyMapZoom(0.5)} aria-label="复位地图缩放">复位</button></div></div></div>
         <div className="offline-map-shell">
           <div ref={viewportRef} className={`offline-map-viewport ${dragging ? "dragging" : ""}`} tabIndex={0} aria-label="可用滚轮缩放和鼠标拖动的离线世界地图" onWheel={zoomWithWheel} onPointerDown={startMapDrag} onPointerMove={moveMapDrag} onPointerUp={endMapDrag} onPointerCancel={endMapDrag}>
-            <div className="offline-map-scaler" style={{ width: mapWidth * mapZoom, height: mapHeight * mapZoom }}>
-            <div className="offline-map-canvas" style={{ width: mapWidth, height: mapHeight, transform: `scale(${mapZoom})` }}>
+            <div ref={scalerRef} className="offline-map-scaler" style={{ width: mapWidth * 0.5, height: mapHeight * 0.5 }}>
+            <div ref={canvasRef} className="offline-map-canvas" style={{ width: mapWidth, height: mapHeight, transform: "translate3d(0, 0, 0) scale(0.5)" }}>
               <div className="offline-map-tiles" style={{ gridTemplateColumns: `repeat(${map.tile.xEnd - map.tile.xStart + 1}, ${map.tile.size}px)` }}>{tiles.map((tile) => <img key={tile.key} src={tile.src} alt="" draggable={false} loading="lazy" />)}</div>
               {map.areas.map((area) => <span className="map-area-label" key={area.name} style={pointPosition(map, area.x, area.y)}>{area.name}</span>)}
               {markers.map((marker) => { const category = categories.find((item) => item.id === marker.category_id); return <button className={`map-marker ${selected?.id === marker.id ? "selected" : ""}`} key={marker.id} style={pointPosition(map, marker.x, marker.y)} onPointerDown={(event) => event.stopPropagation()} onClick={() => setSelectedId(marker.id)} aria-label={`${marker.category}：${marker.name}，点位来源游民星空`} title={marker.name}>{category?.icon ? <img src={category.icon} alt="" /> : <i />}</button>; })}
