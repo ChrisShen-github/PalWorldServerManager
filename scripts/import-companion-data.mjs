@@ -116,11 +116,10 @@ function flattenCategories(groups) {
   })));
 }
 
-const [baseScript, palsScript, mapResponse, landmarkResponse] = await Promise.all([
+const [baseScript, palsScript, mapResponse] = await Promise.all([
   fetchText(PAL_BASE_URL),
   fetchText(PALS_URL),
   fetchJson(MAP_API_URL, { method: "POST", body: JSON.stringify({ gameMapId: MAP_ID, mapId: MAP_ID, userId: 0 }) }),
-  fetchJson(LANDMARK_API_URL, { method: "POST", body: JSON.stringify({ gameMapId: MAP_ID, catalogIdsSelected: [], userId: 0, keyword: "", needGroupResult: false }) }),
 ]);
 
 const base = extractAssignedJson(baseScript, "base");
@@ -130,9 +129,16 @@ const palsWithAssets = rawPals.map(palRecord).filter((pal) => pal.paldex > 0).so
 if (palsWithAssets.length < 280) throw new Error(`Only ${palsWithAssets.length} Pals found; refusing to write a partial catalog`);
 
 const map = mapResponse.map;
-const landmarks = landmarkResponse.landmarks ?? [];
-if (!map?.mapTileUrlsRoot || landmarks.length < 200) throw new Error("Public map response is incomplete; refusing to write a partial offline map");
+if (!map?.mapTileUrlsRoot) throw new Error("Public map response is incomplete; refusing to write a partial offline map");
 const categories = flattenCategories(map.landmarkCatalogGroups);
+const categoryLandmarks = [];
+console.log(`Downloading public markers from ${categories.length} map categories…`);
+await mapConcurrent(categories, 4, async (category) => {
+  const response = await fetchJson(LANDMARK_API_URL, { method: "POST", body: JSON.stringify({ gameMapId: MAP_ID, catalogIdsSelected: [category.id], userId: 0, keyword: "", needGroupResult: false }) });
+  categoryLandmarks.push(...(response.landmarks ?? []));
+});
+const landmarks = [...new Map(categoryLandmarks.map((landmark) => [landmark.id, landmark])).values()];
+if (landmarks.length < 1000) throw new Error(`Only ${landmarks.length} public markers found; refusing to write a partial offline map`);
 const tileRoot = map.mapTileUrlsRoot;
 const iconOutput = join(OUTPUT, "icons");
 const mapOutput = join(OUTPUT, "map");

@@ -150,12 +150,24 @@ function WorldMap() {
   const { map, error } = useMapCatalog();
   const viewportRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ pointerId: number; x: number; y: number; left: number; top: number; moved: boolean } | null>(null);
-  const [categoryId, setCategoryId] = useState("");
+  const selectionInitializedRef = useRef(false);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [dragging, setDragging] = useState(false);
   const categories = map?.categories ?? [];
-  const activeCategory = categories.find((category) => String(category.id) === categoryId) ?? categories.find((category) => category.name === "巨鹫之像") ?? categories[0];
-  const markers = useMemo(() => !map || !activeCategory ? [] : map.landmarks.filter((landmark) => landmark.category_id === activeCategory.id), [map, activeCategory]);
+  const categoryCounts = useMemo(() => new Map((map?.landmarks ?? []).reduce((counts, landmark) => counts.set(landmark.category_id, (counts.get(landmark.category_id) ?? 0) + 1), new Map<number, number>())), [map]);
+  const groupedCategories = useMemo(() => {
+    const groups = new Map<string, MapCategory[]>();
+    categories.forEach((category) => groups.set(category.group, [...(groups.get(category.group) ?? []), category]));
+    return [...groups.entries()].map(([name, items]) => ({ name, items }));
+  }, [categories]);
+  useEffect(() => {
+    if (!map || selectionInitializedRef.current) return;
+    selectionInitializedRef.current = true;
+    setSelectedCategoryIds(categories.filter((category) => category.group === "地点" && (categoryCounts.get(category.id) ?? 0) > 0).map((category) => category.id));
+  }, [map, categories, categoryCounts]);
+  const selectedCategorySet = useMemo(() => new Set(selectedCategoryIds), [selectedCategoryIds]);
+  const markers = useMemo(() => !map ? [] : map.landmarks.filter((landmark) => selectedCategorySet.has(landmark.category_id)), [map, selectedCategorySet]);
   const selected = markers.find((marker) => marker.id === selectedId) ?? markers[0] ?? null;
   const tiles = useMemo(() => {
     if (!map) return [];
@@ -197,24 +209,38 @@ function WorldMap() {
     dragRef.current = null;
     setDragging(false);
   };
+  const toggleCategory = (categoryId: number) => {
+    setSelectedCategoryIds((current) => current.includes(categoryId) ? current.filter((id) => id !== categoryId) : [...current, categoryId]);
+    setSelectedId(null);
+  };
+  const toggleGroup = (items: MapCategory[]) => {
+    const populated = items.filter((category) => (categoryCounts.get(category.id) ?? 0) > 0).map((category) => category.id);
+    const isFullySelected = populated.length > 0 && populated.every((id) => selectedCategorySet.has(id));
+    setSelectedCategoryIds((current) => isFullySelected ? current.filter((id) => !populated.includes(id)) : [...new Set([...current, ...populated])]);
+    setSelectedId(null);
+  };
+  const selectAllCategories = () => {
+    setSelectedCategoryIds(categories.filter((category) => (categoryCounts.get(category.id) ?? 0) > 0).map((category) => category.id));
+    setSelectedId(null);
+  };
 
   return <><CompanionHeader crumb="世界地图" action={<><span className="companion-count"><PalIcon name="map" />离线地图 · {map?.landmarks.length ?? "—"} 个点位</span><span className="data-source-mark">点位来源 · {map?.source.provider ?? "游民星空"}</span></>} />
     <section className="companion-hero panel map-hero"><div><p className="eyebrow">WORLD MAP · LOCAL DATA SNAPSHOT</p><h1>世界地图</h1><p>本地保存底图、区域、分类图标和全部点位。加载、筛选与查看标记均不依赖外部 iframe 或第三方 Cookie。</p><p className="source-caption">底图与地图点位来源：{map?.source.provider ?? "游民星空"}</p></div><div className="companion-hero-mark"><PalIcon name="map" /><small>{map?.source.updated_at ? `地图更新 · ${map.source.updated_at}` : "本地地图快照"}</small></div></section>
     {error ? <section className="companion-error">{error}</section> : !map ? <section className="companion-loading">正在装载离线世界地图…</section> : <section className="map-layout">
+      <aside className="map-filter panel"><p className="eyebrow">MAP MARKERS</p><h2>地图标点</h2><p className="map-filter-help">选择要在地图上显示的类型；默认开启地点标记。</p><div className="map-filter-actions"><button type="button" onClick={selectAllCategories}>全选标点</button><button type="button" onClick={() => { setSelectedCategoryIds([]); setSelectedId(null); }}>清空标点</button></div>{groupedCategories.map((group) => { const populated = group.items.filter((category) => (categoryCounts.get(category.id) ?? 0) > 0); const allSelected = populated.length > 0 && populated.every((category) => selectedCategorySet.has(category.id)); return <section className="marker-group" key={group.name}><header><h3>{group.name}</h3><button type="button" disabled={!populated.length} onClick={() => toggleGroup(group.items)}>{allSelected ? "取消全选" : "全选"}</button></header><div>{group.items.map((category) => { const count = categoryCounts.get(category.id) ?? 0; const checked = selectedCategorySet.has(category.id); return <label className={`map-category ${checked ? "selected" : ""} ${!count ? "empty" : ""}`} key={category.id}><input type="checkbox" checked={checked} disabled={!count} onChange={() => toggleCategory(category.id)} /><span className="map-category-icon">{category.icon ? <img src={category.icon} alt="" /> : <PalIcon name="map" />}</span><span>{category.name}</span><b>{count || "—"}</b></label>; })}</div></section>; })}<footer>点位来源：{map.source.provider ?? "游民星空"}</footer>{selected && <section className="map-selected map-filter-selected"><p className="eyebrow">SELECTED MARKER · 游民星空</p><h3>{selected.name}</h3><small>{selected.group} · {selected.category}</small>{selected.description && <p>{selected.description.replace(/<[^>]*>/g, " ")}</p>}</section>}</aside>
       <section className="world-map panel">
-        <div className="map-toolbar"><label>点位分类<select value={activeCategory ? String(activeCategory.id) : ""} onChange={(event) => { setCategoryId(event.target.value); setSelectedId(null); }}><option value="">选择点位类型</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.group} · {category.name}</option>)}</select></label><strong className="map-marker-count">{markers.length} 个标记</strong></div>
+        <div className="map-toolbar"><div><small>当前显示</small><strong>{markers.length} 个标记</strong></div><span className="map-drag-hint">按住左键拖动地图</span></div>
         <div className="offline-map-shell">
           <div ref={viewportRef} className={`offline-map-viewport ${dragging ? "dragging" : ""}`} tabIndex={0} aria-label="可用鼠标拖动的离线世界地图" onPointerDown={startMapDrag} onPointerMove={moveMapDrag} onPointerUp={endMapDrag} onPointerCancel={endMapDrag}>
             <div className="offline-map-canvas" style={{ width: (map.tile.xEnd - map.tile.xStart + 1) * map.tile.size, height: (map.tile.yEnd - map.tile.yStart + 1) * map.tile.size }}>
               <div className="offline-map-tiles" style={{ gridTemplateColumns: `repeat(${map.tile.xEnd - map.tile.xStart + 1}, ${map.tile.size}px)` }}>{tiles.map((tile) => <img key={tile.key} src={tile.src} alt="" draggable={false} loading="lazy" />)}</div>
               {map.areas.map((area) => <span className="map-area-label" key={area.name} style={pointPosition(map, area.x, area.y)}>{area.name}</span>)}
-              {markers.map((marker) => <button className={`map-marker ${selected?.id === marker.id ? "selected" : ""}`} key={marker.id} style={pointPosition(map, marker.x, marker.y)} onPointerDown={(event) => event.stopPropagation()} onClick={() => setSelectedId(marker.id)} aria-label={`${marker.category}：${marker.name}，点位来源游民星空`} title={marker.name}>{activeCategory?.icon ? <img src={activeCategory.icon} alt="" /> : <i />}</button>)}
+              {markers.map((marker) => { const category = categories.find((item) => item.id === marker.category_id); return <button className={`map-marker ${selected?.id === marker.id ? "selected" : ""}`} key={marker.id} style={pointPosition(map, marker.x, marker.y)} onPointerDown={(event) => event.stopPropagation()} onClick={() => setSelectedId(marker.id)} aria-label={`${marker.category}：${marker.name}，点位来源游民星空`} title={marker.name}>{category?.icon ? <img src={category.icon} alt="" /> : <i />}</button>; })}
             </div>
           </div>
         </div>
         <footer className="map-foot"><span><i />底图、图标与点位来源：游民星空（已保存至本地 `/data/palworld/`）</span><small>按住鼠标左键拖动查看全图；选择分类可减少标记遮挡。</small></footer>
       </section>
-      <aside className="map-info panel"><p className="eyebrow">OFFLINE MAP DATA</p><div className="pal-detail-title"><span className="pal-monogram large"><PalIcon name="map" /></span><div><h2>{map.name}</h2><small>{map.source.provider ?? "游民星空"} 数据快照</small></div></div><dl><div><dt>底图模式</dt><dd>本地高分辨率瓦片</dd></div><div><dt>点位来源</dt><dd>{map.source.provider ?? "游民星空"}</dd></div><div><dt>点位总数</dt><dd>{map.landmarks.length}</dd></div><div><dt>分类数量</dt><dd>{categories.length}</dd></div><div><dt>当前分类</dt><dd>{activeCategory?.name ?? "—"}</dd></div></dl>{selected ? <section className="map-selected"><p className="eyebrow">SELECTED MARKER · 游民星空</p><h3>{selected.name}</h3><small>{selected.group} · {selected.category}</small>{selected.description && <p>{selected.description.replace(/<[^>]*>/g, " ")}</p>}</section> : <p className="map-source">选择地图上的图标可查看名称、分类和备注。</p>}<a className="button-secondary companion-link source-link" href={map.source.website} target="_blank" rel="noreferrer">查看游民星空公开资料</a></aside>
     </section>}
   </>;
 }
