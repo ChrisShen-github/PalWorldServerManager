@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode, type WheelEvent as ReactWheelEvent } from "react";
 import { PalIcon } from "./PalIcons";
 import ThemeToggle from "./ThemeToggle";
 import "./companion.css";
@@ -151,9 +151,12 @@ function WorldMap() {
   const viewportRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ pointerId: number; x: number; y: number; left: number; top: number; moved: boolean } | null>(null);
   const selectionInitializedRef = useRef(false);
+  const mapPositionedRef = useRef(false);
+  const zoomRef = useRef(0.5);
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [mapZoom, setMapZoom] = useState(0.5);
   const categories = map?.categories ?? [];
   const categoryCounts = useMemo(() => new Map((map?.landmarks ?? []).reduce((counts, landmark) => counts.set(landmark.category_id, (counts.get(landmark.category_id) ?? 0) + 1), new Map<number, number>())), [map]);
   const groupedCategories = useMemo(() => {
@@ -175,14 +178,41 @@ function WorldMap() {
     for (let y = map.tile.yStart; y <= map.tile.yEnd; y += 1) for (let x = map.tile.xStart; x <= map.tile.xEnd; x += 1) result.push({ key: `${x}-${y}`, src: `${map.tile.path}/${x}_${y}.jpg` });
     return result;
   }, [map]);
+  const mapWidth = map ? (map.tile.xEnd - map.tile.xStart + 1) * map.tile.size : 0;
+  const mapHeight = map ? (map.tile.yEnd - map.tile.yStart + 1) * map.tile.size : 0;
   useEffect(() => {
-    if (!map || !viewportRef.current) return;
+    if (!map || !viewportRef.current || mapPositionedRef.current) return;
+    mapPositionedRef.current = true;
     const viewport = viewportRef.current;
-    const width = (map.tile.xEnd - map.tile.xStart + 1) * map.tile.size;
-    const height = (map.tile.yEnd - map.tile.yStart + 1) * map.tile.size;
-    viewport.scrollLeft = Math.max(0, (width - viewport.clientWidth) / 2);
-    viewport.scrollTop = Math.max(0, (height - viewport.clientHeight) / 2);
-  }, [map]);
+    requestAnimationFrame(() => {
+      viewport.scrollLeft = Math.max(0, (mapWidth * zoomRef.current - viewport.clientWidth) / 2);
+      viewport.scrollTop = Math.max(0, (mapHeight * zoomRef.current - viewport.clientHeight) / 2);
+    });
+  }, [map, mapHeight, mapWidth]);
+  const applyMapZoom = (nextZoom: number, focalPoint?: { x: number; y: number }) => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const previousZoom = zoomRef.current;
+    const zoom = Math.min(2.5, Math.max(0.12, nextZoom));
+    if (Math.abs(zoom - previousZoom) < 0.001) return;
+    const focalX = focalPoint?.x ?? viewport.clientWidth / 2;
+    const focalY = focalPoint?.y ?? viewport.clientHeight / 2;
+    const mapX = (viewport.scrollLeft + focalX) / previousZoom;
+    const mapY = (viewport.scrollTop + focalY) / previousZoom;
+    zoomRef.current = zoom;
+    setMapZoom(zoom);
+    requestAnimationFrame(() => {
+      viewport.scrollLeft = Math.max(0, mapX * zoom - focalX);
+      viewport.scrollTop = Math.max(0, mapY * zoom - focalY);
+    });
+  };
+  const zoomWithWheel = (event: ReactWheelEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const bounds = viewport.getBoundingClientRect();
+    applyMapZoom(zoomRef.current * (event.deltaY < 0 ? 1.16 : 1 / 1.16), { x: event.clientX - bounds.left, y: event.clientY - bounds.top });
+  };
   const startMapDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (event.button !== 0 || (event.target as HTMLElement).closest("button")) return;
     const viewport = viewportRef.current;
@@ -229,17 +259,19 @@ function WorldMap() {
     {error ? <section className="companion-error">{error}</section> : !map ? <section className="companion-loading">正在装载离线世界地图…</section> : <section className="map-layout">
       <aside className="map-filter panel"><p className="eyebrow">MAP MARKERS</p><h2>地图标点</h2><p className="map-filter-help">选择要在地图上显示的类型；默认开启地点标记。</p><div className="map-filter-actions"><button type="button" onClick={selectAllCategories}>全选标点</button><button type="button" onClick={() => { setSelectedCategoryIds([]); setSelectedId(null); }}>清空标点</button></div>{groupedCategories.map((group) => { const populated = group.items.filter((category) => (categoryCounts.get(category.id) ?? 0) > 0); const allSelected = populated.length > 0 && populated.every((category) => selectedCategorySet.has(category.id)); return <section className="marker-group" key={group.name}><header><h3>{group.name}</h3><button type="button" disabled={!populated.length} onClick={() => toggleGroup(group.items)}>{allSelected ? "取消全选" : "全选"}</button></header><div>{group.items.map((category) => { const count = categoryCounts.get(category.id) ?? 0; const checked = selectedCategorySet.has(category.id); return <label className={`map-category ${checked ? "selected" : ""} ${!count ? "empty" : ""}`} key={category.id}><input type="checkbox" checked={checked} disabled={!count} onChange={() => toggleCategory(category.id)} /><span className="map-category-icon">{category.icon ? <img src={category.icon} alt="" /> : <PalIcon name="map" />}</span><span>{category.name}</span><b>{count || "—"}</b></label>; })}</div></section>; })}<footer>点位来源：{map.source.provider ?? "游民星空"}</footer>{selected && <section className="map-selected map-filter-selected"><p className="eyebrow">SELECTED MARKER · 游民星空</p><h3>{selected.name}</h3><small>{selected.group} · {selected.category}</small>{selected.description && <p>{selected.description.replace(/<[^>]*>/g, " ")}</p>}</section>}</aside>
       <section className="world-map panel">
-        <div className="map-toolbar"><div><small>当前显示</small><strong>{markers.length} 个标记</strong></div><span className="map-drag-hint">按住左键拖动地图</span></div>
+        <div className="map-toolbar"><div><small>当前显示</small><strong>{markers.length} 个标记</strong></div><div className="map-toolbar-actions"><span className="map-drag-hint">滚轮缩放 · 左键拖动</span><div className="map-zoom-controls" role="group" aria-label="地图缩放"><button type="button" onClick={() => applyMapZoom(zoomRef.current / 1.3)} aria-label="缩小地图">缩小</button><output aria-live="polite">{Math.round(mapZoom * 100)}%</output><button type="button" onClick={() => applyMapZoom(zoomRef.current * 1.3)} aria-label="放大地图">放大</button><button type="button" onClick={() => applyMapZoom(0.5)} aria-label="复位地图缩放">复位</button></div></div></div>
         <div className="offline-map-shell">
-          <div ref={viewportRef} className={`offline-map-viewport ${dragging ? "dragging" : ""}`} tabIndex={0} aria-label="可用鼠标拖动的离线世界地图" onPointerDown={startMapDrag} onPointerMove={moveMapDrag} onPointerUp={endMapDrag} onPointerCancel={endMapDrag}>
-            <div className="offline-map-canvas" style={{ width: (map.tile.xEnd - map.tile.xStart + 1) * map.tile.size, height: (map.tile.yEnd - map.tile.yStart + 1) * map.tile.size }}>
+          <div ref={viewportRef} className={`offline-map-viewport ${dragging ? "dragging" : ""}`} tabIndex={0} aria-label="可用滚轮缩放和鼠标拖动的离线世界地图" onWheel={zoomWithWheel} onPointerDown={startMapDrag} onPointerMove={moveMapDrag} onPointerUp={endMapDrag} onPointerCancel={endMapDrag}>
+            <div className="offline-map-scaler" style={{ width: mapWidth * mapZoom, height: mapHeight * mapZoom }}>
+            <div className="offline-map-canvas" style={{ width: mapWidth, height: mapHeight, transform: `scale(${mapZoom})` }}>
               <div className="offline-map-tiles" style={{ gridTemplateColumns: `repeat(${map.tile.xEnd - map.tile.xStart + 1}, ${map.tile.size}px)` }}>{tiles.map((tile) => <img key={tile.key} src={tile.src} alt="" draggable={false} loading="lazy" />)}</div>
               {map.areas.map((area) => <span className="map-area-label" key={area.name} style={pointPosition(map, area.x, area.y)}>{area.name}</span>)}
               {markers.map((marker) => { const category = categories.find((item) => item.id === marker.category_id); return <button className={`map-marker ${selected?.id === marker.id ? "selected" : ""}`} key={marker.id} style={pointPosition(map, marker.x, marker.y)} onPointerDown={(event) => event.stopPropagation()} onClick={() => setSelectedId(marker.id)} aria-label={`${marker.category}：${marker.name}，点位来源游民星空`} title={marker.name}>{category?.icon ? <img src={category.icon} alt="" /> : <i />}</button>; })}
             </div>
+            </div>
           </div>
         </div>
-        <footer className="map-foot"><span><i />底图、图标与点位来源：游民星空（已保存至本地 `/data/palworld/`）</span><small>按住鼠标左键拖动查看全图；选择分类可减少标记遮挡。</small></footer>
+        <footer className="map-foot"><span><i />底图、图标与点位来源：游民星空（已保存至本地 `/data/palworld/`）</span><small>滚轮缩放、左键拖动；选择分类可减少标记遮挡。</small></footer>
       </section>
     </section>}
   </>;
