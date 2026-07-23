@@ -3,6 +3,9 @@ import { basename, dirname, extname, join, resolve } from "node:path";
 
 const PAL_BASE_URL = "https://app.gamersky.com/tools/palworldwiki/data/palworld/palworld-base.js";
 const PALS_URL = "https://app.gamersky.com/tools/palworldwiki/data/palworld/pals.js";
+const ACTIVE_SKILLS_URL = "https://app.gamersky.com/tools/palworldwiki/data/palworld/active-skills.js";
+const PAL_HABITATS_URL = "https://app.gamersky.com/tools/palworldwiki/data/palworld/pal-habitats-bwiki.js";
+const BREEDING_INDEXES_URL = "https://app.gamersky.com/tools/palworldwiki/data/palworld/breeding-indexes.js";
 const MAP_API_URL = "https://wkmap1.gamersky.com/map/getMap";
 const LANDMARK_API_URL = "https://wkmap1.gamersky.com/landmark/getLandmarkList";
 const MAP_WEBSITE = "https://app.gamersky.com/map/?gsAppChannel=diTu&gsGameId=1395719&mapId=26";
@@ -78,12 +81,28 @@ function numberAndSuffix(number) {
   return { paldex: Number(match?.[1] ?? 0), suffix: match?.[2] ?? "" };
 }
 
-function palRecord(raw) {
+function palRecord(raw, { activeSkills, habitats, breeding }) {
   const { paldex, suffix } = numberAndSuffix(raw.number);
   const iconExtension = extname(new URL(sourceUrl(raw.icon.src)).pathname) || ".png";
   const iconFile = `${safeName(raw.id)}${iconExtension}`;
-  const stats = raw.stats ?? {};
-  const movement = raw.movement ?? {};
+  const rawStats = raw.stats ?? {};
+  const rawMovement = raw.movement ?? {};
+  const rawPartnerSkill = raw.partnerSkill ?? {};
+  const habitat = habitats?.[raw.id] ?? null;
+  const activeSkillRecords = (raw.activeSkills ?? []).map((skill) => {
+    const detail = activeSkills.get(skill.id) ?? {};
+    return {
+      id: skill.id,
+      name: skill.nameZh ?? detail.nameZh ?? skill.nameEn ?? skill.id,
+      level: Number(skill.level) || 0,
+      element: elementKeys[detail.element] ?? elementKeys[skill.element] ?? detail.element ?? skill.element ?? null,
+      power: Number.isFinite(detail.power) ? detail.power : skill.power ?? null,
+      cooldown: Number.isFinite(detail.cooldown) ? detail.cooldown : skill.cooldown ?? null,
+      type: detail.attackType ?? null,
+      range: detail.range ? { min: detail.range.min ?? null, max: detail.range.max ?? null } : null,
+      description: detail.description ?? null,
+    };
+  });
   return {
     code: raw.id,
     paldex,
@@ -94,15 +113,27 @@ function palRecord(raw) {
     icon: `/data/palworld/icons/${iconFile}`,
     types: (raw.elements ?? []).map((element) => elementKeys[element] ?? element),
     work: Object.entries(raw.workSuitability ?? {}).map(([name, level]) => ({ key: name, name, level: Number(level) || null })),
-    stats: { HP: stats.hp, ATK: stats.shotAttack ?? stats.attack, DEF: stats.defense, RUN: movement.run, SPRINT: raw.game?.rideSprintSpeed ?? movement.run, PRICE: raw.game?.price }
-      && Object.fromEntries(Object.entries({ HP: stats.hp, ATK: stats.shotAttack ?? stats.attack, DEF: stats.defense, RUN: movement.run, SPRINT: raw.game?.rideSprintSpeed ?? movement.run, PRICE: raw.game?.price }).filter(([, value]) => Number.isFinite(value))),
-    moves: (raw.activeSkills ?? []).map((skill) => ({ skill: skill.nameZh ?? skill.nameEn ?? skill.id, level: Number(skill.level) || 0 })),
+    stats: Object.fromEntries(Object.entries({ HP: rawStats.hp, ATK: rawStats.attack, SHOT: rawStats.shotAttack, DEF: rawStats.defense, WORK_SPEED: rawStats.workSpeed, CAPTURE_RATE: rawStats.captureRate, RARITY: raw.rarity, FOOD: raw.foodAmount }).filter(([, value]) => Number.isFinite(value))),
+    movement: Object.fromEntries(Object.entries({ WALK: rawMovement.walk, RUN: rawMovement.run, SWIM: rawMovement.swim, STAMINA: rawMovement.stamina, RIDE_SPRINT: raw.game?.rideSprintSpeed, TRANSPORT: raw.game?.transportSpeed }).filter(([, value]) => Number.isFinite(value) && value >= 0)),
+    moves: activeSkillRecords,
+    drops: (raw.drops ?? []).map((drop) => ({ item: drop.item, quantity: drop.quantity ?? null, probability: drop.probability ?? null })),
+    habitat: habitat ? {
+      status: habitat.distributionStatus ?? raw.habitatStatus ?? null,
+      source: habitat.dataSource ?? null,
+      tabs: (habitat.tabs ?? []).map((tab) => ({ label: tab.label, count: tab.count ?? 0, regions: (tab.maps ?? []).map((region) => ({ name: region.label, count: region.sourceCount ?? 0 })) })),
+    } : { status: raw.habitatStatus ?? null, source: null, tabs: [] },
+    breeding: {
+      as_child: breeding?.byChild?.[raw.id] ?? [],
+      as_parent: breeding?.byParent?.[raw.id] ?? [],
+    },
     variant: Boolean(suffix),
     boss: Boolean(raw.isBossForm),
     rarity: raw.rarity ?? null,
-    partner_skill: raw.partnerSkill?.name ?? null,
+    partner_skill: rawPartnerSkill.name ?? null,
+    partner_skill_description: rawPartnerSkill.description ?? null,
+    partner_skill_effects: (rawPartnerSkill.levelEffects ?? []).map((effect) => ({ level: effect.level, effects: (effect.effects ?? []).map((item) => ({ effect: item.effect, value: item.value, target: item.target })) })),
     description: raw.description ?? null,
-    source_url: "https://app.gamersky.com/tools/palworldwiki/list.html?appNavigationBarStyle=kNoneBar&type=pals",
+    source_url: `https://app.gamersky.com/tools/palworldwiki/detail.html?type=pal&id=${encodeURIComponent(raw.id)}`,
     _icon_source: raw.icon?.src,
   };
 }
@@ -116,16 +147,22 @@ function flattenCategories(groups) {
   })));
 }
 
-const [baseScript, palsScript, mapResponse] = await Promise.all([
+const [baseScript, palsScript, activeSkillsScript, habitatsScript, breedingIndexesScript, mapResponse] = await Promise.all([
   fetchText(PAL_BASE_URL),
   fetchText(PALS_URL),
+  fetchText(ACTIVE_SKILLS_URL),
+  fetchText(PAL_HABITATS_URL),
+  fetchText(BREEDING_INDEXES_URL),
   fetchJson(MAP_API_URL, { method: "POST", body: JSON.stringify({ gameMapId: MAP_ID, mapId: MAP_ID, userId: 0 }) }),
 ]);
 
 const base = extractAssignedJson(baseScript, "base");
 const rawPals = extractAssignedJson(palsScript, "pals");
+const activeSkills = new Map(extractAssignedJson(activeSkillsScript, "activeSkills").map((skill) => [skill.id, skill]));
+const habitats = extractAssignedJson(habitatsScript, "palHabitats").pals ?? {};
+const breeding = extractAssignedJson(breedingIndexesScript, "breedingIndexes");
 if (!Array.isArray(rawPals)) throw new Error("Unexpected Pals data format");
-const palsWithAssets = rawPals.map(palRecord).filter((pal) => pal.paldex > 0).sort((a, b) => a.paldex - b.paldex || a.suffix.localeCompare(b.suffix));
+const palsWithAssets = rawPals.map((raw) => palRecord(raw, { activeSkills, habitats, breeding })).filter((pal) => pal.paldex > 0).sort((a, b) => a.paldex - b.paldex || a.suffix.localeCompare(b.suffix));
 if (palsWithAssets.length < 280) throw new Error(`Only ${palsWithAssets.length} Pals found; refusing to write a partial catalog`);
 
 const map = mapResponse.map;
@@ -141,10 +178,12 @@ const landmarks = [...new Map(categoryLandmarks.map((landmark) => [landmark.id, 
 if (landmarks.length < 1000) throw new Error(`Only ${landmarks.length} public markers found; refusing to write a partial offline map`);
 const tileRoot = map.mapTileUrlsRoot;
 const iconOutput = join(OUTPUT, "icons");
+const detailOutput = join(OUTPUT, "details");
 const mapOutput = join(OUTPUT, "map");
 const tileOutput = join(mapOutput, "tiles", String(TILE_ZOOM));
 
 await mkdir(OUTPUT, { recursive: true });
+await mkdir(detailOutput, { recursive: true });
 
 const palAssets = palsWithAssets.map((pal) => ({ url: pal._icon_source, file: join(iconOutput, basename(pal.icon)) }));
 const categoryAssets = [...new Map(categories.filter((category) => category.iconUrl).map((category) => [category.id, category])).values()].map((category) => ({
@@ -162,6 +201,8 @@ console.log(`Downloading ${palAssets.length} Pal avatars, ${categoryAssets.lengt
 await mapConcurrent([...palAssets, ...categoryAssets, ...tileAssets], 8, async (asset) => downloadAsset(asset.url, asset.file));
 
 for (const pal of palsWithAssets) delete pal._icon_source;
+await Promise.all(palsWithAssets.map((pal) => writeFile(join(detailOutput, `${safeName(pal.code)}.json`), `${JSON.stringify(pal)}\n`)));
+const palSummaries = palsWithAssets.map(({ movement, moves, drops, habitat, breeding, partner_skill_description, partner_skill_effects, ...summary }) => summary);
 const categoriesForClient = categoryAssets.map(({ category, file }) => ({ ...category, icon: `/data/palworld/map/icons/${basename(file)}` })).map(({ iconUrl, ...category }) => category);
 const landmarkRecords = landmarks.map((landmark) => ({
   id: landmark.id,
@@ -176,17 +217,17 @@ const landmarkRecords = landmarks.map((landmark) => ({
 }));
 
 await writeFile(join(OUTPUT, "pals.json"), `${JSON.stringify({
-  schema_version: 3,
+  schema_version: 4,
   generated_at: new Date().toISOString(),
   game_version: base.version?.version ?? "1.0",
   source: {
     provider: "游民星空",
     website: "https://app.gamersky.com/tools/palworldwiki/list.html?appNavigationBarStyle=kNoneBar&type=pals",
-    dataset: "Palworld 1.0 local game assets",
+    dataset: "Palworld 1.0 local game assets · skills, habitats and breeding indexes",
     dataset_updated: base.generatedJsAt ?? base.manifest?.generatedAt ?? null,
-    note: "公开图鉴数据与头像的本地快照；面板运行时不会请求第三方图鉴接口。",
+    note: "公开图鉴、头像、主动技能、出没与配种索引的本地快照；面板运行时不会请求第三方图鉴接口。",
   },
-  pals: palsWithAssets,
+  pals: palSummaries,
 }, null, 2)}\n`);
 
 await writeFile(join(mapOutput, "map.json"), `${JSON.stringify({
@@ -201,4 +242,4 @@ await writeFile(join(mapOutput, "map.json"), `${JSON.stringify({
   landmarks: landmarkRecords,
 }, null, 2)}\n`);
 
-console.log(`Wrote ${palsWithAssets.length} Pals and ${landmarkRecords.length} map landmarks to ${OUTPUT}`);
+console.log(`Wrote ${palsWithAssets.length} Pal summaries, ${palsWithAssets.length} Pal detail files and ${landmarkRecords.length} map landmarks to ${OUTPUT}`);

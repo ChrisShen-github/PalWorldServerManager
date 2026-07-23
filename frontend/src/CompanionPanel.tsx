@@ -4,10 +4,13 @@ import ThemeToggle from "./ThemeToggle";
 import "./companion.css";
 
 type Work = { key: string; name: string; level: number | null };
+type PalMove = { id?: string; skill?: string; name?: string; level: number; element?: string | null; power?: number | null; cooldown?: number | null; type?: string | null; range?: { min: number | null; max: number | null } | null; description?: string | null };
+type Breeding = { as_child?: [string, string][]; as_parent?: Array<{ mateId: string; childId: string }> };
 type Pal = {
   code: string; paldex: number; suffix: string; name: string; name_zh?: string | null; english_name: string;
-  types: string[]; work: Work[]; stats: Record<string, number> | null; moves: Array<{ skill: string; level: number }>;
-  variant: boolean; boss: boolean; icon?: string; partner_skill?: string | null; description?: string | null; source_url?: string;
+  types: string[]; work: Work[]; stats: Record<string, number> | null; movement?: Record<string, number> | null; moves?: PalMove[];
+  drops?: Array<{ item: string; quantity?: string | null; probability?: string | null }>; habitat?: { status?: string | null; source?: string | null; tabs?: Array<{ label: string; count: number; regions: Array<{ name: string; count: number }> }> }; breeding?: Breeding;
+  variant: boolean; boss: boolean; icon?: string; partner_skill?: string | null; partner_skill_description?: string | null; partner_skill_effects?: Array<{ level: number; effects: Array<{ effect: string; value: string | number; target: string }> }>; description?: string | null; source_url?: string;
 };
 type Catalog = {
   game_version?: string; pals: Pal[];
@@ -24,7 +27,8 @@ type MapCatalog = {
 };
 
 const typeNames: Record<string, string> = { neutral: "无", normal: "无", fire: "火", water: "水", electricity: "雷", leaf: "草", ice: "冰", earth: "地", dark: "暗", dragon: "龙" };
-const statNames: Record<string, string> = { HP: "生命", ATK: "攻击", DEF: "防御", RUN: "跑速", SPRINT: "冲刺", PRICE: "价格" };
+const statNames: Record<string, string> = { HP: "生命", ATK: "近战攻击", SHOT: "射击攻击", DEF: "防御", WORK_SPEED: "工作速度", CAPTURE_RATE: "捕捉率", RARITY: "稀有度", FOOD: "进食量", RUN: "跑速", SPRINT: "冲刺", PRICE: "价格", WALK: "步行速度", SWIM: "游泳速度", STAMINA: "耐力", RIDE_SPRINT: "骑乘冲刺", TRANSPORT: "搬运速度" };
+const moveTypeNames: Record<string, string> = { Shot: "远程", Melee: "近战" };
 function nav(to: string) { location.href = to; }
 function displayName(pal: Pal) { return pal.name_zh || pal.name; }
 function palNumber(pal: Pal) { return `No.${String(pal.paldex).padStart(3, "0")}${pal.suffix ? ` · ${pal.suffix}` : ""}`; }
@@ -95,6 +99,8 @@ function Paldex({ catalog, error }: { catalog: Catalog | null; error: string }) 
   const [type, setType] = useState("all");
   const [work, setWork] = useState("all");
   const [selectedCode, setSelectedCode] = useState<string | null>(initial);
+  const [detail, setDetail] = useState<Pal | null>(null);
+  const [detailError, setDetailError] = useState("");
   const pals = catalog?.pals ?? [];
   const types = useMemo(() => [...new Set(pals.flatMap((pal) => pal.types))].sort(), [pals]);
   const works = useMemo(() => [...new Map(pals.flatMap((pal) => pal.work).map((item) => [item.key, item])).values()].sort((a, b) => a.name.localeCompare(b.name, "zh-Hans-CN")), [pals]);
@@ -105,6 +111,17 @@ function Paldex({ catalog, error }: { catalog: Catalog | null; error: string }) 
       && (work === "all" || pal.work.some((item) => item.key === work));
   }), [pals, query, type, work]);
   const selected = pals.find((pal) => pal.code === selectedCode) ?? filtered[0] ?? null;
+  useEffect(() => {
+    if (!selected) return;
+    let cancelled = false;
+    setDetail(null);
+    setDetailError("");
+    fetch(`/data/palworld/details/${encodeURIComponent(selected.code)}.json`)
+      .then((response) => response.ok ? response.json() as Promise<Pal> : Promise.reject(new Error(String(response.status))))
+      .then((record) => { if (!cancelled) setDetail(record); })
+      .catch(() => { if (!cancelled) setDetailError("完整资料暂时无法读取。请确认镜像已更新并重新加载页面。"); });
+    return () => { cancelled = true; };
+  }, [selected?.code]);
 
   return <><CompanionHeader crumb="帕鲁图鉴" action={<><span className="companion-count"><PalIcon name="paldex" />{pals.length || "—"} 条 · {catalog?.game_version ?? "最新"}</span><span className="data-source-mark">资料来源 · {catalog?.source.provider ?? "游民星空"}</span></>} />
     <section className="companion-hero panel"><div><p className="eyebrow">PALDECK · OFFLINE DATA SNAPSHOT</p><h1>帕鲁图鉴</h1><p>内置最新中文图鉴、头像、工作适性、伙伴技能与招式快照；可按元素、工作适性及名称筛选，运行时无需访问第三方站点。</p><p className="source-caption">图鉴资料来源：{catalog?.source.provider ?? "游民星空"}</p></div><div className="companion-hero-mark"><PalIcon name="paldex" /><small>{catalog?.source.dataset_updated ? `INDEX · ${catalog.source.dataset_updated}` : "本地图鉴快照"}</small></div></section>
@@ -119,19 +136,30 @@ function Paldex({ catalog, error }: { catalog: Catalog | null; error: string }) 
         <div className="paldex-grid" aria-live="polite">{filtered.map((pal) => <button className={`pal-card ${selected?.code === pal.code ? "selected" : ""}`} key={pal.code} onClick={() => setSelectedCode(pal.code)}>
           <PalAvatar pal={pal} /><span className="pal-card-main"><strong>{displayName(pal)}</strong><small>{pal.name}</small><span>{pal.types.map((item) => <TypeBadge key={item} type={item} />)}</span></span><em>{palNumber(pal)} · {pal.work.length} 项工作</em>
         </button>)}</div>
-        <PalDetail pal={selected} />
+        <PalDetail pal={detail?.code === selected?.code ? detail : selected} pals={pals} loading={Boolean(selected && detail?.code !== selected.code && !detailError)} error={detailError} />
       </section>
     </>}
   </>;
 }
 
-function PalDetail({ pal }: { pal: Pal | null }) {
+function PalDetail({ pal, pals = [], loading = false, error = "" }: { pal: Pal | null; pals?: Pal[]; loading?: boolean; error?: string }) {
   if (!pal) return <aside className="pal-detail panel"><p className="eyebrow">PAL PROFILE</p><h2>没有匹配的帕鲁</h2><p>换一个关键词或放宽筛选条件。</p></aside>;
+  const byCode = new Map(pals.map((item) => [item.code, item]));
+  const palName = (code: string) => displayName(byCode.get(code) ?? { name: code, english_name: code, code, paldex: 0, suffix: "", types: [], work: [], stats: null, moves: [], variant: false, boss: false });
+  const moves = pal.moves ?? [];
+  const breedingAsChild = pal.breeding?.as_child ?? [];
+  const breedingAsParent = pal.breeding?.as_parent ?? [];
+  const habitatTabs = pal.habitat?.tabs ?? [];
   return <aside className="pal-detail panel"><p className="eyebrow">PAL PROFILE · {palNumber(pal)}</p><div className="pal-detail-title"><PalAvatar pal={pal} large /><div><h2>{displayName(pal)}</h2><small>{pal.name} · {pal.code}</small></div></div><div className="detail-types">{pal.types.map((item) => <TypeBadge key={item} type={item} />)}</div>
+    {pal.description && <p className="pal-description">{pal.description}</p>}
     <section><h3>工作适性</h3>{pal.work.length ? <div className="work-chips">{pal.work.map((item) => <span key={item.key}>{item.name}{item.level !== null && <b>Lv.{item.level}</b>}</span>)}</div> : <p className="muted">当前索引未提供工作适性。</p>}</section>
+    {loading ? <section className="detail-loading"><h3>完整资料</h3><p className="muted">正在读取这只帕鲁的技能、掉落、出没与配种资料…</p></section> : error ? <section className="detail-loading"><h3>完整资料</h3><p className="muted">{error}</p></section> : <><section><h3>伙伴技能</h3><strong className="partner-skill-name">{pal.partner_skill ?? "当前资料未提供伙伴技能。"}</strong>{pal.partner_skill_description && <p className="muted">{pal.partner_skill_description}</p>}{pal.partner_skill_effects?.length ? <details className="pal-more"><summary>查看升星效果</summary><div className="partner-effects">{pal.partner_skill_effects.map((level) => <div key={level.level}><b>★ {level.level}</b><span>{level.effects.map((effect) => `${effect.effect} ${effect.value}`).join(" · ")}</span></div>)}</div></details> : null}</section>
     <section><h3>基础数值</h3>{pal.stats ? <dl className="stat-list">{Object.entries(pal.stats).filter(([, value]) => Number.isFinite(value)).map(([key, value]) => <div key={key}><dt>{statNames[key] ?? key}</dt><dd>{value}</dd></div>)}</dl> : <p className="muted">当前索引未提供基础数值。</p>}</section>
-    <section><h3>伙伴技能</h3><p className="muted">{pal.partner_skill ?? "当前资料未提供伙伴技能。"}</p></section>
-    <section><h3>招式</h3>{pal.moves.length ? <div className="work-chips">{pal.moves.slice(0, 9).map((move, index) => <span key={`${move.skill}-${index}`}>{move.skill}{move.level > 0 && <b>Lv.{move.level}</b>}</span>)}</div> : <p className="muted">当前资料未提供招式。</p>}</section>
+    <section><h3>移动能力</h3>{pal.movement && Object.keys(pal.movement).length ? <dl className="stat-list">{Object.entries(pal.movement).map(([key, value]) => <div key={key}><dt>{statNames[key] ?? key}</dt><dd>{value}</dd></div>)}</dl> : <p className="muted">当前索引未提供移动参数。</p>}</section>
+    <section><h3>主动技能</h3>{moves.length ? <div className="move-list">{moves.map((move, index) => <article key={`${move.id ?? move.skill ?? move.name}-${index}`}><header><b>{move.name ?? move.skill ?? "未知技能"}</b><span>Lv.{move.level}</span></header><div className="move-meta">{move.element && <TypeBadge type={move.element} />}{move.power !== null && move.power !== undefined && <small>威力 {move.power}</small>}{move.cooldown !== null && move.cooldown !== undefined && <small>冷却 {move.cooldown}s</small>}{move.type && <small>{moveTypeNames[move.type] ?? move.type}</small>}{move.range && <small>范围 {move.range.min ?? 0}–{move.range.max ?? "—"}</small>}</div>{move.description && <p>{move.description}</p>}</article>)}</div> : <p className="muted">当前索引未提供主动技能。</p>}</section>
+    <section><h3>掉落物</h3>{pal.drops?.length ? <div className="drop-list">{pal.drops.map((drop, index) => <div key={`${drop.item}-${index}`}><b>{drop.item}</b><span>{drop.quantity ?? "—"}</span><small>{drop.probability ?? "—"}</small></div>)}</div> : <p className="muted">当前索引未提供掉落物。</p>}</section>
+    <section><h3>出没情况</h3>{habitatTabs.length ? <div className="habitat-list">{habitatTabs.map((tab) => <div key={tab.label}><b>{tab.label}</b><span>{tab.count} 个分布点</span><small>{tab.regions.map((region) => `${region.name} ${region.count}`).join(" · ")}</small></div>)}</div> : <p className="muted">{pal.habitat?.status === "no-wild-distribution-in-table" ? "当前资料未提供野外出没记录。" : "栖息区域仍在整理中。"}</p>}</section>
+    <section><h3>配种信息</h3><details className="pal-more"><summary>怎么孵出来（{breedingAsChild.length} 种）</summary>{breedingAsChild.length ? <div className="breeding-list">{breedingAsChild.map(([left, right], index) => <div key={`${left}-${right}-${index}`}><b>{palName(left)}</b><span>＋</span><b>{palName(right)}</b><span>＝</span><strong>{displayName(pal)}</strong></div>)}</div> : <p className="muted">当前索引未提供方案。</p>}</details><details className="pal-more"><summary>能孵出什么（{breedingAsParent.length} 种）</summary>{breedingAsParent.length ? <div className="breeding-list">{breedingAsParent.map((pair, index) => <div key={`${pair.mateId}-${pair.childId}-${index}`}><b>{displayName(pal)}</b><span>＋</span><b>{palName(pair.mateId)}</b><span>＝</span><strong>{palName(pair.childId)}</strong></div>)}</div> : <p className="muted">当前索引未提供方案。</p>}</details></section></>}
     <p className="detail-source">资料来源：游民星空帕鲁图鉴</p>
     <button className="button-secondary companion-link" onClick={() => nav("?view=map")}><PalIcon name="map" />打开互动地图</button>
     <a className="button-primary companion-link source-link" href={pal.source_url ?? "https://app.gamersky.com/tools/palworldwiki/list.html?appNavigationBarStyle=kNoneBar&type=pals"} target="_blank" rel="noreferrer">查看资料源详情</a>
