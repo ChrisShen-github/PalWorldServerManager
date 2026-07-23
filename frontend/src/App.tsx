@@ -92,6 +92,7 @@ export default function App() {
   if (new URLSearchParams(location.search).get("view") === "backups") return <BackupPanel />;
   if (new URLSearchParams(location.search).get("view") === "operations") return <OperationLogPanel />;
   if (new URLSearchParams(location.search).get("view") === "paldex") return <CompanionPanel view="paldex" />;
+  if (new URLSearchParams(location.search).get("view") === "paldex-detail") return <CompanionPanel view="paldex-detail" />;
   if (new URLSearchParams(location.search).get("view") === "map") return <CompanionPanel view="map" />;
 
   const [overview, setOverview] = useState(empty);
