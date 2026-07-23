@@ -62,7 +62,7 @@ export default function OperationLogPanel() {
   const failed = operations.filter((operation) => operation.status === "failed").length;
 
   return <div className="operation-page">
-    <div className="settings-toolbar"><ThemeToggle /></div>
+    <div className="settings-toolbar"><div className="crumb">服务器管理　/　<strong>运行日志</strong></div><ThemeToggle /></div>
     <section className="operation-hero" aria-labelledby="operation-title">
       <div><p className="eyebrow">NATIVE HOST · OPERATION HISTORY</p><h1 id="operation-title">运行日志</h1><p>安装、更新、服务启停、手动备份、自动备份和存档恢复都会记录在 Ubuntu 宿主机。页面只显示受限代理执行过的任务。</p></div>
       <div className="operation-hero-mark"><PalIcon name="logs" /><strong>{operations.length}</strong><small>最近任务</small></div>

@@ -227,7 +227,7 @@ function BackupPanelContent() {
       : "删除后无法从面板恢复。请确认这不是你需要保留的存档版本。";
 
   return <div className="backup-page">
-    <div className="settings-toolbar"><ThemeToggle /></div>
+    <div className="settings-toolbar"><div className="crumb">服务器管理　/　<strong>存档与备份</strong></div><ThemeToggle /></div>
     <section className="backup-hero" aria-labelledby="backup-title">
       <div><p className="eyebrow">WORLD SAVE · NATIVE HOST</p><h1 id="backup-title">存档与备份</h1><p>备份由 Ubuntu 宿主机执行，涵盖完整 <code>SaveGames</code> 世界目录。每次恢复前都会先自动保护当前版本。</p></div>
       <div className="backup-hero-mark"><PalIcon name="backup" /><strong>{backups.length}</strong><small>可用备份</small></div>

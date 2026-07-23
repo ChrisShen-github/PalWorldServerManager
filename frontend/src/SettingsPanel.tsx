@@ -212,7 +212,7 @@ export default function SettingsPanel() {
 
   return (
     <div className="settings-page">
-      <div className="settings-toolbar"><ThemeToggle /></div>
+      <div className="settings-toolbar"><div className="crumb">服务器管理　/　<strong>世界规则与安装</strong></div><ThemeToggle /></div>
       <section className="settings-hero" aria-labelledby="settings-title">
         <p className="eyebrow">HOST · NATIVE INSTALLATION</p>
         <h1 id="settings-title">主机与服务器设置</h1>
