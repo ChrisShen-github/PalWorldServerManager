@@ -61,8 +61,8 @@ export default function OperationLogPanel() {
   const completed = operations.filter((operation) => operation.status === "success").length;
   const failed = operations.filter((operation) => operation.status === "failed").length;
 
-  return <main className="operation-page" id="main">
-    <div className="settings-toolbar"><a className="settings-back" href="/">← 返回指挥台</a><ThemeToggle /></div>
+  return <div className="operation-page">
+    <div className="settings-toolbar"><ThemeToggle /></div>
     <section className="operation-hero" aria-labelledby="operation-title">
       <div><p className="eyebrow">NATIVE HOST · OPERATION HISTORY</p><h1 id="operation-title">运行日志</h1><p>安装、更新、服务启停、手动备份、自动备份和存档恢复都会记录在 Ubuntu 宿主机。页面只显示受限代理执行过的任务。</p></div>
       <div className="operation-hero-mark"><PalIcon name="logs" /><strong>{operations.length}</strong><small>最近任务</small></div>
@@ -77,5 +77,5 @@ export default function OperationLogPanel() {
       <header className="operation-heading"><div><p className="eyebrow">TASK TIMELINE</p><h2 id="operation-list-title">任务历史</h2></div><div aria-label="日志筛选" className="operation-filter"><button aria-pressed={filter === "all"} className={filter === "all" ? "active" : ""} onClick={() => setFilter("all")} type="button">全部</button><button aria-pressed={filter === "server"} className={filter === "server" ? "active" : ""} onClick={() => setFilter("server")} type="button">服务器</button><button aria-pressed={filter === "backup"} className={filter === "backup" ? "active" : ""} onClick={() => setFilter("backup")} type="button">存档</button></div></header>
       {visible.length ? <div className="operation-list">{visible.map((operation) => <details className={`operation-record ${operation.status}`} key={operation.id}><summary><span className="operation-status"><i /><b>{operation.status === "running" ? "执行中" : operation.status === "success" ? "已完成" : "失败"}</b></span><span className="operation-name"><strong>{operation.label}</strong><small>{formatTime(operation.started_at)} · {duration(operation)}</small></span><span className="operation-result">{operation.messages.at(-1) || "等待任务输出…"}</span></summary><div className="operation-output"><div><span>开始</span><time dateTime={operation.started_at}>{formatTime(operation.started_at)}</time><span>结束</span><time dateTime={operation.finished_at ?? undefined}>{formatTime(operation.finished_at)}</time></div><pre>{operation.messages.length ? operation.messages.join("\n") : "任务尚未输出日志。"}</pre></div></details>)}</div> : <div className="operation-empty"><PalIcon name="logs" /><strong>{loading ? "正在读取日志…" : "还没有任务记录"}</strong><span>{filter === "all" ? "从面板启动、更新、备份或恢复一次服务器后，这里会保留执行过程。" : "当前筛选条件下没有任务记录。"}</span></div>}
     </section>
-  </main>;
+  </div>;
 }

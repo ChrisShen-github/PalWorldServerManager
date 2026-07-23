@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode, type WheelEvent as ReactWheelEvent } from "react";
 import { PalIcon } from "./PalIcons";
+import { PageShell } from "./PageShell";
 import ThemeToggle from "./ThemeToggle";
 import "./companion.css";
 
@@ -65,21 +66,6 @@ function PalAvatar({ pal, large = false }: { pal: Pal; large?: boolean }) {
   </span>;
 }
 
-function CompanionSidebar({ active }: { active: "paldex" | "map" }) {
-  return <aside>
-    <div className="brand"><b className="brand-mark"><PalIcon name="sphere" /></b><span><strong>PALWORLD</strong><small>SERVER MANAGER</small></span></div>
-    <nav>
-      <button onClick={() => nav("/")}><PalIcon className="nav-icon" name="dashboard" /><span>指挥台</span></button>
-      <button className={active === "paldex" ? "active" : ""} aria-current={active === "paldex" ? "page" : undefined} onClick={() => nav("?view=paldex")}><PalIcon className="nav-icon" name="paldex" /><span>帕鲁图鉴</span></button>
-      <button className={active === "map" ? "active" : ""} aria-current={active === "map" ? "page" : undefined} onClick={() => nav("?view=map")}><PalIcon className="nav-icon" name="map" /><span>世界地图</span></button>
-      <button onClick={() => nav("?view=backups")}><PalIcon className="nav-icon" name="backup" /><span>存档与备份</span></button>
-      <button onClick={() => nav("?view=operations")}><PalIcon className="nav-icon" name="logs" /><span>运行日志</span></button>
-      <button onClick={() => nav("?view=settings")}><PalIcon className="nav-icon" name="settings" /><span>世界规则与安装</span></button>
-    </nav>
-    <footer>资料库 · 图鉴快照与互动地图</footer>
-  </aside>;
-}
-
 function CompanionHeader({ crumb, action }: { crumb: string; action?: ReactNode }) {
   return <header className="companion-header"><div className="crumb">世界资料　/　<strong>{crumb}</strong></div><div className="pal-header-actions">{action}<ThemeToggle /></div></header>;
 }
@@ -88,9 +74,9 @@ function TypeBadge({ type }: { type: string }) { return <span className={`type-b
 
 export default function CompanionPanel({ view }: { view: "paldex" | "paldex-detail" | "map" }) {
   const { catalog, error } = useCatalog();
-  return <div className="shell"><CompanionSidebar active={view === "map" ? "map" : "paldex"} /><main className="companion-main" id="main">
+  return <PageShell active={view === "map" ? "map" : "paldex"} mainClassName="companion-main">
     {view === "map" ? <WorldMap /> : view === "paldex-detail" ? <PaldexDetailPage catalog={catalog} error={error} /> : <Paldex catalog={catalog} error={error} />}
-  </main></div>;
+  </PageShell>;
 }
 
 function Paldex({ catalog, error }: { catalog: Catalog | null; error: string }) {

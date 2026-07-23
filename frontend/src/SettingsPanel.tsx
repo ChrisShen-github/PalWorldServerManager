@@ -211,8 +211,8 @@ export default function SettingsPanel() {
   const busy = saving || operation !== null;
 
   return (
-    <main className="settings-page" id="main">
-      <div className="settings-toolbar"><a className="settings-back" href="/">← 返回指挥台</a><ThemeToggle /></div>
+    <div className="settings-page">
+      <div className="settings-toolbar"><ThemeToggle /></div>
       <section className="settings-hero" aria-labelledby="settings-title">
         <p className="eyebrow">HOST · NATIVE INSTALLATION</p>
         <h1 id="settings-title">主机与服务器设置</h1>
@@ -312,6 +312,6 @@ export default function SettingsPanel() {
           </div>
         </section>
       </div>}
-    </main>
+    </div>
   );
 }

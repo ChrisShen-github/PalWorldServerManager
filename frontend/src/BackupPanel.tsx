@@ -20,7 +20,7 @@ class BackupErrorBoundary extends Component<{ children: ReactNode }, { failed: b
   static getDerivedStateFromError() { return { failed: true }; }
   componentDidCatch(_error: Error, _info: ErrorInfo) { /* Keep backup failures visible instead of blanking the page. */ }
   render() {
-    if (this.state.failed) return <main className="backup-page"><section className="backup-panel backup-render-error" role="alert"><p className="eyebrow">BACKUP PAGE RECOVERY</p><h1>备份页面需要重新加载</h1><p>页面交互发生异常，但不会影响已创建的主机备份。请刷新页面后重试。</p><button className="button button-primary" onClick={() => location.reload()} type="button">重新加载页面</button></section></main>;
+    if (this.state.failed) return <div className="backup-page"><section className="backup-panel backup-render-error" role="alert"><p className="eyebrow">BACKUP PAGE RECOVERY</p><h1>备份页面需要重新加载</h1><p>页面交互发生异常，但不会影响已创建的主机备份。请刷新页面后重试。</p><button className="button button-primary" onClick={() => location.reload()} type="button">重新加载页面</button></section></div>;
     return this.props.children;
   }
 }
@@ -226,8 +226,8 @@ function BackupPanelContent() {
         ? "名称只用于面板显示和下载文件名，不会修改归档内容。"
       : "删除后无法从面板恢复。请确认这不是你需要保留的存档版本。";
 
-  return <main className="backup-page" id="main">
-    <div className="settings-toolbar"><a className="settings-back" href="/">← 返回指挥台</a><ThemeToggle /></div>
+  return <div className="backup-page">
+    <div className="settings-toolbar"><ThemeToggle /></div>
     <section className="backup-hero" aria-labelledby="backup-title">
       <div><p className="eyebrow">WORLD SAVE · NATIVE HOST</p><h1 id="backup-title">存档与备份</h1><p>备份由 Ubuntu 宿主机执行，涵盖完整 <code>SaveGames</code> 世界目录。每次恢复前都会先自动保护当前版本。</p></div>
       <div className="backup-hero-mark"><PalIcon name="backup" /><strong>{backups.length}</strong><small>可用备份</small></div>
@@ -246,5 +246,5 @@ function BackupPanelContent() {
     </section>
     {log && <details className="backup-log"><summary>查看本次操作日志</summary><pre>{log}</pre></details>}
     {pending && <div aria-labelledby="backup-confirmation-title" aria-modal="true" className="confirmation-scrim" role="dialog"><section className="confirmation-dialog backup-confirmation"><p className="eyebrow">CONFIRM SAVE OPERATION</p><h2 id="backup-confirmation-title">{title}</h2><p>{detail}</p>{(pending.kind === "create" || pending.kind === "rename" || pending.kind === "import") && <label className="backup-name-field">备份名称<input autoFocus maxLength={80} onChange={(event) => setDraftName(event.target.value)} value={draftName} /></label>}{pending.kind === "import" && <label className="backup-name-field">世界备份包<input accept=".tar.gz,application/gzip" aria-describedby="backup-import-help" onChange={(event) => setImportFile(event.target.files?.[0] ?? null)} type="file" /><small id="backup-import-help">仅支持从面板下载，或自行打包为 <code>SaveGames/…</code> 结构的 .tar.gz 文件。</small></label>}{pending.kind === "restore-confirm" && <label className="backup-name-field">请输入“恢复”确认<input autoFocus autoComplete="off" onChange={(event) => setRestoreConfirmation(event.target.value)} value={restoreConfirmation} /></label>}{hasBackup(pending) && <dl><div><dt>目标备份</dt><dd>{pending.backup.name}</dd></div><div><dt>创建时间</dt><dd>{date(pending.backup.created_at)}</dd></div></dl>}<div className="dialog-actions"><button autoFocus={pending.kind === "restore-review" || pending.kind === "delete"} className="button button-secondary" onClick={() => setPending(null)} type="button">{pending.kind === "restore-confirm" ? "取消恢复" : "取消"}</button>{pending.kind === "restore-review" && hasBackup(pending) ? <button className="button button-primary" onClick={() => { setRestoreConfirmation(""); setPending({ kind: "restore-confirm", backup: pending.backup }); }} type="button">继续确认</button> : <button className={pending.kind === "delete" ? "button button-danger" : "button button-primary"} disabled={(pending.kind === "create" || pending.kind === "rename" || pending.kind === "import") && !draftName.trim() || pending.kind === "import" && !importFile || pending.kind === "restore-confirm" && restoreConfirmation.trim() !== "恢复"} onClick={() => void execute()} type="button">{pending.kind === "create" ? "确认备份" : pending.kind === "import" ? "上传并导入" : pending.kind === "restore-confirm" ? "确认恢复并重启服务" : pending.kind === "rename" ? "保存名称" : "确认删除"}</button>}</div></section></div>}
-  </main>;
+  </div>;
 }

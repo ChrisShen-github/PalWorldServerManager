@@ -3,6 +3,7 @@ import SettingsPanel from "./SettingsPanel";
 import BackupPanel from "./BackupPanel";
 import OperationLogPanel from "./OperationLogPanel";
 import CompanionPanel from "./CompanionPanel";
+import { PageShell } from "./PageShell";
 import { PalIcon, type PalIconName } from "./PalIcons";
 import ThemeToggle from "./ThemeToggle";
 import "./dashboard-overrides.css";
@@ -88,9 +89,9 @@ function nativeService(host: HostStatus) {
 }
 
 export default function App() {
-  if (new URLSearchParams(location.search).get("view") === "settings") return <SettingsPanel />;
-  if (new URLSearchParams(location.search).get("view") === "backups") return <BackupPanel />;
-  if (new URLSearchParams(location.search).get("view") === "operations") return <OperationLogPanel />;
+  if (new URLSearchParams(location.search).get("view") === "settings") return <PageShell active="settings" mainClassName="page-shell-main"><SettingsPanel /></PageShell>;
+  if (new URLSearchParams(location.search).get("view") === "backups") return <PageShell active="backups" mainClassName="page-shell-main"><BackupPanel /></PageShell>;
+  if (new URLSearchParams(location.search).get("view") === "operations") return <PageShell active="operations" mainClassName="page-shell-main"><OperationLogPanel /></PageShell>;
   if (new URLSearchParams(location.search).get("view") === "paldex") return <CompanionPanel view="paldex" />;
   if (new URLSearchParams(location.search).get("view") === "paldex-detail") return <CompanionPanel view="paldex-detail" />;
   if (new URLSearchParams(location.search).get("view") === "map") return <CompanionPanel view="map" />;
@@ -134,20 +135,7 @@ export default function App() {
   const native = nativeService(host);
   const restLabel = overview.status === "online" ? "REST 已连接" : overview.status === "demo" ? "演示模式" : "REST 未连接";
 
-  return <div className="shell">
-    <aside>
-      <div className="brand"><b className="brand-mark"><PalIcon name="sphere" /></b><span><strong>PALWORLD</strong><small>SERVER MANAGER</small></span></div>
-      <nav>
-        <button aria-current="page" className="active"><PalIcon className="nav-icon" name="dashboard" /><span>指挥台</span></button>
-        <button onClick={() => { location.href = "?view=paldex"; }}><PalIcon className="nav-icon" name="paldex" /><span>帕鲁图鉴</span></button>
-        <button onClick={() => { location.href = "?view=map"; }}><PalIcon className="nav-icon" name="map" /><span>世界地图</span></button>
-        <button onClick={() => { location.href = "?view=backups"; }}><PalIcon className="nav-icon" name="backup" /><span>存档与备份</span></button>
-        <button onClick={() => { location.href = "?view=operations"; }}><PalIcon className="nav-icon" name="logs" /><span>运行日志</span></button>
-        <button onClick={() => { location.href = "?view=settings"; }}><PalIcon className="nav-icon" name="settings" /><span>世界规则与安装</span></button>
-      </nav>
-      <footer>原生 SteamCMD · Docker 面板</footer>
-    </aside>
-    <main id="main">
+  return <PageShell active="dashboard">
       <header>
         <div className="crumb">服务器管理　/　<strong>指挥台</strong></div>
         <div className="pal-header-actions">
@@ -197,8 +185,7 @@ export default function App() {
           <button onClick={() => { location.href = "?view=settings"; }}>{host.service_installed === false ? "开始安装" : "管理服务器"}</button>
         </article>
       </section>
-    </main>
-  </div>;
+  </PageShell>;
 }
 
 function Metric({ icon, l, v, d }: { icon: PalIconName; l: string; v: string; d: string }) {
