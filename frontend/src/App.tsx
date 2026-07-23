@@ -3,6 +3,7 @@ import SettingsPanel from "./SettingsPanel";
 import BackupPanel from "./BackupPanel";
 import OperationLogPanel from "./OperationLogPanel";
 import CompanionPanel from "./CompanionPanel";
+import GameManagementPanel from "./GameManagementPanel";
 import { PageShell } from "./PageShell";
 import { PalIcon, type PalIconName } from "./PalIcons";
 import ThemeToggle from "./ThemeToggle";
@@ -89,6 +90,7 @@ function nativeService(host: HostStatus) {
 }
 
 export default function App() {
+  if (new URLSearchParams(location.search).get("view") === "game") return <PageShell active="game" mainClassName="page-shell-main"><GameManagementPanel /></PageShell>;
   if (new URLSearchParams(location.search).get("view") === "settings") return <PageShell active="settings" mainClassName="page-shell-main"><SettingsPanel /></PageShell>;
   if (new URLSearchParams(location.search).get("view") === "backups") return <PageShell active="backups" mainClassName="page-shell-main"><BackupPanel /></PageShell>;
   if (new URLSearchParams(location.search).get("view") === "operations") return <PageShell active="operations" mainClassName="page-shell-main"><OperationLogPanel /></PageShell>;

@@ -2,10 +2,11 @@ import { type ReactNode } from "react";
 import { PalIcon, type PalIconName } from "./PalIcons";
 import "./page-shell.css";
 
-export type PageView = "dashboard" | "paldex" | "map" | "backups" | "operations" | "settings";
+export type PageView = "dashboard" | "game" | "paldex" | "map" | "backups" | "operations" | "settings";
 
 const navigation: Array<{ view: PageView; label: string; icon: PalIconName; href: string }> = [
   { view: "dashboard", label: "指挥台", icon: "dashboard", href: "/" },
+  { view: "game", label: "游戏内管理", icon: "game", href: "?view=game" },
   { view: "paldex", label: "帕鲁图鉴", icon: "paldex", href: "?view=paldex" },
   { view: "map", label: "世界地图", icon: "map", href: "?view=map" },
   { view: "backups", label: "存档与备份", icon: "backup", href: "?view=backups" },

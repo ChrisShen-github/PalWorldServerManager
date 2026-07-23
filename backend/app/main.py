@@ -113,6 +113,43 @@ class BackupScheduleInput(BaseModel):
     minute: int = Field(default=0, ge=0, le=59)
 
 
+def _checked_game_user_id(value: str) -> str:
+    user_id = value.strip()
+    if not user_id or len(user_id) > 128 or any(character.isspace() or ord(character) < 32 for character in user_id):
+        raise ValueError("训练家 ID 格式无效。")
+    return user_id
+
+
+class GameMessageInput(BaseModel):
+    message: str
+
+    @field_validator("message")
+    @classmethod
+    def valid_message(cls, value: str) -> str:
+        message = value.strip()
+        if not message or len(message) > 280 or "\x00" in message:
+            raise ValueError("消息需为 1 到 280 个字符，且不能包含空字符。")
+        return message
+
+
+class GamePlayerActionInput(GameMessageInput):
+    user_id: str
+
+    @field_validator("user_id")
+    @classmethod
+    def valid_user_id(cls, value: str) -> str:
+        return _checked_game_user_id(value)
+
+
+class GameUnbanInput(BaseModel):
+    user_id: str
+
+    @field_validator("user_id")
+    @classmethod
+    def valid_user_id(cls, value: str) -> str:
+        return _checked_game_user_id(value)
+
+
 def _demo_overview() -> ServerOverview:
     return ServerOverview(
         status="demo",
@@ -213,6 +250,35 @@ async def _fetch_overview(settings: Settings) -> ServerOverview:
     )
 
 
+async def _game_action(endpoint: Literal["announce", "kick", "ban", "unban", "save"], payload: dict[str, str] | None = None) -> dict[str, str]:
+    """Proxy the small allow-list of official game-control endpoints.
+
+    REST credentials remain in the panel's server-side settings database and
+    are never returned to the browser.
+    """
+    settings = store.get()
+    if settings.demo_mode:
+        raise HTTPException(status_code=409, detail="演示模式下不能执行游戏内管理操作。")
+    if not settings.rest_password:
+        raise HTTPException(status_code=409, detail="请先在世界规则与安装中设置 REST 管理员密码。")
+    labels = {"announce": "公告", "kick": "踢出", "ban": "封禁", "unban": "解除封禁", "save": "保存世界"}
+    try:
+        async with httpx.AsyncClient(
+            base_url=_rest_api_base(settings.rest_url),
+            auth=(settings.rest_username, settings.rest_password),
+            timeout=httpx.Timeout(10.0, connect=2.0),
+        ) as client:
+            response = await client.post(endpoint, json=payload) if payload is not None else await client.post(endpoint)
+            response.raise_for_status()
+    except httpx.HTTPStatusError as error:
+        if error.response.status_code == 401:
+            raise HTTPException(status_code=401, detail="Palworld REST API 拒绝了管理员凭据，请重新保存管理员密码。") from error
+        raise HTTPException(status_code=502, detail=f"Palworld REST API 未完成{labels[endpoint]}操作（HTTP {error.response.status_code}）。") from error
+    except httpx.HTTPError as error:
+        raise HTTPException(status_code=502, detail=f"无法连接 Palworld REST API 执行{labels[endpoint]}：{error.__class__.__name__}") from error
+    return {"message": f"{labels[endpoint]}操作已发送到游戏服务器。"}
+
+
 @app.get("/api/health")
 async def health() -> dict[str, str]:
     return {"status": "ok"}
@@ -224,6 +290,31 @@ async def server_overview() -> ServerOverview:
     if settings.demo_mode:
         return _demo_overview()
     return await _fetch_overview(settings)
+
+
+@app.post("/api/game/announce")
+async def game_announce(value: GameMessageInput) -> dict[str, str]:
+    return await _game_action("announce", {"message": value.message})
+
+
+@app.post("/api/game/save")
+async def game_save() -> dict[str, str]:
+    return await _game_action("save")
+
+
+@app.post("/api/game/kick")
+async def game_kick(value: GamePlayerActionInput) -> dict[str, str]:
+    return await _game_action("kick", {"userid": value.user_id, "message": value.message})
+
+
+@app.post("/api/game/ban")
+async def game_ban(value: GamePlayerActionInput) -> dict[str, str]:
+    return await _game_action("ban", {"userid": value.user_id, "message": value.message})
+
+
+@app.post("/api/game/unban")
+async def game_unban(value: GameUnbanInput) -> dict[str, str]:
+    return await _game_action("unban", {"userid": value.user_id})
 
 
 @app.get("/api/settings", response_model=SettingsInput)
