@@ -4,11 +4,12 @@ from datetime import datetime, timezone
 import asyncio
 import json
 import re
+import uuid
 from pathlib import Path
 from typing import Literal
 
 import httpx
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field, field_validator
 
@@ -60,6 +61,8 @@ SERVICE_STATES = {"active", "inactive", "failed", "activating", "deactivating"}
 SYSTEMD_ACTIVE_RE = re.compile(r"(?:^|\n)\s*Active:\s+(active|inactive|failed|activating|deactivating)\b")
 BACKUP_ID_RE = re.compile(r"^world-\d{8}T\d{6}(?:\d{6})?Z\.tar\.gz$")
 BACKUPS_DIR = Path("/backups")
+BACKUP_IMPORTS_DIR = Path("/var/lib/palworld-manager/imports")
+MAX_BACKUP_IMPORT_BYTES = 16 * 1024 * 1024 * 1024
 
 
 class SettingsInput(BaseModel):
@@ -404,6 +407,48 @@ async def operations() -> dict[str, object]:
 @app.put("/api/backups/schedule")
 async def put_backup_schedule(value: BackupScheduleInput) -> dict[str, object]:
     return await _agent("set_backup_schedule", value.model_dump())
+
+
+@app.post("/api/backups/import/stream")
+async def import_backup_stream(name: str = Form(...), archive: UploadFile = File(...)) -> StreamingResponse:
+    """Stage an uploaded archive in the manager data volume for host-agent validation.
+
+    The host agent only receives an opaque generated identifier, never a browser
+    filename or a caller-controlled host path.
+    """
+    try:
+        display_name = BackupNameInput(name=name).name
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+    filename = archive.filename or ""
+    if not filename.lower().endswith(".tar.gz"):
+        raise HTTPException(status_code=422, detail="仅支持 .tar.gz 格式的世界备份包。")
+
+    BACKUP_IMPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    import_id = f"{uuid.uuid4().hex}.tar.gz"
+    staged = BACKUP_IMPORTS_DIR / import_id
+    received = 0
+    try:
+        with staged.open("xb") as target:
+            while chunk := await archive.read(1024 * 1024):
+                received += len(chunk)
+                if received > MAX_BACKUP_IMPORT_BYTES:
+                    raise HTTPException(status_code=413, detail="导入包超过 16 GB 限制。")
+                target.write(chunk)
+    except Exception:
+        staged.unlink(missing_ok=True)
+        raise
+    finally:
+        await archive.close()
+
+    async def events():
+        try:
+            async for event in _agent_stream("import_backup", {"import_id": import_id, "name": display_name}):
+                yield event
+        finally:
+            staged.unlink(missing_ok=True)
+
+    return StreamingResponse(events(), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
 
 @app.post("/api/backups/create/stream")

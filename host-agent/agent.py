@@ -26,11 +26,16 @@ SERVICE = "palworld-server.service"
 # recovery points beside compose.yaml so they remain visible and portable.
 MANAGER_ROOT = Path(__file__).resolve().parent.parent
 BACKUP_ROOT = MANAGER_ROOT / "backups"
+BACKUP_IMPORT_ROOT = MANAGER_ROOT / "data" / "imports"
 OPERATION_LOG_ROOT = MANAGER_ROOT / "logs"
 OPERATION_LOG_FILE = OPERATION_LOG_ROOT / "operations.json"
 MAX_OPERATION_LOG_RECORDS = 120
 BACKUP_ID_RE = re.compile(r"^world-\d{8}T\d{6}(?:\d{6})?Z\.tar\.gz$")
+BACKUP_IMPORT_ID_RE = re.compile(r"^[0-9a-f]{32}\.tar\.gz$")
 MAX_MANAGED_BACKUPS = 12
+MAX_BACKUP_IMPORT_BYTES = 16 * 1024 * 1024 * 1024
+MAX_BACKUP_IMPORT_UNPACKED_BYTES = 64 * 1024 * 1024 * 1024
+MAX_BACKUP_IMPORT_MEMBERS = 200_000
 # China has no daylight-saving time. A fixed offset avoids requiring the
 # optional tzdata package when the agent is smoke-tested on Windows.
 CHINA_TZ = timezone(timedelta(hours=8), name="Asia/Shanghai")
@@ -129,6 +134,7 @@ OPERATION_LABELS = {
     "stop": "停止服务器",
     "restart": "重启服务器",
     "create_backup": "创建世界备份",
+    "import_backup": "导入世界备份",
     "restore_backup": "恢复世界存档",
     "scheduled_backup": "自动创建世界备份",
 }
@@ -343,6 +349,12 @@ def backup_path(backup_id: str) -> Path:
     return BACKUP_ROOT / backup_id
 
 
+def backup_import_path(import_id: str) -> Path:
+    if not BACKUP_IMPORT_ID_RE.fullmatch(import_id):
+        raise ValueError("导入文件标识无效")
+    return BACKUP_IMPORT_ROOT / import_id
+
+
 def backup_metadata_path() -> Path:
     return BACKUP_ROOT / "metadata.json"
 
@@ -493,6 +505,61 @@ def create_backup(server: Path, name: object = None, output: Callable[[str], Non
         if was_running:
             emit(output, "正在重新启动 Palworld 服务…")
             run("systemctl", "start", SERVICE, output=output)
+
+
+def validate_backup_archive(archive: Path) -> None:
+    """Validate an import before it can join the managed recovery-point library."""
+    if not archive.is_file() or archive.stat().st_size <= 0:
+        raise ValueError("导入包不存在或为空")
+    if archive.stat().st_size > MAX_BACKUP_IMPORT_BYTES:
+        raise ValueError("导入包超过 16 GB 限制")
+    members = 0
+    unpacked_bytes = 0
+    contains_save_games = False
+    with tarfile.open(archive, "r:gz") as bundle:
+        for member in bundle:
+            members += 1
+            if members > MAX_BACKUP_IMPORT_MEMBERS:
+                raise ValueError("导入包文件数量过多")
+            path = Path(member.name)
+            if path.is_absolute() or ".." in path.parts or member.issym() or member.islnk() or not (member.isfile() or member.isdir()):
+                raise ValueError("导入包包含不安全路径")
+            if member.name == "SaveGames" or member.name.startswith("SaveGames/"):
+                contains_save_games = True
+            else:
+                raise ValueError("导入包必须以 SaveGames 目录为根目录")
+            unpacked_bytes += member.size
+            if unpacked_bytes > MAX_BACKUP_IMPORT_UNPACKED_BYTES:
+                raise ValueError("导入包解压后超过 64 GB 限制")
+    if not contains_save_games:
+        raise ValueError("导入包中不包含 SaveGames 根目录")
+
+
+def import_backup(import_id: str, name: object, output: Callable[[str], None] | None = None) -> dict[str, object]:
+    source = backup_import_path(import_id)
+    archive: Path | None = None
+    temporary: Path | None = None
+    try:
+        emit(output, "正在校验导入的世界备份包…")
+        validate_backup_archive(source)
+        BACKUP_ROOT.mkdir(parents=True, exist_ok=True)
+        stamp = china_backup_stamp(datetime.now(CHINA_TZ))
+        archive = backup_path(f"world-{stamp}.tar.gz")
+        temporary = archive.with_suffix(".tar.gz.partial")
+        emit(output, "正在写入宿主机备份库…")
+        shutil.copyfile(source, temporary)
+        os.replace(temporary, archive)
+        metadata = read_backup_metadata()
+        metadata[archive.name] = clean_backup_name(name)
+        write_backup_metadata(metadata)
+        prune_backups(output)
+        record = next(item for item in backup_records() if item["id"] == archive.name)
+        emit(output, f"存档已导入：{archive.name}")
+        return {"message": "存档已导入，可在恢复点列表中恢复。", "backup": record, "retention": MAX_MANAGED_BACKUPS}
+    finally:
+        if temporary:
+            temporary.unlink(missing_ok=True)
+        source.unlink(missing_ok=True)
 
 
 def safe_extract(bundle: tarfile.TarFile, destination: Path) -> None:
@@ -873,6 +940,7 @@ def operate(action: str, payload: dict[str, object], output: Callable[[str], Non
     if action == "list_operation_logs": return list_operation_logs()
     if action == "set_backup_schedule": return apply_backup_schedule(payload)
     if action == "create_backup": return create_backup(checked_path(str(payload["server_path"])), payload.get("name"), output)
+    if action == "import_backup": return import_backup(str(payload.get("import_id", "")), payload.get("name"), output)
     if action == "restore_backup": return restore_backup(checked_path(str(payload["server_path"])), str(payload.get("backup_id", "")), payload.get("confirmed") is True, output)
     if action == "delete_backup": return delete_backup(str(payload.get("backup_id", "")), payload.get("confirmed") is True)
     if action == "rename_backup": return rename_backup(str(payload.get("backup_id", "")), payload.get("name"))
@@ -934,7 +1002,7 @@ async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> 
     try:
         payload = json.loads((await reader.readline()).decode())
         action = payload.get("action")
-        if action not in {"status", "monitor", "install", "update", "start", "stop", "restart", "get_config", "set_config", "list_backups", "list_operation_logs", "set_backup_schedule", "create_backup", "restore_backup", "delete_backup", "rename_backup"}:
+        if action not in {"status", "monitor", "install", "update", "start", "stop", "restart", "get_config", "set_config", "list_backups", "list_operation_logs", "set_backup_schedule", "create_backup", "import_backup", "restore_backup", "delete_backup", "rename_backup"}:
             raise ValueError("不允许的操作")
         streaming = bool(payload.get("stream"))
         async with OPERATION_LOCK:

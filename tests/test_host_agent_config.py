@@ -114,6 +114,28 @@ class HostAgentConfigTests(unittest.TestCase):
             self.assertIsNotNone(restored["safety_backup"])
             self.assertEqual(len(list(backup_root.glob("world-*.tar.gz"))), 2)
 
+    def test_imported_world_backup_is_validated_and_added_to_recovery_points(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            server = Path(directory) / "palserver"
+            saves = server / "Pal" / "Saved" / "SaveGames" / "0" / "WORLD"
+            saves.mkdir(parents=True)
+            (saves / "Level.sav").write_text("world", encoding="utf-8")
+            backup_root = Path(directory) / "runtime" / "backups"
+            import_root = Path(directory) / "runtime" / "data" / "imports"
+            import_root.mkdir(parents=True)
+
+            with patch.object(AGENT, "BACKUP_ROOT", backup_root), patch.object(AGENT, "BACKUP_IMPORT_ROOT", import_root), patch.object(AGENT, "status", return_value="inactive"):
+                created = AGENT.create_backup(server, "导出源")
+                source = backup_root / created["backup"]["id"]
+                import_id = "a" * 32 + ".tar.gz"
+                uploaded = import_root / import_id
+                uploaded.write_bytes(source.read_bytes())
+                imported = AGENT.import_backup(import_id, "外部世界存档")
+
+            self.assertEqual(imported["backup"]["name"], "外部世界存档")
+            self.assertTrue((backup_root / imported["backup"]["id"]).is_file())
+            self.assertFalse(uploaded.exists())
+
     def test_backup_identifiers_do_not_allow_path_traversal(self) -> None:
         with self.assertRaisesRegex(ValueError, "备份标识"):
             AGENT.backup_path("../../PalWorldSettings.ini")
