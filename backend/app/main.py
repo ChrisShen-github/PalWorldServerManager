@@ -204,10 +204,13 @@ def _rest_api_base(url: str) -> str:
 
 def _masked_ip(value: str) -> str:
     """Return a useful but privacy-preserving representation of a player IP."""
+    normalized = value.strip()
+    if not normalized:
+        return "游戏接口未提供"
     try:
-        address = ipaddress.ip_address(value)
+        address = ipaddress.ip_address(normalized)
     except ValueError:
-        return "—"
+        return "游戏接口格式未知"
     if address.version == 4:
         parts = address.exploded.split(".")
         return ".".join([*parts[:3], "*"])

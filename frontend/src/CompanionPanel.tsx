@@ -168,13 +168,37 @@ function pointPosition(map: MapCatalog, x: number, y: number) {
   };
 }
 
+// The official REST API exposes Unreal world units, not the longitude/latitude
+// values used by the saved map tiles. These are the playable-world edges from
+// Palworld's WorldMapUIData; Y is horizontal on the in-game map and X is vertical.
+const PALWORLD_WORLD_BOUNDS = {
+  minX: -999940,
+  maxX: 447900,
+  minY: -738920,
+  maxY: 708920,
+};
+
+function gameWorldMapPoint(x: number, y: number) {
+  const horizontal = Math.min(1, Math.max(0, (y - PALWORLD_WORLD_BOUNDS.minY) / (PALWORLD_WORLD_BOUNDS.maxY - PALWORLD_WORLD_BOUNDS.minY)));
+  const vertical = Math.min(1, Math.max(0, (PALWORLD_WORLD_BOUNDS.maxX - x) / (PALWORLD_WORLD_BOUNDS.maxX - PALWORLD_WORLD_BOUNDS.minX)));
+  return { horizontal, vertical };
+}
+
+function gameWorldPosition(x: number, y: number) {
+  const point = gameWorldMapPoint(x, y);
+  return { left: `${point.horizontal * 100}%`, top: `${point.vertical * 100}%` };
+}
+
 function WorldMap() {
   const { map, error } = useMapCatalog();
   const mapQuery = new URLSearchParams(location.search);
   const focusedTrainer = mapQuery.get("trainer")?.slice(0, 80) ?? "";
-  const focusedX = Number(mapQuery.get("x"));
-  const focusedY = Number(mapQuery.get("y"));
+  const focusedXValue = mapQuery.get("x");
+  const focusedYValue = mapQuery.get("y");
+  const focusedX = focusedXValue === null ? Number.NaN : Number(focusedXValue);
+  const focusedY = focusedYValue === null ? Number.NaN : Number(focusedYValue);
   const hasFocusedTrainer = Boolean(focusedTrainer) && Number.isFinite(focusedX) && Number.isFinite(focusedY);
+  const focusedPoint = useMemo(() => hasFocusedTrainer ? gameWorldMapPoint(focusedX, focusedY) : null, [focusedX, focusedY, hasFocusedTrainer]);
   const viewportRef = useRef<HTMLDivElement>(null);
   const scalerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -222,16 +246,15 @@ function WorldMap() {
     });
   }, [map, mapHeight, mapWidth]);
   useEffect(() => {
-    if (!map || !viewportRef.current || !hasFocusedTrainer) return;
+    if (!map || !viewportRef.current || !focusedPoint) return;
     const viewport = viewportRef.current;
-    const { west, east, south, north } = map.bounds;
-    const x = Math.min(mapWidth, Math.max(0, ((focusedX - west) / (east - west)) * mapWidth));
-    const y = Math.min(mapHeight, Math.max(0, ((north - focusedY) / (north - south)) * mapHeight));
+    const x = focusedPoint.horizontal * mapWidth;
+    const y = focusedPoint.vertical * mapHeight;
     requestAnimationFrame(() => {
       viewport.scrollLeft = Math.max(0, x * zoomRef.current - viewport.clientWidth / 2);
       viewport.scrollTop = Math.max(0, y * zoomRef.current - viewport.clientHeight / 2);
     });
-  }, [focusedX, focusedY, hasFocusedTrainer, map, mapHeight, mapWidth]);
+  }, [focusedPoint, map, mapHeight, mapWidth]);
   useEffect(() => () => {
     if (wheelFrameRef.current !== null) cancelAnimationFrame(wheelFrameRef.current);
     if (zoomCommitRef.current !== null) window.clearTimeout(zoomCommitRef.current);
@@ -327,7 +350,7 @@ function WorldMap() {
   return <><CompanionHeader crumb="世界地图" action={<><span className="companion-count"><PalIcon name="map" />离线地图 · {map?.landmarks.length ?? "—"} 个点位</span><span className="data-source-mark">点位来源 · {map?.source.provider ?? "游民星空"}</span></>} />
     <section className="companion-hero panel map-hero"><div><p className="eyebrow">WORLD MAP · LOCAL DATA SNAPSHOT</p><h1>世界地图</h1><p>本地保存底图、区域、分类图标和全部点位。加载、筛选与查看标记均不依赖外部 iframe 或第三方 Cookie。</p><p className="source-caption">底图与地图点位来源：{map?.source.provider ?? "游民星空"}</p></div><div className="companion-hero-mark"><PalIcon name="map" /><small>{map?.source.updated_at ? `地图更新 · ${map.source.updated_at}` : "本地地图快照"}</small></div></section>
     {error ? <section className="companion-error">{error}</section> : !map ? <section className="companion-loading">正在装载离线世界地图…</section> : <section className="map-layout">
-      <aside className="map-filter panel"><p className="eyebrow">MAP MARKERS</p><h2>地图标点</h2><p className="map-filter-help">选择要在地图上显示的类型；默认开启地点标记。</p>{hasFocusedTrainer && <section className="map-player-focus"><p className="eyebrow">LIVE TRAINER</p><strong>{focusedTrainer}</strong><small>实时坐标 X {focusedX.toFixed(1)} · Y {focusedY.toFixed(1)}</small></section>}<div className="map-filter-actions"><button type="button" onClick={selectAllCategories}>全选标点</button><button type="button" onClick={() => { setSelectedCategoryIds([]); setSelectedId(null); }}>清空标点</button></div>{groupedCategories.map((group) => { const populated = group.items.filter((category) => (categoryCounts.get(category.id) ?? 0) > 0); const allSelected = populated.length > 0 && populated.every((category) => selectedCategorySet.has(category.id)); return <section className="marker-group" key={group.name}><header><h3>{group.name}</h3><button type="button" disabled={!populated.length} onClick={() => toggleGroup(group.items)}>{allSelected ? "取消全选" : "全选"}</button></header><div>{group.items.map((category) => { const count = categoryCounts.get(category.id) ?? 0; const checked = selectedCategorySet.has(category.id); return <label className={`map-category ${checked ? "selected" : ""} ${!count ? "empty" : ""}`} key={category.id}><input type="checkbox" checked={checked} disabled={!count} onChange={() => toggleCategory(category.id)} /><span className="map-category-icon">{category.icon ? <img src={category.icon} alt="" /> : <PalIcon name="map" />}</span><span>{category.name}</span><b>{count || "—"}</b></label>; })}</div></section>; })}<footer>点位来源：{map.source.provider ?? "游民星空"}</footer>{selected && <section className="map-selected map-filter-selected"><p className="eyebrow">SELECTED MARKER · 游民星空</p><h3>{selected.name}</h3><small>{selected.group} · {selected.category}</small>{selected.description && <p>{selected.description.replace(/<[^>]*>/g, " ")}</p>}</section>}</aside>
+      <aside className="map-filter panel"><p className="eyebrow">MAP MARKERS</p><h2>地图标点</h2><p className="map-filter-help">选择要在地图上显示的类型；默认开启地点标记。</p>{hasFocusedTrainer && <section className="map-player-focus"><p className="eyebrow">LIVE TRAINER</p><strong>{focusedTrainer}</strong><small>游戏坐标 X {focusedX.toFixed(1)} · Y {focusedY.toFixed(1)}</small><em>已换算至当前离线地图</em></section>}<div className="map-filter-actions"><button type="button" onClick={selectAllCategories}>全选标点</button><button type="button" onClick={() => { setSelectedCategoryIds([]); setSelectedId(null); }}>清空标点</button></div>{groupedCategories.map((group) => { const populated = group.items.filter((category) => (categoryCounts.get(category.id) ?? 0) > 0); const allSelected = populated.length > 0 && populated.every((category) => selectedCategorySet.has(category.id)); return <section className="marker-group" key={group.name}><header><h3>{group.name}</h3><button type="button" disabled={!populated.length} onClick={() => toggleGroup(group.items)}>{allSelected ? "取消全选" : "全选"}</button></header><div>{group.items.map((category) => { const count = categoryCounts.get(category.id) ?? 0; const checked = selectedCategorySet.has(category.id); return <label className={`map-category ${checked ? "selected" : ""} ${!count ? "empty" : ""}`} key={category.id}><input type="checkbox" checked={checked} disabled={!count} onChange={() => toggleCategory(category.id)} /><span className="map-category-icon">{category.icon ? <img src={category.icon} alt="" /> : <PalIcon name="map" />}</span><span>{category.name}</span><b>{count || "—"}</b></label>; })}</div></section>; })}<footer>点位来源：{map.source.provider ?? "游民星空"}</footer>{selected && <section className="map-selected map-filter-selected"><p className="eyebrow">SELECTED MARKER · 游民星空</p><h3>{selected.name}</h3><small>{selected.group} · {selected.category}</small>{selected.description && <p>{selected.description.replace(/<[^>]*>/g, " ")}</p>}</section>}</aside>
       <section className="world-map panel">
         <div className="map-toolbar"><div><small>当前显示</small><strong>{markers.length} 个标记</strong></div><div className="map-toolbar-actions"><span className="map-drag-hint">滚轮缩放 · 左键拖动</span><div className="map-zoom-controls" role="group" aria-label="地图缩放"><button type="button" onClick={() => applyMapZoom(zoomRef.current / 1.3)} aria-label="缩小地图">缩小</button><output aria-live="polite">{Math.round(mapZoom * 100)}%</output><button type="button" onClick={() => applyMapZoom(zoomRef.current * 1.3)} aria-label="放大地图">放大</button><button type="button" onClick={() => applyMapZoom(0.5)} aria-label="复位地图缩放">复位</button></div></div></div>
         <div className="offline-map-shell">
@@ -336,7 +359,7 @@ function WorldMap() {
             <div ref={canvasRef} className="offline-map-canvas" style={{ width: mapWidth, height: mapHeight, transform: "translate3d(0, 0, 0) scale(0.5)" }}>
               <div className="offline-map-tiles" style={{ gridTemplateColumns: `repeat(${map.tile.xEnd - map.tile.xStart + 1}, ${map.tile.size}px)` }}>{tiles.map((tile) => <img key={tile.key} src={tile.src} alt="" draggable={false} loading="lazy" />)}</div>
               {map.areas.map((area) => <span className="map-area-label" key={area.name} style={pointPosition(map, area.x, area.y)}>{area.name}</span>)}
-              {hasFocusedTrainer && <span aria-label={`${focusedTrainer} 的实时位置`} className="map-player-marker" style={pointPosition(map, focusedX, focusedY)}><PalIcon name="trainers" /><b>{focusedTrainer}</b></span>}
+              {hasFocusedTrainer && <span aria-label={`${focusedTrainer} 的实时位置`} className="map-player-marker" style={gameWorldPosition(focusedX, focusedY)}><PalIcon name="trainers" /><b>{focusedTrainer}</b></span>}
               {markers.map((marker) => { const category = categories.find((item) => item.id === marker.category_id); return <button className={`map-marker ${selected?.id === marker.id ? "selected" : ""}`} key={marker.id} style={pointPosition(map, marker.x, marker.y)} onPointerDown={(event) => event.stopPropagation()} onClick={() => setSelectedId(marker.id)} aria-label={`${marker.category}：${marker.name}，点位来源游民星空`} title={marker.name}>{category?.icon ? <img src={category.icon} alt="" /> : <i />}</button>; })}
             </div>
             </div>

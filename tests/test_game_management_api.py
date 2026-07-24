@@ -32,7 +32,8 @@ class GameManagementInputTests(unittest.TestCase):
     def test_player_ip_is_masked_before_returning_to_browser(self) -> None:
         self.assertEqual(_masked_ip("192.168.1.88"), "192.168.1.*")
         self.assertEqual(_masked_ip("2001:db8:abcd:12::42"), "2001:0db8:abcd:0012:****:****:****:****")
-        self.assertEqual(_masked_ip("not-an-ip"), "—")
+        self.assertEqual(_masked_ip(""), "游戏接口未提供")
+        self.assertEqual(_masked_ip("not-an-ip"), "游戏接口格式未知")
 
 
 if __name__ == "__main__":

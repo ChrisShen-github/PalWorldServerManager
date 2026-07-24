@@ -66,7 +66,7 @@ export default function PlayerDetailsDialog({ player, onClose }: { player: Onlin
       </dl>
       <button className="player-details-map" disabled={!canLocate} onClick={openMap} type="button">在世界地图定位</button>
       <p aria-live="polite" className="player-details-feedback">{feedback}</p>
-      <p className="player-details-privacy">连接 IP 已由面板脱敏；完整 IP 不会发送到浏览器。</p>
+      <p className="player-details-privacy">{player.ip_address === "游戏接口未提供" ? "当前帕鲁服务端没有返回该训练家的 IP；面板不会尝试从其他渠道收集它。" : "连接 IP 已由面板脱敏；完整 IP 不会发送到浏览器。"}</p>
       <footer><button autoFocus className="button button-secondary" onClick={onClose} type="button">关闭详情</button></footer>
     </section>
   </div>;
