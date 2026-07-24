@@ -6,8 +6,11 @@ import CompanionPanel from "./CompanionPanel";
 import GameManagementPanel from "./GameManagementPanel";
 import { PageShell } from "./PageShell";
 import { PalIcon, type PalIconName } from "./PalIcons";
+import PlayerDetailsDialog from "./PlayerDetailsDialog";
 import ThemeToggle from "./ThemeToggle";
+import type { OnlinePlayer } from "./onlinePlayer";
 import "./dashboard-overrides.css";
+import "./dashboard-player-details.css";
 import "./monitoring.css";
 
 type Overview = {
@@ -16,7 +19,7 @@ type Overview = {
   message: string;
   server: { version: string; name: string; description: string; world_guid: string };
   metrics: { server_fps: number; frame_time_ms: number; current_players: number; max_players: number; uptime_seconds: number; base_camps: number; world_days: number };
-  players: Array<{ name: string; account_name: string; player_id: string; ping: number; level: number; building_count: number }>;
+  players: OnlinePlayer[];
 };
 
 type HostStatus = {
@@ -127,6 +130,7 @@ export default function App() {
   const [hostOperation, setHostOperation] = useState<DashboardOperation | null>(null);
   const [confirmingOperation, setConfirmingOperation] = useState<Exclude<DashboardOperation, "start"> | null>(null);
   const [hostFeedback, setHostFeedback] = useState("");
+  const [selectedPlayer, setSelectedPlayer] = useState<OnlinePlayer | null>(null);
 
   const refresh = useCallback(async () => {
     setBusy(true);
@@ -261,7 +265,7 @@ export default function App() {
         <article className="panel">
           <div className="head"><div><p className="eyebrow">LIVE TRAINERS</p><h2>在线训练家</h2></div></div>
           {overview.players.length
-            ? <div className="table">{overview.players.map((player) => <div className="tr" key={player.player_id}><span className="player"><b>{player.name[0]}</b><span><strong>{player.name}</strong><small>@{player.account_name}</small></span></span><span>Lv. {player.level}</span><span>{player.ping.toFixed(0)} ms</span><span>{player.building_count} 建造物</span></div>)}</div>
+            ? <div className="table">{overview.players.map((player) => <div className="tr" key={player.player_id}><span className="player"><b>{player.name[0]}</b><span><strong>{player.name}</strong><small>@{player.account_name}</small></span></span><span>Lv. {player.level}</span><span>{player.ping.toFixed(0)} ms</span><span>{player.building_count} 建造物</span><button aria-label={`查看 ${player.name} 的详情`} className="player-details-trigger" onClick={() => setSelectedPlayer(player)} type="button">详情</button></div>)}</div>
             : <div className="empty"><strong>这里还没有训练家</strong><span>{overview.status === "online" ? "当前没有训练家在线。" : "请确认 REST API 设置，连接后将显示训练家数据。"}</span></div>}
         </article>
         <article className="panel note native-note">
@@ -281,6 +285,7 @@ export default function App() {
           <div className="dashboard-dialog-actions"><button autoFocus className="service-control" onClick={() => setConfirmingOperation(null)} type="button">取消</button><button className={confirmingOperation === "stop" ? "service-control stop" : "service-control start"} onClick={() => void executeHostOperation(confirmingOperation)} type="button">{dashboardConfirmation[confirmingOperation].confirm}</button></div>
         </section>
       </div>}
+      {selectedPlayer && <PlayerDetailsDialog onClose={() => setSelectedPlayer(null)} player={selectedPlayer} />}
   </PageShell>;
 }
 

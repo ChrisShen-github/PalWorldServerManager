@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 import asyncio
+import ipaddress
 import json
 import re
 import uuid
@@ -37,6 +38,8 @@ class Player(BaseModel):
     name: str
     account_name: str
     player_id: str
+    user_id: str
+    ip_address: str
     ping: float = Field(ge=0)
     level: int = Field(ge=0)
     building_count: int = Field(ge=0)
@@ -172,10 +175,10 @@ def _demo_overview() -> ServerOverview:
             world_days=43,
         ),
         players=[
-            Player(name="Aether", account_name="aether", player_id="demo-001", ping=28, level=54, building_count=219, location_x=-292.4, location_y=146.8),
-            Player(name="Mori", account_name="mori", player_id="demo-002", ping=41, level=47, building_count=136, location_x=-114.1, location_y=209.2),
-            Player(name="Lumen", account_name="lumen", player_id="demo-003", ping=17, level=50, building_count=87, location_x=32.7, location_y=-66.4),
-            Player(name="Rin", account_name="rin", player_id="demo-004", ping=62, level=36, building_count=44, location_x=217.9, location_y=-33.2),
+            Player(name="Aether", account_name="aether", player_id="demo-001", user_id="steam_demo_001", ip_address="192.168.1.*", ping=28, level=54, building_count=219, location_x=-292.4, location_y=146.8),
+            Player(name="Mori", account_name="mori", player_id="demo-002", user_id="steam_demo_002", ip_address="192.168.1.*", ping=41, level=47, building_count=136, location_x=-114.1, location_y=209.2),
+            Player(name="Lumen", account_name="lumen", player_id="demo-003", user_id="steam_demo_003", ip_address="192.168.1.*", ping=17, level=50, building_count=87, location_x=32.7, location_y=-66.4),
+            Player(name="Rin", account_name="rin", player_id="demo-004", user_id="steam_demo_004", ip_address="192.168.1.*", ping=62, level=36, building_count=44, location_x=217.9, location_y=-33.2),
         ],
     )
 
@@ -197,6 +200,19 @@ def _rest_api_base(url: str) -> str:
     if not base.endswith("/v1/api"):
         base += "/v1/api"
     return base + "/"
+
+
+def _masked_ip(value: str) -> str:
+    """Return a useful but privacy-preserving representation of a player IP."""
+    try:
+        address = ipaddress.ip_address(value)
+    except ValueError:
+        return "—"
+    if address.version == 4:
+        parts = address.exploded.split(".")
+        return ".".join([*parts[:3], "*"])
+    groups = address.exploded.split(":")
+    return ":".join([*groups[:4], "****", "****", "****", "****"])
 
 
 async def _fetch_overview(settings: Settings) -> ServerOverview:
@@ -239,6 +255,8 @@ async def _fetch_overview(settings: Settings) -> ServerOverview:
                 name=str(player.get("name", "未知玩家")),
                 account_name=str(player.get("accountName", "—")),
                 player_id=str(player.get("playerId", "—")),
+                user_id=str(player.get("userId", "—")),
+                ip_address=_masked_ip(str(player.get("ip", ""))),
                 ping=float(player.get("ping", 0)),
                 level=int(player.get("level", 0)),
                 building_count=int(player.get("building_count", 0)),
