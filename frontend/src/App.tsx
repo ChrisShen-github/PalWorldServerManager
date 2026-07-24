@@ -48,6 +48,9 @@ type Monitoring = {
   history?: Array<{ sampled_at: string; host_cpu_percent: number; host_memory_percent: number; disk_used_percent: number; palworld_cpu_percent: number; palworld_memory_bytes: number; server_fps: number | null; current_players: number | null }>;
 };
 
+type DashboardOperation = "start" | "restart" | "stop";
+type StreamEvent = { event: "progress" | "complete"; ok?: boolean; message: string };
+
 const empty: Overview = {
   status: "offline",
   checked_at: new Date().toISOString(),
@@ -65,6 +68,25 @@ const disconnectedHost: HostStatus = {
 };
 
 const emptyMonitoring: Monitoring = { ok: false, message: "正在等待宿主机监控数据。", history: [] };
+
+const dashboardOperationLabel: Record<DashboardOperation, string> = {
+  start: "启动服务器",
+  restart: "重启服务器",
+  stop: "停止服务器",
+};
+
+const dashboardConfirmation: Record<Exclude<DashboardOperation, "start">, { title: string; detail: string; confirm: string }> = {
+  restart: {
+    title: "确认重启服务器？",
+    detail: "服务器会短暂离线，在线训练家将断开连接。",
+    confirm: "确认重启",
+  },
+  stop: {
+    title: "确认停止服务器？",
+    detail: "服务器会立即停止，在线训练家将断开连接。建议先完成一次存档备份。",
+    confirm: "确认停止",
+  },
+};
 
 function bytes(value: number) {
   if (value < 1024) return `${value} B`;
@@ -102,6 +124,9 @@ export default function App() {
   const [host, setHost] = useState(disconnectedHost);
   const [monitoring, setMonitoring] = useState(emptyMonitoring);
   const [busy, setBusy] = useState(true);
+  const [hostOperation, setHostOperation] = useState<DashboardOperation | null>(null);
+  const [confirmingOperation, setConfirmingOperation] = useState<Exclude<DashboardOperation, "start"> | null>(null);
+  const [hostFeedback, setHostFeedback] = useState("");
 
   const refresh = useCallback(async () => {
     setBusy(true);
@@ -134,8 +159,62 @@ export default function App() {
     return () => clearInterval(id);
   }, [refresh]);
 
+  useEffect(() => {
+    if (!confirmingOperation) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setConfirmingOperation(null);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [confirmingOperation]);
+
+  const executeHostOperation = async (operation: DashboardOperation) => {
+    setConfirmingOperation(null);
+    setHostOperation(operation);
+    setHostFeedback(`正在${dashboardOperationLabel[operation]}…`);
+    try {
+      const response = await fetch(`/api/host/${operation}/stream`, { method: "POST" });
+      if (!response.ok || !response.body) throw new Error("无法连接宿主机代理。请检查 Agent 状态后重试。");
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let completed = false;
+      while (true) {
+        const { done, value } = await reader.read();
+        buffer += decoder.decode(value, { stream: !done });
+        let boundary = buffer.indexOf("\n\n");
+        while (boundary >= 0) {
+          const packet = buffer.slice(0, boundary);
+          buffer = buffer.slice(boundary + 2);
+          const data = packet.split("\n").find((line) => line.startsWith("data: "))?.slice(6);
+          if (data) {
+            const event = JSON.parse(data) as StreamEvent;
+            setHostFeedback(event.message);
+            if (event.event === "complete") {
+              completed = true;
+              if (!event.ok) throw new Error(event.message);
+              setHostFeedback(`${dashboardOperationLabel[operation]}完成。`);
+            }
+          }
+          boundary = buffer.indexOf("\n\n");
+        }
+        if (done) break;
+      }
+      if (!completed) throw new Error("操作连接意外结束，请到运行日志查看结果。");
+    } catch (error) {
+      setHostFeedback(`操作未完成：${error instanceof Error ? error.message : "未知错误"}`);
+    } finally {
+      await refresh();
+      setHostOperation(null);
+    }
+  };
+
   const native = nativeService(host);
   const restLabel = overview.status === "online" ? "REST 已连接" : overview.status === "demo" ? "演示模式" : "REST 未连接";
+  const serviceAvailable = host.agent_connected && host.service_installed !== false;
+  const serviceRunning = host.service_state === "active";
+  const serviceChanging = host.service_state === "activating" || host.service_state === "deactivating";
+  const controlsDisabled = !serviceAvailable || serviceChanging || hostOperation !== null;
 
   return <PageShell active="dashboard">
       <header>
@@ -160,7 +239,13 @@ export default function App() {
       <section className="service-overview" aria-label="原生服务状态">
         <div className={`service-state ${native.tone}`}><i /><span><strong>{native.label}</strong><small>{native.detail}</small></span></div>
         <div className="service-rest"><span>游戏数据</span><strong>{restLabel}</strong><small>{overview.message}</small></div>
-        <button className="service-settings" onClick={() => { location.href = "?view=settings"; }}>服务器设置</button>
+        <div aria-label="服务器快捷操作" className="service-controls">
+          <button className="service-control start" disabled={controlsDisabled || serviceRunning} onClick={() => void executeHostOperation("start")} type="button">{hostOperation === "start" ? "正在启动…" : "启动"}</button>
+          <button className="service-control" disabled={controlsDisabled || !serviceRunning} onClick={() => setConfirmingOperation("restart")} type="button">{hostOperation === "restart" ? "正在重启…" : "重启"}</button>
+          <button className="service-control stop" disabled={controlsDisabled || !serviceRunning} onClick={() => setConfirmingOperation("stop")} type="button">{hostOperation === "stop" ? "正在停止…" : "停止"}</button>
+          <button className="service-settings" onClick={() => { location.href = "?view=settings"; }} type="button">服务器设置</button>
+        </div>
+        {hostFeedback && <p aria-live="polite" className={`service-operation-feedback ${hostFeedback.startsWith("操作未完成") ? "error" : ""}`}>{hostFeedback}</p>}
       </section>
 
       <section className="metrics">
@@ -187,6 +272,15 @@ export default function App() {
           <button onClick={() => { location.href = "?view=settings"; }}>{host.service_installed === false ? "开始安装" : "管理服务器"}</button>
         </article>
       </section>
+      {confirmingOperation && <div aria-labelledby="dashboard-confirmation-title" aria-modal="true" className="dashboard-confirmation-scrim" role="dialog">
+        <section className="dashboard-confirmation-dialog">
+          <p className="eyebrow">CONFIRM NATIVE SERVER ACTION</p>
+          <h2 id="dashboard-confirmation-title">{dashboardConfirmation[confirmingOperation].title}</h2>
+          <p>{dashboardConfirmation[confirmingOperation].detail}</p>
+          <dl><div><dt>当前服务</dt><dd>{native.label}</dd></div><div><dt>任务日志</dt><dd>将保存至运行日志页</dd></div></dl>
+          <div className="dashboard-dialog-actions"><button autoFocus className="service-control" onClick={() => setConfirmingOperation(null)} type="button">取消</button><button className={confirmingOperation === "stop" ? "service-control stop" : "service-control start"} onClick={() => void executeHostOperation(confirmingOperation)} type="button">{dashboardConfirmation[confirmingOperation].confirm}</button></div>
+        </section>
+      </div>}
   </PageShell>;
 }
 
