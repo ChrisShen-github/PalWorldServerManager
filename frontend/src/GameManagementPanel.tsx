@@ -4,6 +4,7 @@ import PlayerDetailsDialog from "./PlayerDetailsDialog";
 import ThemeToggle from "./ThemeToggle";
 import type { OnlinePlayer } from "./onlinePlayer";
 import "./game-management.css";
+import "./game-player-layout.css";
 
 type Overview = { status: "online" | "offline" | "demo"; message: string; server: { name: string; version: string }; metrics: { current_players: number; max_players: number; server_fps: number }; players: OnlinePlayer[] };
 type Pending = { kind: "kick" | "ban"; player: OnlinePlayer } | { kind: "unban"; userId: string };
